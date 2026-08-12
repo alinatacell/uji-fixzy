@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#FFC107">
+<title>FIXZY | Kendali Admin</title>
+<meta name="fixzy-version" content="kendali-fixed-20260810-02-exp-base-fix">
+
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#f3f4f6;color:#111827;font-family:Arial,Helvetica,sans-serif}
+body{min-height:100vh}
+button,input,select{font:inherit}
+
+.top{
+  position:sticky;top:0;z-index:50;
+  background:#111827;color:#fff;padding:12px 16px;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 3px 15px rgba(0,0,0,.16)
+}
+.brand{flex:1;min-width:0}
+.brand h1{margin:0;font-size:21px;font-weight:900}
+.brand h1 span{color:#ffc107}
+.brand p{margin:3px 0 0;color:#cbd5e1;font-size:11px}
+.top-actions{display:flex;gap:7px}
+.btn{
+  border:0;border-radius:12px;padding:10px 13px;
+  font-weight:900;cursor:pointer
+}
+.btn-refresh{background:#ffc107;color:#111827}
+.btn-back{background:#fff;color:#111827}
+
+.wrap{max-width:1250px;margin:auto;padding:16px}
+.hero{
+  background:linear-gradient(135deg,#111827,#263244);
+  color:#fff;border-radius:20px;padding:19px;margin-bottom:14px;
+  box-shadow:0 8px 25px rgba(15,23,42,.10)
+}
+.hero h2{margin:0;font-size:25px}
+.hero p{margin:7px 0 0;color:#dbe4ee;line-height:1.5;font-size:12px}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat{
+  background:#fff;border:1px solid #e5e7eb;border-radius:17px;
+  padding:15px;box-shadow:0 4px 15px rgba(15,23,42,.05)
+}
+.stat small{display:block;color:#64748b;font-weight:800;font-size:11px}
+.stat b{display:block;margin-top:6px;font-size:23px}
+.stat.total b{color:#2563eb}
+.stat.active b{color:#15803d}
+.stat.expired b{color:#dc2626}
+.stat.pending b{color:#d97706}
+
+.card{
+  background:#fff;border-radius:19px;padding:14px;
+  box-shadow:0 4px 18px rgba(15,23,42,.06);margin-bottom:14px
+}
+.card-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;flex-wrap:wrap;margin-bottom:10px
+}
+.card-head h3{margin:0;font-size:18px}
+.note{font-size:11px;color:#64748b;line-height:1.5}
+
+.toolbar{
+  background:#fff;border-radius:17px;padding:12px;
+  display:grid;grid-template-columns:1.5fr .7fr auto;
+  gap:8px;margin-bottom:14px;
+  box-shadow:0 4px 15px rgba(15,23,42,.05)
+}
+input,select{
+  width:100%;border:1px solid #cbd5e1;border-radius:11px;
+  padding:11px 12px;background:#fff;color:#111827;outline:none
+}
+input:focus,select:focus{
+  border-color:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.12)
+}
+
+.table-wrap{overflow:auto;border:1px solid #e5e7eb;border-radius:14px}
+table{width:100%;border-collapse:collapse;min-width:1080px}
+th{
+  background:#111827;color:#fff;padding:11px 10px;
+  text-align:left;font-size:11px;white-space:nowrap
+}
+td{padding:11px 10px;border-bottom:1px solid #edf0f3;font-size:12px;vertical-align:top}
+tr:last-child td{border-bottom:0}
+.konter{font-weight:900;font-size:13px}
+.sub{color:#64748b;font-size:10px;margin-top:3px;line-height:1.4}
+.email{font-size:11px;word-break:break-all}
+
+.badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:5px 9px;border-radius:999px;font-size:10px;font-weight:900;
+  white-space:nowrap
+}
+.badge.green{background:#dcfce7;color:#166534}
+.badge.red{background:#fee2e2;color:#991b1b}
+.badge.yellow{background:#fef3c7;color:#92400e}
+.badge.blue{background:#dbeafe;color:#1d4ed8}
+.badge.gray{background:#e5e7eb;color:#374151}
+
+.days{font-weight:900}
+.days.good{color:#15803d}
+.days.warn{color:#d97706}
+.days.bad{color:#dc2626}
+
+.actions-cell{min-width:190px}
+.action-row{display:flex;gap:6px;flex-wrap:wrap}
+.action{
+  border:0;border-radius:9px;padding:8px 10px;
+  font-size:11px;font-weight:900;cursor:pointer
+}
+.approve{background:#16a34a;color:#fff}
+.reject{background:#dc2626;color:#fff}
+.detail{background:#e5e7eb;color:#111827}
+.action:disabled{opacity:.45;cursor:not-allowed}
+
+.request-card{
+  border:1px solid #e5e7eb;border-left:5px solid #f59e0b;
+  border-radius:14px;padding:12px;margin-bottom:9px;background:#fff
+}
+.request-card.approved{border-left-color:#16a34a}
+.request-card.rejected{border-left-color:#dc2626}
+.req-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.req-name{font-weight:1000;font-size:14px}
+.req-meta{font-size:10px;color:#64748b;margin-top:3px;line-height:1.5}
+.req-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0}
+.req-box{background:#f8fafc;border-radius:10px;padding:9px}
+.req-box small{display:block;color:#64748b;font-size:9px;font-weight:800}
+.req-box b{display:block;margin-top:3px;font-size:12px}
+.req-actions{display:flex;gap:7px;flex-wrap:wrap}
+.proof-link{
+  display:inline-block;margin-top:8px;padding:8px 10px;border-radius:9px;
+  background:#dbeafe;color:#1d4ed8;text-decoration:none;font-size:11px;font-weight:900
+}
+
+.empty{text-align:center;color:#64748b;padding:28px;font-size:12px}
+.loading{text-align:center;padding:30px;color:#64748b}
+.error{background:#fee2e2;color:#991b1b;border-radius:14px;padding:13px;margin-bottom:14px;font-size:12px;line-height:1.5}
+.success{background:#dcfce7;color:#166534;border-radius:14px;padding:13px;margin-bottom:14px;font-size:12px}
+.warning{background:#fef3c7;color:#92400e;border-radius:14px;padding:13px;margin-bottom:14px;font-size:12px}
+
+.modal{
+  position:fixed;inset:0;z-index:100;background:rgba(15,23,42,.65);
+  display:none;align-items:center;justify-content:center;padding:14px
+}
+.modal.show{display:flex}
+.modal-box{
+  width:min(680px,100%);max-height:90vh;overflow:auto;
+  background:#fff;border-radius:20px;padding:18px;
+  box-shadow:0 20px 70px rgba(0,0,0,.3)
+}
+.modal-head{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.modal-head h3{margin:0}
+.close{
+  border:0;background:#111827;color:#fff;width:36px;height:36px;
+  border-radius:10px;font-size:20px;cursor:pointer
+}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.detail-box{background:#f8fafc;border-radius:12px;padding:11px}
+.detail-box small{display:block;color:#64748b;font-size:9px;font-weight:800}
+.detail-box b{display:block;margin-top:4px;font-size:12px;word-break:break-word}
+.confirm{
+  background:#fffbeb;border:1px solid #fde68a;border-radius:13px;
+  padding:12px;margin-top:13px;font-size:11px;line-height:1.5;color:#78350f
+}
+.confirm-actions{display:flex;gap:8px;margin-top:12px}
+.confirm-actions button{flex:1}
+
+@media(max-width:800px){
+  .stats{grid-template-columns:1fr 1fr}
+  .toolbar{grid-template-columns:1fr 1fr}
+  .toolbar button{grid-column:1/-1}
+  .req-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:520px){
+  .top{padding:10px}
+  .brand h1{font-size:17px}
+  .brand p{font-size:9px}
+  .top-actions .btn{padding:8px 9px;font-size:10px}
+  .wrap{padding:10px 9px}
+  .hero{padding:16px}
+  .hero h2{font-size:21px}
+  .stats{gap:7px}
+  .stat{padding:11px}
+  .stat b{font-size:19px}
+  .toolbar{grid-template-columns:1fr}
+  .toolbar button{grid-column:auto}
+  .req-grid{grid-template-columns:1fr 1fr}
+  .detail-grid{grid-template-columns:1fr}
+}
+</style>
+
+<style id="fixzy-black-logo-header">
+header{background:#111827!important;color:#fff!important;box-shadow:0 2px 10px #0003!important}
+header:before{content:"";display:block;flex:0 0 42px;width:42px;height:42px;background:#000 url('logo.png') center/contain no-repeat;border-radius:9px;padding:2px;box-sizing:border-box}
+@media(max-width:600px){header:before{flex-basis:38px;width:38px;height:38px}}
+</style>
+
+
+<style id="fixzy-alert-popup-css">
+#fixzyAlertOverlay{display:none;position:fixed;inset:0;z-index:100000;background:rgba(15,23,42,.68);align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(3px)}
+#fixzyAlertOverlay.show{display:flex}
+#fixzyAlertBox{width:min(430px,100%);background:#fff;color:#111827;border-radius:20px;padding:20px;box-shadow:0 24px 70px rgba(0,0,0,.35);font-family:Arial,sans-serif}
+#fixzyAlertTitle{font-size:19px;font-weight:900;margin:0 0 10px;color:#111827}
+#fixzyAlertMessage{font-size:14px;line-height:1.6;white-space:pre-line;color:#475569;max-height:55vh;overflow:auto}
+#fixzyAlertOk{width:100%;margin-top:16px;background:#111827;color:#fff;border:0;border-radius:12px;padding:12px 15px;font-weight:900;font-size:15px;cursor:pointer}
+</style>
+
+</head>
+
+<body>
+
+<header class="top">
+  <div class="brand">
+    <h1>FIXZY <span>KENDALI ADMIN</span></h1>
+    <p>Kontrol konter terdaftar & persetujuan perpanjangan aktivasi</p>
+  </div>
+  <div class="top-actions">
+    <button class="btn btn-refresh" onclick="muatSemua()">↻ Refresh</button>
+    <button class="btn btn-back" onclick="tutupHalaman()">← Kembali</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section class="hero">
+  <h2>🛡️ Kendali FIXZY</h2>
+  <p>
+    Kelola seluruh akun konter yang terdaftar. Periksa masa aktif,
+    lihat permintaan perpanjangan, dan pilih <b>Setujui</b> atau
+    <b>Tolak</b>. Persetujuan memperpanjang masa aktif akun.
+  </p>
+</section>
+
+<div id="message"></div>
+
+<section class="stats">
+  <div class="stat total"><small>🏪 Total Konter</small><b id="totalUsers">0</b></div>
+  <div class="stat active"><small>🟢 Masih Aktif</small><b id="activeUsers">0</b></div>
+  <div class="stat expired"><small>🔴 Kedaluwarsa</small><b id="expiredUsers">0</b></div>
+  <div class="stat pending"><small>🟡 Menunggu</small><b id="pendingCount">0</b></div>
+  <div class="stat total"><small>💰 Pendapatan Perpanjangan</small><b id="renewalIncome">Rp 0</b></div>
+</section>
+
+<section class="card">
+  <div class="card-head">
+    <div>
+      <h3>🏪 Data Konter Terdaftar</h3>
+      <div class="note">Data dibaca dari koleksi <b>users</b>.</div>
+    </div>
+    <select id="filterStatus" onchange="renderUsers()" style="max-width:180px">
+      <option value="semua">Semua Konter</option>
+      <option value="aktif">Masih Aktif</option>
+      <option value="expired">Kedaluwarsa</option>
+      <option value="pending">Ada Permintaan</option>
+    </select>
+  </div>
+
+  <div class="toolbar" style="margin-bottom:10px">
+    <input id="searchUser" placeholder="Cari nama konter, pemilik, email, telepon..." oninput="renderUsers()">
+    <select id="sortUser" onchange="renderUsers()">
+      <option value="expAsc">Expiring Terdekat</option>
+      <option value="name">Nama Konter A-Z</option>
+      <option value="newest">Akun Terbaru</option>
+    </select>
+    <button class="btn btn-refresh" onclick="renderUsers()">Tampilkan</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Konter / Pemilik</th>
+          <th>Email</th>
+          <th>Telepon</th>
+          <th>Role</th>
+          <th>Mulai Aktif</th>
+          <th>Masa Aktif / Exp</th>
+          <th>Sisa</th>
+          <th>Permintaan</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="usersBody">
+        <tr><td colspan="10" class="loading">Memuat data konter...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card">
+  <div class="card-head">
+    <div>
+      <h3>🔐 Permintaan Perpanjangan Aktivasi</h3>
+      <div class="note">Permintaan <b>MENUNGGU</b> selalu berada di bagian atas.</div>
+    </div>
+    <select id="filterRequest" onchange="renderRequests()" style="max-width:180px">
+      <option value="semua">Semua</option>
+      <option value="menunggu">Menunggu</option>
+      <option value="disetujui">Disetujui</option>
+      <option value="ditolak">Ditolak</option>
+    </select>
+  </div>
+  <div id="requestsList">
+    <div class="loading">Memuat permintaan...</div>
+  </div>
+</section>
+
+</main>
+
+<div class="modal" id="detailModal" onclick="if(event.target===this)tutupModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="modalTitle">Detail</h3>
+      <button class="close" onclick="tutupModal()">×</button>
+    </div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {
+  getFirestore,collection,getDocs,doc,updateDoc,writeBatch,
+  serverTimestamp,getDoc
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+const firebaseConfig={
+  apiKey:"AIzaSyCwMbJsuORhIq4QCmp4c1r6OsjAUlfxU5Y",
+  authDomain:"fixzy-f056f.firebaseapp.com",
+  projectId:"fixzy-f056f",
+  storageBucket:"fixzy-f056f.firebasestorage.app",
+  messagingSenderId:"838081521031",
+  appId:"1:838081521031:web:50fdee909b56460b055f22"
+};
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+let users=[];
+let requests=[];
+let currentUser=null;
+let isAdmin=false;
+
+const $=id=>document.getElementById(id);
+
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+
+function val(o,keys,def=""){
+  for(const k of keys){
+    const v=o?.[k];
+    if(v!==undefined && v!==null && String(v).trim()!=="") return v;
+  }
+  return def;
+}
+
+function num(v){
+  if(typeof v==="number") return v;
+  return Number(String(v??"").replace(/[^\d.-]/g,""))||0;
+}
+
+function today(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
+function dateOnly(v){
+  if(!v) return "";
+  if(typeof v==="object" && typeof v.toDate==="function"){
+    try{return v.toDate().toISOString().slice(0,10)}catch(e){}
+  }
+  if(typeof v==="object" && v.seconds!==undefined){
+    try{return new Date(Number(v.seconds)*1000).toISOString().slice(0,10)}catch(e){}
+  }
+  const s=String(v).trim();
+  const m=s.match(/^(\d{4}-\d{2}-\d{2})/);
+  if(m)return m[1];
+  const d=new Date(s);
+  if(!Number.isNaN(d.getTime())) return d.toISOString().slice(0,10);
+  return "";
+}
+
+function formatDate(v){
+  const d=dateOnly(v);
+  if(!d)return "-";
+  const x=new Date(d+"T00:00:00");
+  if(Number.isNaN(x.getTime()))return d;
+  return x.toLocaleDateString("id-ID",{
+    day:"2-digit",month:"long",year:"numeric"
+  });
+}
+
+function timestampMs(v){
+  if(!v)return 0;
+  if(typeof v==="object" && typeof v.toMillis==="function"){
+    try{return v.toMillis()}catch(e){}
+  }
+  if(typeof v==="object" && v.seconds!==undefined){
+    return Number(v.seconds)*1000;
+  }
+  const n=Date.parse(String(v));
+  return Number.isNaN(n)?0:n;
+}
+
+function daysLeft(exp){
+  const e=dateOnly(exp);
+  if(!e)return null;
+  const a=new Date(today()+"T00:00:00");
+  const b=new Date(e+"T00:00:00");
+  return Math.ceil((b-a)/86400000);
+}
+
+function expiryClass(n){
+  if(n===null)return "warn";
+  if(n<0)return "bad";
+  if(n<=7)return "warn";
+  return "good";
+}
+
+function expiryText(n){
+  if(n===null)return "Tidak ada tanggal";
+  if(n<0)return `Lewat ${Math.abs(n)} hari`;
+  if(n===0)return "Berakhir hari ini";
+  if(n===1)return "1 hari lagi";
+  return `${n} hari lagi`;
+}
+
+function statusRequest(v){
+  const s=String(v||"menunggu").trim().toLowerCase();
+  if(["approved","approve","disetujui","setuju"].includes(s))return "disetujui";
+  if(["rejected","reject","ditolak","tolak"].includes(s))return "ditolak";
+  return "menunggu";
+}
+
+function statusBadge(s){
+  s=statusRequest(s);
+  if(s==="disetujui")return '<span class="badge green">DISETUJUI</span>';
+  if(s==="ditolak")return '<span class="badge red">DITOLAK</span>';
+  return '<span class="badge yellow">MENUNGGU</span>';
+}
+
+function requestDate(r){
+  return r.createdAt || r.tanggalPengajuan || r.tanggal || r.createdDate || r.created_at || "";
+}
+
+function requestDays(r){
+  const direct=num(val(r,[
+    "durasiHari","durationDays","requestedDays","days",
+    "lamaHari","jumlahHari","hari"
+  ],0));
+  if(direct>0)return Math.floor(direct);
+
+  const bulan=num(val(r,["bulan","months","durasiBulan","jumlahBulan"],0));
+  if(bulan>0){
+    if(bulan===3)return 90;
+    if(bulan===6)return 180;
+    if(bulan===12)return 365;
+    return Math.floor(bulan*30);
+  }
+
+  const paket=String(val(r,["paket","package","plan","namaPaket"],"")).toLowerCase();
+  if(/12\s*bulan|1\s*tahun|tahunan|year/.test(paket))return 365;
+  if(/6\s*bulan/.test(paket))return 180;
+  if(/3\s*bulan|triwulan/.test(paket))return 90;
+  if(/2\s*bulan/.test(paket))return 60;
+  if(/1\s*bulan|bulanan|month/.test(paket))return 30;
+  return 0;
+}
+
+/* Kalender bulan: 3 bulan = tanggal yang sama + 3 bulan.
+   Ini membuat 08 Nov + 3 bulan menjadi 08 Feb, bukan sekadar +90 hari. */
+function requestMonths(r){
+  const bulan=num(val(r,["bulan","months","durasiBulan","jumlahBulan"],0));
+  if([3,6,12].includes(bulan))return bulan;
+  const paket=String(val(r,["paket","package","plan","namaPaket"],"")).toLowerCase();
+  if(/12\s*bulan|1\s*tahun|tahunan|year/.test(paket))return 12;
+  if(/6\s*bulan/.test(paket))return 6;
+  if(/3\s*bulan|triwulan/.test(paket))return 3;
+  if(/2\s*bulan/.test(paket))return 2;
+  if(/1\s*bulan|bulanan|month/.test(paket))return 1;
+  return 0;
+}
+
+function addMonthsToDate(baseDate,months){
+  const d=new Date(baseDate.getFullYear(),baseDate.getMonth(),baseDate.getDate());
+  const wantedDay=d.getDate();
+  d.setDate(1);
+  d.setMonth(d.getMonth()+months);
+  const last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+  d.setDate(Math.min(wantedDay,last));
+  return d;
+}
+
+function dateString(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
+function userName(u){
+  return String(val(u,["namaKonter","namaToko","namaUsaha","toko","nama"],"Konter Tanpa Nama"));
+}
+
+function ownerName(u){
+  return String(val(u,["namaPemilik","pemilik","namaOwner","owner","namaLengkap","nama"],"-"));
+}
+
+function emailOf(u){
+  return String(val(u,["email","emailAkun"],"-"));
+}
+
+function phoneOf(u){
+  return String(val(u,["telepon","noTelepon","nomorTelepon","phone","whatsapp","noWA","nomorWA"],"-"));
+}
+
+function roleOf(u){
+  return String(val(u,["role","peran"],"user"));
+}
+
+function startOf(u){
+  return val(u,["tanggalMulai","mulaiAktif","startDate","tanggalAktif","createdDate","createdAt"],"");
+}
+
+function expOf(u){
+  return val(u,[
+    "tanggalExpired","tanggalExp","masaAktif","expired","expiry",
+    "exp","tanggalBerakhir","activationExpiry","activationExpires",
+    "activationEnd","expiresAt","expiredAt","activationExpiresAt"
+  ],"");
+}
+
+function findRequestsForUser(u){
+  const uid=String(u.id||u.uid||"");
+  const email=emailOf(u).toLowerCase();
+  return requests.filter(r=>{
+    const rid=String(val(r,["uid","userId","user_id","pemilikId"],""));
+    const re=String(val(r,["email","emailAkun"],"")).toLowerCase();
+    return (uid && rid===uid)||(email!=="-" && email && re===email);
+  });
+}
+
+function money(v){
+  return "Rp "+num(v).toLocaleString("id-ID");
+}
+
+function requestNominal(r){
+  return num(val(r,["nominal","harga","jumlah","total"],0));
+}
+
+function showMessage(text,type="success"){
+  $("message").innerHTML=`<div class="${type}">${esc(text)}</div>`;
+  setTimeout(()=>{$("message").innerHTML=""},6000);
+}
+
+window.tutupHalaman=function(){
+  try{
+    if(window.frameElement){
+      window.parent.postMessage({type:"FIXZY_CLOSE_PAGE"},"*");
+      return;
+    }
+  }catch(e){}
+  try{history.back()}catch(e){}
+};
+
+window.tutupModal=function(){
+  $("detailModal").classList.remove("show");
+};
+
+async function cekAdmin(user){
+  if(!user) return false;
+
+  // Cek hanya dokumen admin yang sedang login.
+  // Ini lebih aman dan tidak bergantung pada query seluruh koleksi
+  // untuk menentukan apakah akun adalah admin.
+  const snap=await getDoc(doc(db,"users",user.uid));
+
+  if(!snap.exists()) return false;
+
+  const data=snap.data()||{};
+  const role=String(data.role||data.peran||"").trim().toLowerCase();
+
+  return role==="admin";
+}
+
+async function loadUsers(){
+  const snap=await getDocs(collection(db,"users"));
+  users=snap.docs.map(d=>({id:d.id,...d.data()}));
+}
+
+async function loadRequests(){
+  const snap=await getDocs(collection(db,"aktivasi_pengajuan"));
+  requests=snap.docs.map(d=>({id:d.id,...d.data()}));
+}
+
+async function muatSemua(){
+  $("usersBody").innerHTML='<tr><td colspan="10" class="loading">Memuat data Firebase...</td></tr>';
+  $("requestsList").innerHTML='<div class="loading">Memuat permintaan...</div>';
+
+  if(!currentUser){
+    $("usersBody").innerHTML='<tr><td colspan="10" class="empty">Belum login Firebase.</td></tr>';
+    $("requestsList").innerHTML='<div class="error">Silakan login sebagai admin terlebih dahulu.</div>';
+    $("message").innerHTML='<div class="error">Belum login Firebase.</div>';
+    return;
+  }
+
+  try{
+    isAdmin=await cekAdmin(currentUser);
+
+    if(!isAdmin){
+      $("usersBody").innerHTML=
+        '<tr><td colspan="10" class="empty">Akun Firebase ini bukan admin.</td></tr>';
+      $("requestsList").innerHTML=
+        '<div class="error">Akses ditolak. Dokumen <b>users/'+
+        esc(currentUser.uid)+'</b> harus mempunyai <b>role: "admin"</b>.</div>';
+      $("message").innerHTML='<div class="error">Akun bukan admin.</div>';
+      return;
+    }
+
+    await Promise.all([loadUsers(),loadRequests()]);
+    renderAll();
+    $("message").innerHTML='<div class="success">Data Kendali berhasil dimuat.</div>';
+
+  }catch(e){
+    console.error("FIXZY KENDALI:",e);
+
+    const msg=String(e?.message||e);
+
+    $("usersBody").innerHTML=
+      `<tr><td colspan="10" class="empty">
+        <b>Data konter tidak terbaca.</b><br>${esc(msg)}
+      </td></tr>`;
+
+    $("requestsList").innerHTML=
+      `<div class="error">
+        <b>Gagal membaca data Firebase.</b><br>
+        ${esc(msg)}<br><br>
+        Pastikan Firebase sudah login dan Rules Firestore mengizinkan akun admin
+        membaca <b>users</b> dan <b>aktivasi_pengajuan</b>.
+      </div>`;
+
+    $("message").innerHTML=`<div class="error">${esc(msg)}</div>`;
+  }
+}
+
+window.muatSemua=muatSemua;
+
+function renderAll(){
+  const pending=requests.filter(r=>statusRequest(r.status)==="menunggu").length;
+  const active=users.filter(u=>{
+    const n=daysLeft(expOf(u));
+    return n!==null&&n>=0;
+  }).length;
+  const expired=users.filter(u=>{
+    const n=daysLeft(expOf(u));
+    return n!==null&&n<0;
+  }).length;
+
+  const renewalIncome=requests
+    .filter(r=>statusRequest(r.status)==="disetujui")
+    .reduce((sum,r)=>sum+requestNominal(r),0);
+
+  $("totalUsers").textContent=users.length;
+  $("activeUsers").textContent=active;
+  $("expiredUsers").textContent=expired;
+  $("pendingCount").textContent=pending;
+  $("renewalIncome").textContent=money(renewalIncome);
+
+  renderUsers();
+  renderRequests();
+}
+
+window.renderUsers=function(){
+  const q=String($("searchUser").value||"").trim().toLowerCase();
+  const filter=$("filterStatus").value;
+  const sort=$("sortUser").value;
+
+  let rows=users.filter(u=>{
+    const text=[userName(u),ownerName(u),emailOf(u),phoneOf(u),roleOf(u)].join(" ").toLowerCase();
+    if(q&&!text.includes(q))return false;
+
+    const left=daysLeft(expOf(u));
+    const hasPending=findRequestsForUser(u).some(r=>statusRequest(r.status)==="menunggu");
+
+    if(filter==="aktif"&&!(left!==null&&left>=0))return false;
+    if(filter==="expired"&&!(left!==null&&left<0))return false;
+    if(filter==="pending"&&!hasPending)return false;
+    return true;
+  });
+
+  if(sort==="name"){
+    rows.sort((a,b)=>userName(a).localeCompare(userName(b),"id"));
+  }else if(sort==="newest"){
+    rows.sort((a,b)=>timestampMs(b.createdAt||b.createdDate)-timestampMs(a.createdAt||a.createdDate));
+  }else{
+    rows.sort((a,b)=>(daysLeft(expOf(a))??999999)-(daysLeft(expOf(b))??999999));
+  }
+
+  if(!rows.length){
+    $("usersBody").innerHTML='<tr><td colspan="10" class="empty">Belum ada data konter yang cocok.</td></tr>';
+    return;
+  }
+
+  $("usersBody").innerHTML=rows.map((u,i)=>{
+    const exp=expOf(u);
+    const left=daysLeft(exp);
+    const reqs=findRequestsForUser(u).slice().sort((a,b)=>timestampMs(requestDate(b))-timestampMs(requestDate(a)));
+    const pending=reqs.find(r=>statusRequest(r.status)==="menunggu");
+
+    let status="";
+    if(left===null)status='<span class="badge gray">BELUM ADA EXP</span>';
+    else if(left<0)status='<span class="badge red">KEDALUWARSA</span>';
+    else if(left<=7)status='<span class="badge yellow">SEGERA EXP</span>';
+    else status='<span class="badge green">AKTIF</span>';
+
+    const requestHtml=pending
+      ? `<div>${statusBadge(pending.status)}</div>
+         <div class="sub">${esc(val(pending,["paket","package","plan","namaPaket"],"-"))}
+         ${requestMonths(pending)?` · ${requestMonths(pending)} bulan`:""}</div>`
+      : reqs.length
+        ? statusBadge(reqs[0].status)
+        : '<span class="badge gray">Tidak ada</span>';
+
+    return `
+      <tr>
+        <td>${i+1}</td>
+        <td>
+          <div class="konter">${esc(userName(u))}</div>
+          <div class="sub">Pemilik: ${esc(ownerName(u))}</div>
+        </td>
+        <td class="email">${esc(emailOf(u))}</td>
+        <td>${esc(phoneOf(u))}</td>
+        <td><span class="badge blue">${esc(roleOf(u))}</span></td>
+        <td>${formatDate(startOf(u))}</td>
+        <td><b>${formatDate(exp)}</b><div class="sub">${status}</div></td>
+        <td><div class="days ${expiryClass(left)}">${expiryText(left)}</div></td>
+        <td>${requestHtml}</td>
+        <td class="actions-cell">
+          <div class="action-row">
+            <button class="action detail" onclick="detailUser('${esc(u.id)}')">Detail</button>
+            ${pending?`
+              <button class="action approve" onclick="setujui('${esc(pending.id)}')">✓ Setujui</button>
+              <button class="action reject" onclick="tolak('${esc(pending.id)}')">✕ Tolak</button>
+            `:""}
+          </div>
+        </td>
+      </tr>`;
+  }).join("");
+};
+
+window.renderRequests=function(){
+  const filter=$("filterRequest").value;
+  let rows=requests.slice().sort((a,b)=>{
+    const pa=statusRequest(a.status)==="menunggu";
+    const pb=statusRequest(b.status)==="menunggu";
+    if(pa!==pb)return pb-pa;
+    return timestampMs(requestDate(b))-timestampMs(requestDate(a));
+  });
+
+  if(filter!=="semua")rows=rows.filter(r=>statusRequest(r.status)===filter);
+
+  if(!rows.length){
+    $("requestsList").innerHTML='<div class="empty">Belum ada permintaan perpanjangan.</div>';
+    return;
+  }
+
+  $("requestsList").innerHTML=rows.map(r=>{
+    const s=statusRequest(r.status);
+    const uid=String(val(r,["uid","userId","user_id","pemilikId"],""));
+    let user=users.find(u=>u.id===uid);
+
+    if(!user){
+      const email=String(val(r,["email","emailAkun"],"")).toLowerCase();
+      if(email)user=users.find(u=>emailOf(u).toLowerCase()===email);
+    }
+
+    const konter=user?userName(user):val(r,["namaKonter","namaToko","namaUsaha","toko","nama"],"Konter");
+    const email=user?emailOf(user):val(r,["email","emailAkun"],"-");
+    const paket=val(r,["paket","package","plan","namaPaket"],"-");
+    const bulan=requestMonths(r);
+    const durasi=requestDays(r);
+    const nominal=requestNominal(r);
+    const bukti=val(r,["buktiPembayaran","bukti","paymentProof","buktiTransfer","buktiTransferUrl"],"");
+    const oldExp=user?expOf(user):val(r,["expLama","tanggalExpiredLama","masaAktifLama"],"");
+
+    /*
+     * PENTING:
+     * Tanggal "Exp setelah persetujuan" harus dihitung dari EXP AKUN,
+     * bukan dari tanggal pengajuan / tanggal hari ini dan bukan dari
+     * tanggalExpiredBaru yang mungkin sudah tersimpan saat user membuat request.
+     *
+     * Jika akun masih punya EXP, perpanjangan dimulai dari EXP tersebut.
+     * Jika EXP sudah lewat atau belum ada, baru mulai dari hari ini.
+     */
+    let previewNewExp="";
+    const previewOldDate=dateOnly(oldExp);
+    const previewMonths=requestMonths(r);
+    const previewDays=requestDays(r);
+
+    if(previewOldDate || previewMonths || previewDays){
+      let previewBase;
+      if(previewOldDate && previewOldDate>=today()){
+        previewBase=new Date(previewOldDate+"T00:00:00");
+      }else{
+        previewBase=new Date(today()+"T00:00:00");
+      }
+
+      if(previewMonths){
+        previewNewExp=dateString(addMonthsToDate(previewBase,previewMonths));
+      }else if(previewDays){
+        previewBase.setDate(previewBase.getDate()+previewDays);
+        previewNewExp=dateString(previewBase);
+      }
+    }
+
+    let proofHtml="";
+    if(bukti){
+      const b=String(bukti);
+      if(/^https?:\/\//i.test(b)){
+        proofHtml=`<a class="proof-link" href="${esc(b)}" target="_blank" rel="noopener">📎 Buka Bukti Pembayaran</a>`;
+      }else{
+        proofHtml=`<div class="req-meta">Bukti pembayaran: <b>${esc(b)}</b></div>`;
+      }
+    }else{
+      proofHtml=`<div class="req-meta">📱 Bukti transfer dikirim melalui WhatsApp admin.</div>`;
+    }
+
+    return `
+      <article class="request-card ${s==="disetujui"?"approved":s==="ditolak"?"rejected":""}">
+        <div class="req-head">
+          <div>
+            <div class="req-name">${esc(konter)}</div>
+            <div class="req-meta">${esc(email)} · Pengajuan ${formatDate(requestDate(r))}</div>
+          </div>
+          ${statusBadge(s)}
+        </div>
+
+        <div class="req-grid">
+          <div class="req-box"><small>Paket</small><b>${esc(paket)}</b></div>
+          <div class="req-box"><small>Durasi</small><b>${bulan?bulan+" bulan":(durasi?durasi+" hari":"-")}</b></div>
+          <div class="req-box"><small>Exp Saat Ini</small><b>${formatDate(oldExp)}</b></div>
+          <div class="req-box"><small>Nominal</small><b>${nominal>0?money(nominal):"Rp 0"}</b></div>
+        </div>
+
+        ${previewNewExp?`<div class="req-meta">Exp setelah persetujuan: <b>${formatDate(previewNewExp)}</b></div>`:""}
+        ${proofHtml}
+
+        ${s==="menunggu"?`
+          <div class="req-actions" style="margin-top:9px">
+            <button class="action approve" onclick="setujui('${esc(r.id)}')">✓ SETUJUI PERPANJANGAN</button>
+            <button class="action reject" onclick="tolak('${esc(r.id)}')">✕ TOLAK</button>
+          </div>`:""}
+
+        ${s==="ditolak"&&val(r,["alasanPenolakan"],"")?
+          `<div class="req-meta" style="margin-top:8px">Alasan penolakan: <b>${esc(val(r,["alasanPenolakan"],""))}</b></div>`:""}
+      </article>`;
+  }).join("");
+};
+
+window.setujui=async function(requestId){
+  if(!isAdmin){
+    showPopup("Akun ini bukan admin.");
+    return;
+  }
+
+  const r=requests.find(x=>x.id===requestId);
+  if(!r){showPopup("Permintaan tidak ditemukan.");return;}
+  if(statusRequest(r.status)!=="menunggu"){
+    showPopup("Permintaan ini sudah diproses.");
+    return;
+  }
+
+  const uid=String(val(r,["uid","userId","user_id","pemilikId"],""));
+  const email=String(val(r,["email","emailAkun"],"")).toLowerCase();
+
+  let user=users.find(u=>u.id===uid);
+  if(!user&&email)user=users.find(u=>emailOf(u).toLowerCase()===email);
+
+  if(!user){
+    showPopup("Akun konter tidak ditemukan di koleksi users.");
+    return;
+  }
+
+  const months=requestMonths(r);
+  const durasi=requestDays(r);
+  if(!months&&!durasi){
+    showPopup("Durasi paket tidak ditemukan. Pastikan pengajuan menyimpan 3, 6, atau 12 bulan.");
+    return;
+  }
+
+  const oldExp=expOf(user);
+  const oldDate=dateOnly(oldExp);
+
+  /*
+   * Dasar perpanjangan:
+   * - Jika akun mempunyai tanggal EXP, gunakan tanggal EXP tersebut.
+   * - Jangan mengganti EXP aktif dengan tanggal hari ini.
+   * - Jika EXP memang sudah lewat / kosong, barulah mulai dari hari ini.
+   */
+  let base;
+  if(oldDate){
+    const oldDateObj=new Date(oldDate+"T00:00:00");
+    if(!Number.isNaN(oldDateObj.getTime()) && oldDate>=today()){
+      base=oldDateObj;
+    }else{
+      base=new Date(today()+"T00:00:00");
+    }
+  }else{
+    base=new Date(today()+"T00:00:00");
+  }
+
+  let newDate;
+  if(months){
+    newDate=addMonthsToDate(base,months);
+  }else{
+    newDate=new Date(base);
+    newDate.setDate(newDate.getDate()+durasi);
+  }
+
+  const newExp=dateString(newDate);
+
+  const ok=confirm(
+    `SETUJUI PERPANJANGAN?\\n\\n`+
+    `Konter: ${userName(user)}\\n`+
+    `Exp lama: ${formatDate(oldExp)}\\n`+
+    `Paket: ${months?months+" bulan":durasi+" hari"}\\n`+
+    `Exp baru: ${formatDate(newExp)}\\n\\n`+
+    `Klik OK untuk memperpanjang masa aktif akun.`
+  );
+  if(!ok)return;
+
+  try{
+    const batch=writeBatch(db);
+
+    /* Semua field tanggal utama diperbarui sekaligus agar kompatibel
+       dengan halaman Cek Aktivasi yang mencari beberapa nama field. */
+    batch.update(doc(db,"users",user.id),{
+      exp:newExp,
+      expired:newExp,
+      expiry:newExp,
+      masaAktif:newExp,
+      tanggalExp:newExp,
+      tanggalExpired:newExp,
+      tanggalBerakhir:newExp,
+      activationExpiry:newExp,
+      activationExpires:newExp,
+      activationEnd:newExp,
+      expiresAt:newExp,
+      expiredAt:newExp,
+      activationExpiresAt:newExp,
+      statusAktivasi:"aktif",
+      activationStatus:"active",
+      updatedAt:serverTimestamp()
+    });
+
+    batch.update(doc(db,"aktivasi_pengajuan",r.id),{
+      status:"disetujui",
+      approvedAt:serverTimestamp(),
+      diprosesPada:serverTimestamp(),
+      tanggalExpiredLama:oldDate||"",
+      tanggalExpiredBaru:newExp,
+      durasiDisetujui:durasi||0,
+      bulanDisetujui:months||0,
+      nominalDisetujui:requestNominal(r)
+    });
+
+    const nominal=requestNominal(r);
+
+    // Catat pendapatan perpanjangan hanya setelah admin menyetujui.
+    const pendapatanRef=doc(collection(db,"pendapatan"));
+    batch.set(pendapatanRef,{
+      jenis:"Perpanjangan Masa Aktif",
+      kategori:"Perpanjangan Aktivasi",
+      sumber:"aktivasi_pengajuan",
+      requestId:r.id,
+      uid:user.id,
+      email:emailOf(user),
+      namaKonter:userName(user),
+      namaPemilik:ownerName(user),
+      paket:val(r,["paket","package","plan","namaPaket"],"-"),
+      durasiBulan:months||0,
+      durasiHari:durasi||0,
+      nominal:nominal,
+      jumlah:nominal,
+      total:nominal,
+      status:"masuk",
+      tanggal:today(),
+      keterangan:`Pendapatan perpanjangan masa aktif ${userName(user)}`,
+      createdAt:serverTimestamp()
+    });
+
+    await batch.commit();
+
+    showMessage(
+      `Perpanjangan ${userName(user)} berhasil disetujui. Pendapatan ${money(nominal)} sudah dicatat. Masa aktif baru: ${formatDate(newExp)}.`
+    );
+
+    await muatSemua();
+  }catch(e){
+    console.error(e);
+    showPopup("Gagal menyetujui: "+(e.message||e));
+  }
+};
+
+window.tolak=async function(requestId){
+  if(!isAdmin){
+    showPopup("Akun ini bukan admin.");
+    return;
+  }
+
+  const r=requests.find(x=>x.id===requestId);
+  if(!r){showPopup("Permintaan tidak ditemukan.");return;}
+  if(statusRequest(r.status)!=="menunggu"){
+    showPopup("Permintaan ini sudah diproses.");
+    return;
+  }
+
+  const alasan=prompt("Alasan penolakan (boleh dikosongkan):","");
+  if(alasan===null)return;
+
+  try{
+    await updateDoc(doc(db,"aktivasi_pengajuan",r.id),{
+      status:"ditolak",
+      rejectedAt:serverTimestamp(),
+      diprosesPada:serverTimestamp(),
+      alasanPenolakan:alasan.trim()
+    });
+
+    showMessage("Permintaan perpanjangan berhasil ditolak.");
+    await muatSemua();
+  }catch(e){
+    console.error(e);
+    showPopup("Gagal menolak permintaan: "+(e.message||e));
+  }
+};
+
+window.detailUser=function(id){
+  const u=users.find(x=>x.id===id);
+  if(!u)return;
+
+  const reqs=findRequestsForUser(u).slice().sort(
+    (a,b)=>timestampMs(requestDate(b))-timestampMs(requestDate(a))
+  );
+
+  const left=daysLeft(expOf(u));
+
+  $("modalTitle").textContent=userName(u);
+  $("modalContent").innerHTML=`
+    <div class="detail-grid">
+      <div class="detail-box"><small>Nama Konter</small><b>${esc(userName(u))}</b></div>
+      <div class="detail-box"><small>Pemilik</small><b>${esc(ownerName(u))}</b></div>
+      <div class="detail-box"><small>Email</small><b>${esc(emailOf(u))}</b></div>
+      <div class="detail-box"><small>Telepon / WhatsApp</small><b>${esc(phoneOf(u))}</b></div>
+      <div class="detail-box"><small>Role</small><b>${esc(roleOf(u))}</b></div>
+      <div class="detail-box"><small>UID Firebase</small><b>${esc(u.id)}</b></div>
+      <div class="detail-box"><small>Mulai Aktif</small><b>${formatDate(startOf(u))}</b></div>
+      <div class="detail-box"><small>Masa Aktif / Exp</small><b>${formatDate(expOf(u))}</b></div>
+      <div class="detail-box"><small>Sisa Masa Aktif</small><b>${esc(expiryText(left))}</b></div>
+      <div class="detail-box"><small>Status</small><b>${left!==null&&left>=0?"AKTIF":"KEDALUWARSA"}</b></div>
+    </div>
+
+    <div style="margin-top:15px">
+      <b>Riwayat Permintaan Perpanjangan</b>
+      ${
+        reqs.length
+        ? reqs.map(r=>`
+          <div class="request-card ${
+            statusRequest(r.status)==="disetujui"?"approved":
+            statusRequest(r.status)==="ditolak"?"rejected":""
+          }" style="margin-top:9px">
+            <div class="req-head">
+              <div>
+                <div class="req-name">${esc(val(r,["paket","package","plan","namaPaket"],"-"))}</div>
+                <div class="req-meta">${formatDate(requestDate(r))}</div>
+              </div>
+              ${statusBadge(r.status)}
+            </div>
+            <div class="req-meta" style="margin-top:7px">
+              Durasi: <b>${requestMonths(r)?requestMonths(r)+" bulan":(requestDays(r)?requestDays(r)+" hari":"-")}</b>
+              · Nominal: <b>${requestNominal(r)>0?money(requestNominal(r)):"Rp 0"}</b>
+            </div>
+            ${val(r,["tanggalExpiredBaru"],"")?
+              `<div class="req-meta">Exp baru: <b>${formatDate(val(r,["tanggalExpiredBaru"],""))}</b></div>`:""}
+          </div>
+        `).join("")
+        : '<div class="empty">Belum ada riwayat permintaan.</div>'
+      }
+    </div>
+  `;
+
+  $("detailModal").classList.add("show");
+};
+
+onAuthStateChanged(auth,async user=>{
+  currentUser=user||null;
+
+  if(!user){
+    isAdmin=false;
+    $("message").innerHTML='<div class="error">Belum login Firebase. Silakan login sebagai akun admin terlebih dahulu.</div>';
+    $("usersBody").innerHTML='<tr><td colspan="10" class="empty">Menunggu login Firebase...</td></tr>';
+    $("requestsList").innerHTML='<div class="empty">Menunggu login Firebase...</div>';
+    return;
+  }
+
+  try{
+    isAdmin=await cekAdmin(user);
+
+    if(!isAdmin){
+      $("message").innerHTML=
+        '<div class="error"><b>Akses ditolak.</b><br>Akun Firebase yang sedang login bukan akun admin. Pastikan dokumen <b>users/'+
+        esc(user.uid)+'</b> mempunyai <b>role: "admin"</b>.</div>';
+      $("usersBody").innerHTML='<tr><td colspan="10" class="empty">Akses admin diperlukan.</td></tr>';
+      $("requestsList").innerHTML='<div class="empty">Akses admin diperlukan.</div>';
+      return;
+    }
+
+    await muatSemua();
+  }catch(e){
+    console.error(e);
+    $("message").innerHTML='<div class="error">Gagal memeriksa akses admin: '+esc(e.message||e)+'</div>';
+  }
+});
+</script>
+
+
+<div id="fixzyAlertOverlay" aria-hidden="true"><div id="fixzyAlertBox" role="alertdialog" aria-modal="true" aria-labelledby="fixzyAlertTitle"><h3 id="fixzyAlertTitle">FIXZY</h3><div id="fixzyAlertMessage"></div><button id="fixzyAlertOk" type="button">Oke</button></div></div>
+
+<script>
+(function(){function showPopup(message,title){const o=document.getElementById('fixzyAlertOverlay'),m=document.getElementById('fixzyAlertMessage'),t=document.getElementById('fixzyAlertTitle'),b=document.getElementById('fixzyAlertOk');if(!o||!m||!t||!b){console.error(message);return;}t.textContent=title||'FIXZY';m.textContent=String(message??'');o.classList.add('show');o.setAttribute('aria-hidden','false');setTimeout(()=>b.focus(),30);}function closePopup(){const o=document.getElementById('fixzyAlertOverlay');if(o){o.classList.remove('show');o.setAttribute('aria-hidden','true');}}window.showPopup=showPopup;window.closePopup=closePopup;document.addEventListener('click',e=>{if(e.target?.id==='fixzyAlertOk'||e.target?.id==='fixzyAlertOverlay')closePopup();});document.addEventListener('keydown',e=>{if(e.key==='Escape')closePopup();});})();
+</script>
+
+</body>
+</html>
