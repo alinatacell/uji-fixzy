@@ -20,7 +20,7 @@
 :where(code, pre, kbd, samp) {
   font-family: "Optimistic Mono", ui-monospace, monospace;
 }
-</style><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FIXZY ADMIN - FINAL TOKEN TAMPIL</title>
+</style><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FIXZY ADMIN - TOKEN ONLY</title>
 <style>*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#f1f5f9;color:#0f172a}
 .top{background:#0f172a;color:#fff;padding:12px 14px;position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center}
 .btn{border:0;border-radius:8px;padding:9px 12px;font-weight:900;cursor:pointer;font-size:11px}
@@ -43,27 +43,28 @@ td{padding:8px;border-bottom:1px solid #f1f5f9;vertical-align:top}
 .badge.ok{background:#dcfce7;color:#15803d} .badge.off{background:#fee2e2;color:#991b1b}
 #loginBox{max-width:380px;margin:60px auto;background:#fff;padding:20px;border-radius:16px;box-shadow:0 10px 30px #0002}
 </style></head><body>
-<div id="loginBox"><h2 style="margin:0 0 8px">🔒 Login Owner</h2><input id="email" value="servicehpmaja@gmail.com" style="width:100%;margin-bottom:8px"><input id="pass" type="password" placeholder="Password" style="width:100%;margin-bottom:8px"><button class="btn btn-dark" style="width:100%" onclick="loginOwner()">Masuk</button><div id="loginErr" style="color:#dc2626;font-size:11px;margin-top:8px;display:none"></div></div>
+<div id="loginBox"><h2 style="margin:0 0 8px">🔒 Login Owner - FIXZY</h2><p style="font-size:11px;color:#64748b;margin:0 0 10px">Login sama dengan Daftar Akun / Pengguna</p><input id="email" value="servicehpmaja@gmail.com" style="width:100%;margin-bottom:8px"><input id="pass" type="password" placeholder="Password" style="width:100%;margin-bottom:8px"><button class="btn btn-dark" style="width:100%" onclick="loginOwner()">Masuk</button><div id="loginErr" style="color:#dc2626;font-size:11px;margin-top:8px;display:none"></div></div>
 <div id="app" style="display:none">
-<div class="top"><div><h1 style="margin:0;font-size:14px">FIXZY ADMIN - OWNER ONLY</h1><small style="color:#94a3b8" id="ownerEmail"></small></div><div style="display:flex;gap:6px"><button class="btn btn-white" id="btnRefresh" onclick="loadAll()">↻ Refresh</button><button class="btn btn-red" onclick="logout()">Logout</button></div></div>
+<div class="top"><div><h1 style="margin:0;font-size:14px">FIXZY ADMIN - TOKEN ONLY</h1><small style="color:#94a3b8" id="ownerEmail"></small></div><div style="display:flex;gap:6px"><a href="pengguna.html" style="text-decoration:none"><button class="btn btn-white">👑 Daftar Akun</button></a><button class="btn btn-white" id="btnRefresh" onclick="loadAll()">↻ Refresh</button><button class="btn btn-red" onclick="logout()">Logout</button></div></div>
 <div class="wrap">
 <div class="stats"><div class="stat"><small>Total Token</small><b id="stTotal">0</b></div><div class="stat yellow"><small>Tersedia</small><b id="stSedia">0</b></div><div class="stat blue"><small>Terpakai</small><b id="stPakai">0</b></div><div class="stat green"><small>Pendapatan</small><b id="stUang">Rp 0</b></div></div>
 <div class="card"><h3>🎫 Buat Token - Masa Aktif Manual (Bebas Hari)</h3>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<div><label style="font-size:10px;font-weight:800">MASA AKTIF HARI - KETIK BEBAS (contoh: 90, 120, 360)</label><input id="paket" type="number" min="1" value="90" style="font-weight:800"></div>
+<div><label style="font-size:10px;font-weight:800">MASA AKTIF HARI - KETIK BEBAS (contoh: 90, 120, 360)</label><input id="paket" type="number" min="1" placeholder="Bebas: 90, 120, 360..." style="font-weight:800"></div>
 <div><label style="font-size:10px;font-weight:800">JUMLAH TOKEN</label><input id="jml" type="number" value="1" min="1"></div>
-<div><label style="font-size:10px;font-weight:800">HARGA / TOKEN Rp</label><input id="harga" type="number" value="50000"></div>
+<div><label style="font-size:10px;font-weight:800">HARGA / TOKEN Rp</label><input id="harga" type="number" placeholder="50000"></div>
 <div><label style="font-size:10px;font-weight:800">PREFIX OPSIONAL</label><input id="pref" placeholder="Kosong = random"></div>
 </div>
 <button class="btn btn-yellow" style="width:100%;margin-top:10px;height:46px;font-size:14px" onclick="buatToken()">Buat Token</button>
 <div id="msg" style="font-size:11px;margin-top:8px;font-weight:800;color:#15803d"></div>
 <div style="margin-top:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px">
-<div style="font-size:11px;font-weight:900;margin-bottom:6px">🔍 CARI PAKET - Ketik angka paket</div>
+<div style="font-size:11px;font-weight:900;margin-bottom:8px">🔍 PENCARIAN - 2 KOLOM (Paket & Token)</div>
 <div style="display:grid;grid-template-columns:1fr 120px;gap:6px">
-<input id="cariPaket" type="number" placeholder="Contoh: 90, 120, 360..." oninput="renderTokens()" style="font-weight:800">
-<select id="filterStatus" onchange="renderTokens()"><option value="">Semua Status</option><option value="tersedia">Tersedia</option><option value="terpakai">Terpakai</option></select>
+<div><label style="font-size:9px;font-weight:800;color:#64748b">KOLOM 1: CARI PAKET (MASA AKTIF)</label><input id="cariPaket" type="number" placeholder="Ketik: 90, 120, 360..." oninput="renderTokens()" style="font-weight:800"></div>
+<div><label style="font-size:9px;font-weight:800;color:#64748b">STATUS</label><select id="filterStatus" onchange="renderTokens()"><option value="">Semua</option><option value="tersedia">Tersedia</option><option value="terpakai">Terpakai</option></select></div>
 </div>
-<div style="display:flex;gap:6px;margin-top:8px"><input id="cariToken" placeholder="Cari token / email pemakai..." style="flex:1" oninput="renderTokens()"><button class="btn btn-white" onclick="resetSearch()">Reset</button></div>
+<div style="display:flex;gap:6px;margin-top:8px"><div style="flex:1"><label style="font-size:9px;font-weight:800;color:#64748b">KOLOM 2: CARI TOKEN / EMAIL (SPESIFIK)</label><input id="cariToken" placeholder="Ketik token atau email..." style="width:100%" oninput="renderTokens()"></div><button class="btn btn-white" style="align-self:flex-end" onclick="resetSearch()">Reset</button></div>
+<div style="margin-top:6px;font-size:10px;color:#64748b;line-height:1.4">💡 Kolom 1 = filter paket: ketik 90 muncul semua token 90 hari. Kolom 2 = filter spesifik token/email di dalam paket itu.</div>
 <div style="display:flex;gap:6px;align-items:center;margin-top:10px;flex-wrap:wrap">
 <label style="font-size:11px;font-weight:800"><input type="checkbox" id="checkAll" onchange="toggleAll(this)"> Ceklis Semua</label>
 <span id="filterInfo" style="font-size:10px;color:#64748b"></span>
@@ -72,7 +73,6 @@ td{padding:8px;border-bottom:1px solid #f1f5f9;vertical-align:top}
 </div>
 <div class="table-wrap"><table><thead><tr><th><input type="checkbox" id="checkAllHead" onchange="document.getElementById('checkAll').checked=this.checked;toggleAll(this)"></th><th>TOKEN</th><th>PAKET</th><th>HARGA</th><th>STATUS</th><th>PEMAKAI</th><th>AKSI</th></tr></thead><tbody id="tokenBody"><tr><td colspan=7 style="text-align:center;padding:20px">Memuat...</td></tr></tbody></table></div>
 </div>
-<div class="card"><h3>👑 Daftar Owner - Tanpa Aksi</h3><div class="table-wrap" style="min-width:0"><table style="min-width:500px"><thead><tr><th>Konter</th><th>Email</th><th>Aktif Sampai</th><th>Sisa</th><th>Status</th></tr></thead><tbody id="userBody"></tbody></table></div></div>
 </div></div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
@@ -81,7 +81,6 @@ import { getFirestore, collection, getDocs, doc, deleteDoc, addDoc } from "https
 const cfg={apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",authDomain:"fixzy-update.firebaseapp.com",projectId:"fixzy-update",storageBucket:"fixzy-update.firebasestorage.app",messagingSenderId:"995892519622",appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"};
 const app=initializeApp(cfg); const auth=getAuth(app); const db=getFirestore(app);
 let allTokens=[], selected=new Set();
-function parseExp(o){ let cands=[o.exp,o.expAt,o.expiredAt,o.aktifSampai,o.tanggalBerakhir]; for(let k in o){ let lk=k.toLowerCase(); if(lk.includes('exp')||lk.includes('akhir')) cands.push(o[k]); } for(let c of cands){ if(!c) continue; try{ if(c.toDate) return c.toDate(); if(c.seconds) return new Date(c.seconds*1000); let d=new Date(c); if(!isNaN(d)&&d.getFullYear()>2020) return d; }catch(e){} } return null; }
 window.loginOwner=async function(){ const e=document.getElementById('email').value.trim(); const p=document.getElementById('pass').value.trim(); const err=document.getElementById('loginErr'); err.style.display='none'; if(!e||!p){ err.style.display='block'; err.textContent='Isi email & password'; return; } try{ await signInWithEmailAndPassword(auth,e,p); }catch(ex){ err.style.display='block'; err.textContent='Gagal: '+ex.message; } }
 window.logout=async function(){ await signOut(auth); location.reload(); }
 onAuthStateChanged(auth,(u)=>{ if(!u){ document.getElementById('loginBox').style.display='block'; document.getElementById('app').style.display='none'; return; } document.getElementById('loginBox').style.display='none'; document.getElementById('app').style.display='block'; document.getElementById('ownerEmail').textContent=u.email; loadAll(); });
@@ -90,22 +89,11 @@ window.loadAll=async function(){
   const btn=document.getElementById('btnRefresh'); if(btn){ btn.textContent='⏳ Loading...'; btn.disabled=true; }
   selected.clear(); allTokens=[]; document.getElementById('tokenBody').innerHTML='<tr><td colspan=7 style="text-align:center;padding:20px">Memuat ulang tokens...</td></tr>';
   try{
-    // USER LIST PINDAH KE daftar-pengguna.html - skip load users di token page
-    /*const snapU=await getDocs(collection(db,"users"));
-    let users=[]; snapU.forEach(d=>users.push({id:d.id,...d.data()}));
-    users=users.filter(u=>{ const r=(u.role||'').toLowerCase(); return r!=='employee' && r!=='karyawan'; });
-    let htmlU=""; users.forEach(u=>{ const e=parseExp(u); const tgl=e?e.toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'}):'-'; const sisa=e?Math.ceil((e-new Date())/86400000):0; const sisaTxt=sisa>0?sisa+' hari':(sisa===0?'hari ini':'exp'); const st=sisa>7?'ok':(sisa>0?'wait':'off'); htmlU+=`<tr><td><b>${u.namaKonter||u.nama||'-'}</b></td><td>${u.email||'-'}</td><td>${tgl}</td><td>${sisaTxt}</td><td><span class="badge ${st}">${sisa>0?'Aktif':'Expired'}</span></td></tr>`; });
-    */ document.getElementById('userBody')?document.getElementById('userBody').innerHTML="":null; const htmlU="";
-    if(false){ document.getElementById('userBody').innerHTML=htmlU||'<tr><td colspan=5>Tidak ada owner</td></tr>';
-  }catch(e){ document.getElementById('userBody').innerHTML='<tr><td colspan=5 style="color:red">Error users: '+e.message+'</td></tr>'; }
-  try{
-    // TANPA orderBy biar tidak butuh index dan token lama tetap kebaca
     const snap=await getDocs(collection(db,"tokens"));
     allTokens=[]; snap.forEach(d=>allTokens.push({id:d.id,...d.data()}));
-    // sort manual by createdAt terbaru
     allTokens.sort((a,b)=>{ const da=a.createdAt?.toDate?a.createdAt.toDate(): (a.createdAt?.seconds?new Date(a.createdAt.seconds*1000): new Date(a.createdAt||0)); const db2=b.createdAt?.toDate?b.createdAt.toDate(): (b.createdAt?.seconds?new Date(b.createdAt.seconds*1000): new Date(b.createdAt||0)); return db2-da; });
     renderTokens();
-  }catch(e){ document.getElementById('tokenBody').innerHTML='<tr><td colspan=7 style="color:red">Error tokens: '+e.message+'<br>Pastikan Rules: allow read,write if request.auth!=null</td></tr>'; }
+  }catch(e){ document.getElementById('tokenBody').innerHTML='<tr><td colspan=7 style="color:red">Error tokens: '+e.message+'</td></tr>'; }
   if(btn){ btn.textContent='↻ Refresh'; btn.disabled=false; }
 }
 window.renderTokens=function(){
@@ -121,15 +109,13 @@ window.renderTokens=function(){
     if(q){ const hay=(t.token||'')+' '+(t.usedByEmail||'')+' '+(t.usedBy||'')+' '+paketStr; if(!hay.toLowerCase().includes(q)) return false; }
     return true;
   });
-  let total=filtered.length, sedia=filtered.filter(t=>!t.used).length, pakai=filtered.filter(t=>t.used).length;
-  let uang=filtered.filter(t=>t.used).reduce((a,b)=>a+(Number(b.harga)||0),0);
-  // stats global kalau tidak filter, kalau filter tampil filter
-  const showStats = !fPaket && !fStatus && !q;
+  let total=filtered.length;
   let gTotal=allTokens.length, gSedia=allTokens.filter(t=>!t.used).length, gPakai=allTokens.filter(t=>t.used).length, gUang=allTokens.filter(t=>t.used).reduce((a,b)=>a+(Number(b.harga)||0),0);
+  const showStats = !fPaket && !fStatus && !q;
   document.getElementById('stTotal').textContent=showStats?gTotal:total;
-  document.getElementById('stSedia').textContent=showStats?gSedia:sedia;
-  document.getElementById('stPakai').textContent=showStats?gPakai:pakai;
-  document.getElementById('stUang').textContent='Rp '+(showStats?gUang:uang).toLocaleString('id-ID');
+  document.getElementById('stSedia').textContent=showStats?gSedia:filtered.filter(t=>!t.used).length;
+  document.getElementById('stPakai').textContent=showStats?gPakai:filtered.filter(t=>t.used).length;
+  document.getElementById('stUang').textContent='Rp '+(showStats?gUang:filtered.filter(t=>t.used).reduce((a,b)=>a+(Number(b.harga)||0),0)).toLocaleString('id-ID');
   document.getElementById('filterInfo').textContent=fPaket?`Paket ${fPaket} Hari: ${filtered.length} token`:(q?`Hasil "${q}": ${filtered.length}`:`${filtered.length} token`);
   let html=""; filtered.forEach(t=>{
     const isUsed=!!t.used;
