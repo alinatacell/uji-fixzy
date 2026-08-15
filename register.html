@@ -116,7 +116,7 @@ body{background:#0d0d0d;background-image:radial-gradient(circle at top,rgba(255,
 </div>
 
 <div class="token-help">
-Klik kolom token untuk menampilkan token 90 hari yang belum terpakai. Daftar dapat di-scroll dan dicari.
+Klik kolom token untuk menampilkan token registrasi yang belum terpakai. Daftar dapat di-scroll dan dicari.
 </div>
 </div>
 
@@ -230,23 +230,25 @@ async function loadAvailableTokens(force=false){
    snap.forEach(d=>{
 
      const x=d.data()||{};
-
      const token=String(x.token||"").trim();
 
-     const paketHari=
-       Number(x.paketHari||0) ||
-       Number(String(x.paket||"").replace(/[^0-9]/g,"")) ||
-       0;
+     /*
+       registerTokens adalah collection khusus token registrasi.
+       Jangan bergantung pada field paketHari karena generator token
+       yang sudah berjalan dapat memakai nama/struktur field berbeda.
+       Selama token belum terpakai, token tersebut ditampilkan.
+     */
 
      const used=
        x.used===true ||
        String(x.status||"").toLowerCase()==="terpakai";
 
-     if(token && paketHari===90 && !used){
+     if(token && !used){
 
        tokenData.push({
          id:d.id,
          ...x,
+         token:token,
          paketHari:90
        });
 
@@ -255,13 +257,20 @@ async function loadAvailableTokens(force=false){
    });
 
    tokenData.sort((a,b)=>{
+
      const getDate=(x)=>{
+
        if(x?.toDate)return x.toDate();
-       if(x?.seconds)return new Date(x.seconds*1000);
+
+       if(x?.seconds)
+         return new Date(x.seconds*1000);
+
        return new Date(x||0);
+
      };
 
      return getDate(b.createdAt)-getDate(a.createdAt);
+
    });
 
    tokenLoaded=true;
@@ -278,8 +287,11 @@ async function loadAvailableTokens(force=false){
      '</div>';
 
  }finally{
+
    tokenLoading=false;
+
  }
+
 }
 
 function renderTokenOptions(){
@@ -440,11 +452,6 @@ form.addEventListener("submit",async(e)=>{
 
    tokenId=tokenDoc.id;
 
-   const paketHari=
-     Number(tokenInfo.paketHari||0) ||
-     Number(String(tokenInfo.paket||"").replace(/[^0-9]/g,"")) ||
-     0;
-
    const sudahDipakai=
      tokenInfo.used===true ||
      String(tokenInfo.status||"").toLowerCase()==="terpakai";
@@ -453,9 +460,11 @@ form.addEventListener("submit",async(e)=>{
      throw new Error("Token sudah pernah digunakan.");
    }
 
-   if(paketHari!==90){
-     throw new Error("Token registrasi harus paket 3 bulan / 90 hari.");
-   }
+   /*
+     Token yang berada di registerTokens adalah token khusus
+     registrasi pengguna baru yang dibuat dari halaman Admin.
+     Masa aktif registrasi ditetapkan 90 hari saat akun dibuat.
+   */
 
    /* -----------------------------------------------------
       2. BUAT AUTH
