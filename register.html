@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Fixzy | Registrasi</title>
+<meta name="theme-color" content="#FFC107">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+html{scroll-behavior:smooth;}
+body{background:#0d0d0d;background-image:radial-gradient(circle at top, rgba(255,193,7,.18), transparent 60%);color:#fff;min-height:100vh;overflow-x:hidden;}
+.container{width:100%;max-width:430px;margin:auto;padding:20px 15px 40px;}
+.card{background:#1b1b1b;border-radius:25px;padding:25px;border:1px solid rgba(255,193,7,.15);box-shadow:0 15px 35px rgba(0,0,0,.45);}
+.logo-area{text-align:center;margin-bottom:25px;}
+.logo{width:170px;height:170px;object-fit:contain;padding:10px;border-radius:30px;background:#111;box-shadow:0 0 25px rgba(255,193,7,.35),0 0 60px rgba(255,193,7,.15);animation:logoGlow 2.5s infinite alternate;}
+@keyframes logoGlow{0%{transform:scale(1);box-shadow:0 0 20px rgba(255,193,7,.25);}100%{transform:scale(1.03);box-shadow:0 0 40px rgba(255,193,7,.5);}}
+.logo-area h1{margin-top:18px;font-size:30px;font-weight:700;color:#FFC107;}
+.logo-area p{margin-top:8px;font-size:15px;color:#bdbdbd;}
+.input-box{margin-bottom:18px;}
+.input-box label{display:block;margin-bottom:8px;font-size:14px;font-weight:600;color:#FFC107;}
+.input-box input,.input-box textarea{width:100%;padding:14px;background:#252525;border:1px solid #333;border-radius:14px;font-size:15px;color:#fff;outline:none;transition:.25s;}
+.input-box textarea{resize:none;min-height:90px;}
+.input-box input:focus,.input-box textarea:focus{border-color:#FFC107;box-shadow:0 0 12px rgba(255,193,7,.25);}
+.password{display:flex;align-items:center;background:#252525;border:1px solid #333;border-radius:14px;overflow:hidden;}
+.password input{border:none!important;background:transparent!important;box-shadow:none!important;margin:0;}
+.password button{width:55px;height:50px;border:none;background:#FFC107;color:#111;font-size:20px;cursor:pointer;transition:.3s;}
+.password button:hover{background:#FFD54F;}
+.token-box{margin:20px 0 12px;padding:14px;border-radius:14px;background:rgba(255,193,7,.08);border:1px solid rgba(255,193,7,.25);}
+.token-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;}
+.token-head label{margin:0!important;}
+.token-help{font-size:10px;color:#aaa;line-height:1.5;margin-top:7px;}
+.token-btn{border:1px solid #FFC107;background:transparent;color:#FFC107;border-radius:9px;padding:7px 9px;font-size:10px;font-weight:700;cursor:pointer;}
+.token-popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);justify-content:center;align-items:center;z-index:10000;padding:15px;}
+.token-modal{width:100%;max-width:430px;max-height:90vh;background:#1b1b1b;border:1px solid #FFC107;border-radius:18px;padding:16px;display:flex;flex-direction:column;box-shadow:0 15px 40px rgba(0,0,0,.6);}
+.token-modal-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;}
+.token-modal-head h3{margin:0;color:#FFC107;font-size:16px;}
+.token-close{border:0;background:#333;color:#fff;border-radius:8px;width:34px;height:34px;font-size:18px;cursor:pointer;}
+.token-list{overflow-y:auto;max-height:62vh;border:1px solid #333;border-radius:10px;background:#111;padding:6px;}
+.token-row{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;padding:8px;border-bottom:1px solid #252525;}
+.token-row:last-child{border-bottom:0;}
+.token-code{font-family:monospace;font-weight:800;color:#fff;font-size:12px;word-break:break-all;}
+.token-meta{font-size:9px;color:#aaa;margin-top:2px;}
+.token-actions{display:flex;gap:4px;align-items:center;}
+.token-copy,.token-delete{border:0;border-radius:7px;padding:6px 8px;font-size:9px;font-weight:800;cursor:pointer;}
+.token-copy{background:#FFC107;color:#111;}
+.token-delete{background:#ef4444;color:#fff;}
+.token-status{font-size:9px;font-weight:800;padding:3px 6px;border-radius:999px;}
+.token-status.available{background:#14532d;color:#bbf7d0;}
+.token-status.used{background:#7f1d1d;color:#fecaca;}
+.token-empty{text-align:center;color:#aaa;font-size:11px;padding:20px;}
+.token-popup-info{font-size:10px;color:#aaa;line-height:1.5;margin:7px 0;}
+.token-filter{display:flex;gap:6px;margin-bottom:7px;}
+.token-filter input{flex:1!important;margin:0!important;}
+.token-filter button{border:1px solid #555;background:#252525;color:#fff;border-radius:8px;padding:8px 10px;font-size:10px;font-weight:700;}
+.check{display:flex;gap:10px;margin:18px 0;font-size:14px;color:#ddd;}
+.check input{margin-top:4px;transform:scale(1.15);accent-color:#FFC107;}
+#btnDaftar{width:100%;padding:16px;border:none;border-radius:16px;background:linear-gradient(90deg,#FFC107,#FF9800);color:#111;font-size:17px;font-weight:700;cursor:pointer;transition:.3s;box-shadow:0 10px 25px rgba(255,193,7,.30);}
+#btnDaftar:hover{transform:translateY(-2px);box-shadow:0 15px 35px rgba(255,193,7,.45);}
+#loading{display:none;margin-top:15px;text-align:center;color:#FFC107;font-weight:600;}
+@media(max-width:480px){.container{padding:15px;}.logo{width:150px;height:150px;}.logo-area h1{font-size:26px;}.card{padding:20px;}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="card">
+<div class="logo-area">
+<img src="logo.png" class="logo" alt="Fixzy Logo">
+<h1>Registrasi Akun</h1>
+</div>
+<form id="registerForm">
+<div class="input-box"><label>Nama Konter</label><input type="text" id="namaKonter" placeholder="Masukkan nama konter" required></div>
+<div class="input-box"><label>Nama Pemilik</label><input type="text" id="namaPemilik" placeholder="Masukkan nama pemilik" required></div>
+<div class="input-box"><label>No WhatsApp</label><input type="tel" id="whatsapp" placeholder="08xxxxxxxxxx" maxlength="15" inputmode="numeric" required></div>
+<div class="input-box"><label>Email</label><input type="email" id="email" placeholder="email@gmail.com" required></div>
+<div class="input-box"><label>Alamat</label><textarea id="alamat" placeholder="Masukkan alamat lengkap"></textarea></div>
+<div class="input-box"><label>Password</label><div class="password"><input type="password" id="password" placeholder="Minimal 8 karakter" required><button type="button" id="lihatPassword">👁</button></div></div>
+<div class="input-box"><label>Konfirmasi Password</label><input type="password" id="konfirmasiPassword" placeholder="Ulangi password" required></div>
+<div class="token-box">
+  <div class="token-head">
+    <label>Token Aktivasi 3 Bulan</label>
+    <button type="button" class="token-btn" onclick="bukaTokenPopup()">🎫 Lihat Token</button>
+  </div>
+  <input type="text" id="tokenAktivasi" placeholder="Masukkan token aktivasi" autocomplete="off" required>
+  <div class="token-help">Wajib menggunakan token khusus pengguna baru. Token perpanjangan tidak dapat digunakan untuk registrasi.</div>
+</div>
+<label class="check"><input type="checkbox" id="setuju" required><span>Saya menyetujui syarat dan ketentuan penggunaan aplikasi Fixzy.</span></label>
+<button id="btnDaftar" type="submit">DAFTAR SEKARANG</button>
+<div id="loading">Sedang membuat akun...</div>
+<!-- FIX: Tombol login bawah sekarang langsung ke dashboard.html -->
+<div style="margin-top:20px;text-align:center;">Sudah punya akun? <a href="login.html" style="color:#FFC107;font-weight:bold;text-decoration:none;">Login</a></div>
+</form>
+</div>
+</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, serverTimestamp, collection, getDocs, query, where, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+const firebaseConfig = {
+apiKey: "AIzaSyCwMbJsuORhIq4QCmp4c1r6OsjAUlfxU5Y",
+authDomain: "fixzy-f056f.firebaseapp.com",
+projectId: "fixzy-f056f",
+storageBucket: "fixzy-f056f.firebasestorage.app",
+messagingSenderId: "838081521031",
+appId: "1:838081521031:web:50fdee909b56460b055f22"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const form = document.getElementById("registerForm");
+const btn = document.getElementById("btnDaftar");
+const loading = document.getElementById("loading");
+const lihatPassword = document.getElementById("lihatPassword");
+const passwordInput = document.getElementById("password");
+lihatPassword.addEventListener("click",()=>{ passwordInput.type= passwordInput.type==="password" ? "text" : "password"; });
+document.getElementById("whatsapp").addEventListener("input",function(){ this.value=this.value.replace(/[^0-9]/g,""); });
+form.addEventListener("submit", async (e)=>{
+ e.preventDefault();
+ btn.disabled=true; loading.style.display="block";
+ const namaKonter=document.getElementById("namaKonter").value.trim();
+ const namaPemilik=document.getElementById("namaPemilik").value.trim();
+ const whatsapp=document.getElementById("whatsapp").value.trim();
+ const email=document.getElementById("email").value.trim();
+ const alamat=document.getElementById("alamat").value.trim();
+ const password=document.getElementById("password").value;
+ const konfirmasi=document.getElementById("konfirmasiPassword").value;
+ const tokenAktivasi=document.getElementById("tokenAktivasi").value.trim().toUpperCase();
+
+ if(password.length<8){tampilPopup("Fixzy","Password minimal 8 karakter.");return selesaiForm();}
+ if(whatsapp.length<10){tampilPopup("Fixzy","Nomor WhatsApp minimal 10 digit.");return selesaiForm();}
+ if(password!==konfirmasi){tampilPopup("Fixzy","Konfirmasi password tidak sama.");return selesaiForm();}
+ if(namaKonter.length<3){tampilPopup("Fixzy","Nama konter minimal 3 karakter.");return selesaiForm();}
+ if(namaPemilik.length<3){tampilPopup("Fixzy","Nama pemilik minimal 3 karakter.");return selesaiForm();}
+ if(alamat.length<5){tampilPopup("Fixzy","Alamat minimal 5 karakter.");return selesaiForm();}
+ if(!document.getElementById("setuju").checked){tampilPopup("Fixzy","Silakan setujui syarat dan ketentuan.");return selesaiForm();}
+ if(!tokenAktivasi){tampilPopup("Fixzy","Token aktivasi wajib diisi.");return selesaiForm();}
+
+ try{
+   const tokenSnap=await getDocs(query(collection(db,"tokens"),where("token","==",tokenAktivasi)));
+   if(tokenSnap.empty){tampilPopup("Fixzy","Token tidak ditemukan atau tidak valid.");return selesaiForm();}
+
+   let tokenDoc=null, tokenData=null;
+   tokenSnap.forEach(d=>{if(!tokenDoc){tokenDoc=d;tokenData=d.data()||{};}});
+
+   if(!tokenData || (tokenData.tipe!=="aktivasi_baru" && tokenData.jenis!=="aktivasi_baru")){
+     tampilPopup("Fixzy","Token ini bukan token aktivasi pengguna baru.\nToken perpanjangan tidak dapat digunakan untuk registrasi.");
+     return selesaiForm();
+   }
+   if(tokenData.used===true || String(tokenData.status||"").toLowerCase()==="terpakai"){
+     tampilPopup("Fixzy","Token sudah pernah digunakan.");
+     return selesaiForm();
+   }
+   const paketHari=Number(tokenData.paketHari||90);
+   if(paketHari!==90){
+     tampilPopup("Fixzy","Token registrasi harus paket 3 bulan / 90 hari.");
+     return selesaiForm();
+   }
+
+   const userCredential=await createUserWithEmailAndPassword(auth,email,password);
+   const uid=userCredential.user.uid;
+   const tanggalAktivasi=new Date();
+   const tanggalBerakhir=new Date(tanggalAktivasi);
+   tanggalBerakhir.setDate(tanggalBerakhir.getDate()+90);
+
+   await setDoc(doc(db,"users",uid),{
+     uid,idKonter:"FX-"+Date.now(),aplikasi:"Fixzy",namaKonter,namaPemilik,whatsapp,email,alamat,
+     paket:"3 Bulan",jenisLisensi:"Aktivasi Token",durasi:"90 Hari",harga:Number(tokenData.harga||0),
+     status:"active",statusPembayaran:"paid",masaAktif:"aktif",perpanjangan:false,perpanjanganStatus:"none",
+     role:"user",tokenAktivasi,tokenType:"aktivasi_baru",tokenId:tokenDoc.id,
+     createdAt:serverTimestamp(),tanggalDaftar:serverTimestamp(),tanggalAktivasi: tanggalAktivasi.toISOString(),
+     tanggalBerakhir:tanggalBerakhir.toISOString(),device:navigator.userAgent,versi:"Fixzy V1",lastLogin:null
+   });
+
+   await updateDoc(doc(db,"tokens",tokenDoc.id),{
+     used:true,status:"terpakai",usedBy:uid,usedByEmail:email,usedAt:serverTimestamp()
+   });
+
+   tampilPopup("Fixzy","Pendaftaran berhasil!\n\nAkun aktif selama 90 hari.\nToken aktivasi sudah ditandai TERPAKAI.\nSilakan login sekarang.");
+   setTimeout(()=>{
+     if(window.parent&&window.parent!==window) window.parent.postMessage({type:"FIXZY_REGISTER_SUCCESS"},"*");
+     else window.location.href="login.html";
+   },1500);
+ }catch(err){
+   let pesan="Terjadi kesalahan.";
+   switch(err.code){
+    case "auth/email-already-in-use":pesan="Email sudah digunakan.";break;
+    case "auth/invalid-email":pesan="Format email tidak valid.";break;
+    case "auth/weak-password":pesan="Password terlalu lemah.";break;
+    default:pesan=err.message||pesan;
+   }
+   tampilPopup("Fixzy",pesan);
+ }finally{btn.disabled=false;loading.style.display="none";}
+});
+function selesaiForm(){btn.disabled=false;loading.style.display="none";}
+function tampilPopup(judul,pesan){
+  document.getElementById("popupJudul").innerText=judul;
+  document.getElementById("popupPesan").innerText=pesan;
+  document.getElementById("popup").style.display="flex";
+}
+function tutupPopup(){
+  document.getElementById("popup").style.display="none";
+}
+window.tampilPopup=tampilPopup;
+window.tutupPopup=tutupPopup;
+</script>
+<div id="popup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:9999;">
+  <div style="width:90%;max-width:340px;background:#1b1b1b;padding:25px;border-radius:20px;text-align:center;border:1px solid #FFC107;">
+    <h3 id="popupJudul" style="color:#FFC107;">Fixzy</h3>
+    <p id="popupPesan" style="margin:20px 0;color:#fff;white-space:pre-line;"></p>
+    <button onclick="tutupPopup()" style="padding:12px 30px;border:none;border-radius:10px;background:#FFC107;color:#111;font-weight:bold;cursor:pointer;">OK</button>
+  </div>
+</div>
+
+<!-- POPUP TOKEN REGISTRASI: maksimal 100 token -->
+<div id="tokenPopup" class="token-popup">
+ <div class="token-modal">
+  <div class="token-modal-head"><h3>🎫 Token Registrasi Pengguna Baru</h3><button class="token-close" type="button" onclick="tutupTokenPopup()">×</button></div>
+  <div class="token-popup-info">Menampilkan maksimal 100 token <b>aktivasi_baru</b> paket 90 hari. Token terpakai ditandai merah dan dapat dihapus.</div>
+  <div class="token-filter"><input id="cariTokenReg" placeholder="Cari token / email..." oninput="renderTokenPopup()"><button type="button" onclick="muatTokenPopup()">↻</button></div>
+  <div id="tokenListReg" class="token-list"><div class="token-empty">Memuat token...</div></div>
+ </div>
+</div>
+<script>
+async function bukaTokenPopup(){document.getElementById("tokenPopup").style.display="flex";document.getElementById("cariTokenReg").value="";await muatTokenPopup()}
+function tutupTokenPopup(){document.getElementById("tokenPopup").style.display="none"}
+async function muatTokenPopup(){
+ const box=document.getElementById("tokenListReg");box.innerHTML='<div class="token-empty">Memuat token...</div>';
+ try{
+  const snap=await getDocs(collection(db,"tokens"));window.fixzyRegisterTokens=[];
+  snap.forEach(d=>{const x=d.data()||{};if((x.tipe==="aktivasi_baru"||x.jenis==="aktivasi_baru")&&Number(x.paketHari||90)===90)window.fixzyRegisterTokens.push({id:d.id,...x})});
+  window.fixzyRegisterTokens.sort((a,b)=>{const da=a.createdAt?.toDate?a.createdAt.toDate():new Date(a.createdAt||0),dbb=b.createdAt?.toDate?b.createdAt.toDate():new Date(b.createdAt||0);return dbb-da});
+  window.fixzyRegisterTokens=window.fixzyRegisterTokens.slice(0,100);renderTokenPopup();
+ }catch(e){box.innerHTML='<div class="token-empty">Gagal memuat token: '+escapeTokenReg(e.message||e)+'</div>'}
+}
+function renderTokenPopup(){
+ const box=document.getElementById("tokenListReg"),q=(document.getElementById("cariTokenReg").value||"").toLowerCase().trim();
+ const data=(window.fixzyRegisterTokens||[]).filter(t=>!q||((t.token||"")+" "+(t.usedByEmail||"")+" "+(t.usedBy||"")).toLowerCase().includes(q));
+ if(!data.length){box.innerHTML='<div class="token-empty">Tidak ada token registrasi.</div>';return}
+ box.innerHTML=data.map(t=>{
+  const used=!!t.used;
+  const copy='<button class="token-copy" type="button" onclick="copyTokenReg(\\''+String(t.token||"").replace(/\\/g,"\\\\").replace(/'/g,"\\'")+'\\')">COPY</button>';
+  const del=used?'<button class="token-delete" type="button" onclick="hapusTokenTerpakai(\\''+String(t.id).replace(/\\/g,"\\\\").replace(/'/g,"\\'")+'\\')">HAPUS</button>':"";
+  return '<div class="token-row"><div><div class="token-code">'+escapeTokenReg(t.token||"-")+'</div><div class="token-meta">3 Bulan / 90 Hari · '+(used?'<span class="token-status used">TERPAKAI</span>':'<span class="token-status available">TERSEDIA</span>')+(used&&t.usedByEmail?' · '+escapeTokenReg(t.usedByEmail):"")+'</div></div><div class="token-actions">'+copy+del+'</div></div>';
+ }).join("");
+}
+async function copyTokenReg(token){try{await navigator.clipboard.writeText(token);tampilPopup("Token","Token berhasil disalin:\n"+token)}catch(e){prompt("Salin token ini:",token)}}
+async function hapusTokenTerpakai(id){
+ if(!window.confirm("Hapus token yang sudah terpakai ini?"))return;
+ try{await deleteDoc(doc(db,"tokens",id));await muatTokenPopup()}catch(e){tampilPopup("Token","Token tidak bisa dihapus: "+(e.message||e))}
+}
+function escapeTokenReg(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+</script>
+
+</body>
+</html>
