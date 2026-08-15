@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FIXZY - Token Aktivasi Pengguna Baru</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#0f172a}
+.top{background:#0f172a;color:#fff;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:0;z-index:10}
+.top h1{font-size:14px;margin:0}.top small{color:#94a3b8}.wrap{max-width:1000px;margin:auto;padding:12px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px;margin-bottom:12px}.card h3{font-size:13px;margin:0 0 10px}
+.notice{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:10px;padding:10px;font-size:11px;line-height:1.5;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}label{display:block;font-size:10px;font-weight:900;margin-bottom:5px;color:#475569}
+input,select{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font-size:12px;background:#fff}
+.btn{border:0;border-radius:8px;padding:10px 13px;font-weight:900;cursor:pointer;font-size:11px}.btn-yellow{background:#facc15;color:#111}.btn-dark{background:#0f172a;color:#fff}.btn-red{background:#ef4444;color:#fff}.btn-white{background:#fff;border:1px solid #cbd5e1}
+.full{width:100%;height:46px;margin-top:10px;font-size:14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px}.stat small{font-size:10px;color:#64748b;font-weight:900}.stat b{display:block;font-size:20px;margin-top:3px}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:10px;margin-top:10px}table{width:100%;border-collapse:collapse;min-width:650px;font-size:11px}
+th{background:#0f172a;color:#fff;text-align:left;padding:9px 8px;font-size:10px}td{padding:8px;border-bottom:1px solid #f1f5f9}
+.badge{display:inline-block;padding:3px 7px;border-radius:999px;font-size:10px;font-weight:900}.ok{background:#dcfce7;color:#15803d}.off{background:#fee2e2;color:#991b1b}
+.msg{font-size:11px;font-weight:800;margin-top:8px}#loginBox{max-width:380px;margin:60px auto;background:#fff;padding:20px;border-radius:16px;box-shadow:0 10px 30px #0002}
+@media(max-width:600px){.grid,.stats{grid-template-columns:1fr}.top{align-items:flex-start}}
+</style>
+</head>
+<body>
+<div id="loginBox"><h2 style="margin:0 0 8px">🔒 Login Owner</h2>
+<input id="email" placeholder="Email Owner" style="margin-bottom:8px"><input id="pass" type="password" placeholder="Password" style="margin-bottom:8px">
+<button class="btn btn-dark" style="width:100%" onclick="loginOwner()">Masuk</button>
+<div id="loginErr" style="color:#dc2626;font-size:11px;margin-top:8px;display:none"></div></div>
+
+<div id="app" style="display:none">
+<div class="top"><div><h1>🎫 FIXZY — TOKEN AKTIVASI PENGGUNA BARU</h1><small id="ownerEmail"></small></div>
+<div><button class="btn btn-white" onclick="loadAll()">↻ Refresh</button><button class="btn btn-red" onclick="logout()">Logout</button></div></div>
+<div class="wrap">
+<div class="notice"><b>KHUSUS PENGGUNA BARU.</b><br>Token dari halaman ini otomatis bertipe <b>aktivasi_baru</b>, paket <b>3 Bulan / 90 Hari</b>. Token ini <b>tidak boleh digunakan untuk perpanjangan</b>.</div>
+<div class="stats"><div class="stat"><small>Total Token Aktivasi</small><b id="stTotal">0</b></div><div class="stat"><small>Tersedia</small><b id="stSedia">0</b></div><div class="stat"><small>Terpakai</small><b id="stPakai">0</b></div></div>
+
+<div class="card"><h3>➕ Buat Token Aktivasi Baru — 3 Bulan</h3>
+<div class="grid">
+<div><label>JUMLAH TOKEN</label><input id="jml" type="number" min="1" value="1"></div>
+<div><label>HARGA / TOKEN (Rp)</label><input id="harga" type="number" min="0" value="50000"></div>
+<div><label>PREFIX OPSIONAL</label><input id="pref" placeholder="Contoh: NEW"></div>
+<div><label>PAKET</label><input value="3 Bulan / 90 Hari" disabled></div>
+</div>
+<button class="btn btn-yellow full" onclick="buatToken()">🎫 Buat Token Aktivasi Baru</button><div id="msg" class="msg"></div></div>
+
+<div class="card"><h3>🔎 Token Aktivasi Baru</h3>
+<div class="grid"><div><label>CARI TOKEN / EMAIL</label><input id="cari" placeholder="Ketik token atau email..." oninput="render()"></div>
+<div><label>STATUS</label><select id="status" onchange="render()"><option value="">Semua</option><option value="tersedia">Tersedia</option><option value="terpakai">Terpakai</option></select></div></div>
+<div class="table-wrap"><table><thead><tr><th>TOKEN</th><th>PAKET</th><th>HARGA</th><th>STATUS</th><th>PEMAKAI</th><th>AKSI</th></tr></thead>
+<tbody id="body"><tr><td colspan="6" style="text-align:center;padding:20px">Memuat...</td></tr></tbody></table></div></div>
+</div></div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import{getFirestore,collection,getDocs,addDoc,query,where}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+const cfg={apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",authDomain:"fixzy-update.firebaseapp.com",projectId:"fixzy-update",storageBucket:"fixzy-update.firebasestorage.app",messagingSenderId:"995892519622",appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"};
+const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);let all=[];
+window.loginOwner=async()=>{const e=email.value.trim(),p=pass.value.trim(),er=loginErr;er.style.display="none";if(!e||!p){er.textContent="Email dan password wajib diisi.";er.style.display="block";return}try{await signInWithEmailAndPassword(auth,e,p)}catch(x){er.textContent="Gagal login: "+x.message;er.style.display="block"}};
+window.logout=async()=>{await signOut(auth)};
+onAuthStateChanged(auth,u=>{loginBox.style.display=u?"none":"block";app.style.display=u?"block":"none";if(u){ownerEmail.textContent=u.email||"";loadAll()}});
+function genToken(){const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let t="";for(let i=0;i<12;i++)t+=c[Math.floor(Math.random()*c.length)];return t.match(/.{1,4}/g).join("-")}
+async function tokenBelumAda(t){return(await getDocs(query(collection(db,"tokens"),where("token","==",t)))).empty}
+window.buatToken=async()=>{const n=parseInt(jml.value||"0"),hargaN=parseInt(harga.value||"0"),pre=pref.value.trim().toUpperCase(),msg=document.getElementById("msg");if(!n||n<1){msg.textContent="Jumlah token tidak valid.";return}msg.textContent="Membuat token...";
+try{for(let i=0;i<n;i++){let t;do{t=(pre?pre+"-":"")+genToken()}while(!(await tokenBelumAda(t)));await addDoc(collection(db,"tokens"),{token:t,tipe:"aktivasi_baru",jenis:"aktivasi_baru",paket:"3 Bulan",paketHari:90,durasi:"90 Hari",harga:hargaN,used:false,usedBy:"",usedByEmail:"",usedAt:null,status:"tersedia",createdAt:new Date()})}
+msg.textContent=n+" token aktivasi baru 3 bulan berhasil dibuat.";jml.value=1;pref.value="";await loadAll();setTimeout(()=>msg.textContent="",4000)}catch(e){msg.textContent="Gagal: "+e.message}};
+window.loadAll=async()=>{try{const s=await getDocs(collection(db,"tokens"));all=[];s.forEach(d=>{const x=d.data();if(x.tipe==="aktivasi_baru"||x.jenis==="aktivasi_baru")all.push({id:d.id,...x})});render()}catch(e){body.innerHTML='<tr><td colspan="6" style="color:#dc2626;padding:20px">Error: '+e.message+"</td></tr>"}};
+window.render=()=>{const q=cari.value.toLowerCase().trim(),st=status.value,r=all.filter(t=>(!st||(st==="tersedia"&&!t.used)||(st==="terpakai"&&t.used))&&(!q||((t.token||"")+" "+(t.usedByEmail||"")).toLowerCase().includes(q)));stTotal.textContent=all.length;stSedia.textContent=all.filter(t=>!t.used).length;stPakai.textContent=all.filter(t=>t.used).length;body.innerHTML=r.length?r.map(t=>'<tr><td><b>'+esc(t.token||"-")+'</b></td><td><b>3 Bulan</b><br><small>90 Hari</small></td><td>Rp '+Number(t.harga||0).toLocaleString("id-ID")+'</td><td>'+(t.used?'<span class="badge off">Terpakai</span>':'<span class="badge ok">Tersedia</span>')+'</td><td>'+esc(t.used?(t.usedByEmail||t.usedBy||"-"):"-")+'</td><td><button class="btn btn-white" onclick="copyToken(\''+String(t.token||"").replace(/'/g,"\\'")+'\')">Copy</button></td></tr>').join(""):'<tr><td colspan="6" style="text-align:center;padding:20px">Belum ada token aktivasi baru.</td></tr>'};
+window.copyToken=async t=>{try{await navigator.clipboard.writeText(t);alert("Token disalin: "+t)}catch(e){prompt("Salin token:",t)}};
+function esc(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+</script>
+</body></html>
