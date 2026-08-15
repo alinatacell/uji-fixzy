@@ -42,7 +42,7 @@ td{padding:8px;border-bottom:1px solid #f1f5f9;vertical-align:top}
 </head>
 <body>
 
-<div id="loginBox">
+<div id="loginBox" style="display:block">
 <h2 style="margin:0 0 8px">🔒 Login Owner</h2>
 <input id="email" value="servicehpmaja@gmail.com" style="width:100%;margin-bottom:8px">
 <input id="pass" type="password" placeholder="Password" style="width:100%;margin-bottom:8px">
@@ -163,7 +163,7 @@ bukan untuk perpanjangan paket.
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, deleteDoc, addDoc, query, where } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const cfg={
  apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",
@@ -181,6 +181,14 @@ const db=getFirestore(app);
 let allTokens=[];
 let selected=new Set();
 
+function tampilApp(u){
+ if(!u)return;
+ document.getElementById('loginBox').style.display='none';
+ document.getElementById('app').style.display='block';
+ document.getElementById('ownerEmail').textContent=u.email||'';
+ loadAll();
+}
+
 window.loginOwner=async function(){
  const e=document.getElementById('email').value.trim();
  const p=document.getElementById('pass').value.trim();
@@ -194,7 +202,10 @@ window.loginOwner=async function(){
  }
 
  try{
-  await signInWithEmailAndPassword(auth,e,p);
+  const cred=await signInWithEmailAndPassword(auth,e,p);
+  // Tampilkan halaman langsung setelah login berhasil.
+  // Tidak reload dan tidak menunggu callback untuk membuka UI.
+  tampilApp(cred.user);
  }catch(ex){
   err.style.display='block';
   err.textContent='Gagal: '+ex.message;
@@ -202,21 +213,19 @@ window.loginOwner=async function(){
 };
 
 window.logout=async function(){
- await signOut(auth);
- location.reload();
+ try{ await signOut(auth); }catch(e){}
+ document.getElementById('app').style.display='none';
+ document.getElementById('loginBox').style.display='block';
 };
 
+let authReady=false;
 onAuthStateChanged(auth,(u)=>{
- if(!u){
+ authReady=true;
+ if(u) tampilApp(u);
+ else {
   document.getElementById('loginBox').style.display='block';
   document.getElementById('app').style.display='none';
-  return;
  }
-
- document.getElementById('loginBox').style.display='none';
- document.getElementById('app').style.display='block';
- document.getElementById('ownerEmail').textContent=u.email||'';
- loadAll();
 });
 
 window.loadAll=async function(){
@@ -226,14 +235,14 @@ window.loadAll=async function(){
  selected.clear();
 
  try{
-  const snap=await getDocs(query(
-   collection(db,"tokens"),
-   where("tipe","==","aktivasi_baru")
-  ));
+  const snap=await getDocs(collection(db,"tokens"));
 
   allTokens=[];
   snap.forEach(d=>{
-   allTokens.push({id:d.id,...d.data()});
+   const x=d.data()||{};
+   if(x.tipe==="aktivasi_baru" || x.jenis==="aktivasi_baru"){
+    allTokens.push({id:d.id,...x});
+   }
   });
 
   allTokens.sort((a,b)=>{
@@ -246,7 +255,7 @@ window.loadAll=async function(){
 
  }catch(e){
   document.getElementById('tokenBody').innerHTML=
-   '<tr><td colspan="7" style="color:red;padding:20px">Error tokens: '+escapeHtml(e.message)+'</td></tr>';
+   '<tr><td colspan="7" style="color:red;padding:20px"><b>Gagal membaca Firebase</b><br>'+escapeHtml(e.message)+'</td></tr>';
  }
 
  if(btn){btn.textContent='↻ Refresh';btn.disabled=false}
