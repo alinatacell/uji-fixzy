@@ -393,12 +393,10 @@ function genToken(){
  return t.match(/.{1,4}/g).join("-");
 }
 
-async function tokenSudahAda(token){
- const snap=await getDocs(query(
-  collection(db,"tokens"),
-  where("token","==",token)
- ));
- return !snap.empty;
+function tokenSudahAda(token, batchTokens){
+ const target=String(token||'').trim().toUpperCase();
+ if(batchTokens && batchTokens.has(target)) return true;
+ return allTokens.some(t=>String(t.token||'').trim().toUpperCase()===target);
 }
 
 window.buatToken=async function(){
@@ -415,12 +413,14 @@ window.buatToken=async function(){
  msg.textContent="Membuat "+jml+" token registrasi 3 bulan...";
 
  try{
+  const batchTokens=new Set();
   for(let i=0;i<jml;i++){
    let token;
 
    do{
     token=(pref?pref+"-":"")+genToken();
-   }while(await tokenSudahAda(token));
+   }while(tokenSudahAda(token,batchTokens));
+   batchTokens.add(token.toUpperCase());
 
    await addDoc(collection(db,"tokens"),{
     token,
