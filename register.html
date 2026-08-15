@@ -223,7 +223,17 @@ async function loadAvailableTokens(force=false){
 
  try{
 
-   const snap=await getDocs(collection(db,"registerTokens"));
+   /*
+     SAMA SEPERTI PRODUK PENJUALAN:
+     ambil data langsung dari Firebase lalu masukkan ke array.
+     Token registrasi dibuat oleh halaman Admin di collection "tokens".
+   */
+   const snap=await getDocs(
+     query(
+       collection(db,"tokens"),
+       where("tipe","==","aktivasi_baru")
+     )
+   );
 
    tokenData=[];
 
@@ -231,13 +241,6 @@ async function loadAvailableTokens(force=false){
 
      const x=d.data()||{};
      const token=String(x.token||"").trim();
-
-     /*
-       registerTokens adalah collection khusus token registrasi.
-       Jangan bergantung pada field paketHari karena generator token
-       yang sudah berjalan dapat memakai nama/struktur field berbeda.
-       Selama token belum terpakai, token tersebut ditampilkan.
-     */
 
      const used=
        x.used===true ||
@@ -249,7 +252,7 @@ async function loadAvailableTokens(force=false){
          id:d.id,
          ...x,
          token:token,
-         paketHari:90
+         paketHari:Number(x.paketHari||90)
        });
 
      }
@@ -259,14 +262,9 @@ async function loadAvailableTokens(force=false){
    tokenData.sort((a,b)=>{
 
      const getDate=(x)=>{
-
        if(x?.toDate)return x.toDate();
-
-       if(x?.seconds)
-         return new Date(x.seconds*1000);
-
+       if(x?.seconds)return new Date(x.seconds*1000);
        return new Date(x||0);
-
      };
 
      return getDate(b.createdAt)-getDate(a.createdAt);
@@ -293,6 +291,12 @@ async function loadAvailableTokens(force=false){
  }
 
 }
+
+window.refreshRegistrationTokens=async function(){
+ tokenLoaded=false;
+ tokenData=[];
+ await loadAvailableTokens(true);
+};
 
 function renderTokenOptions(){
 
@@ -431,7 +435,7 @@ form.addEventListener("submit",async(e)=>{
 
    const tokenSnap=await getDocs(
      query(
-       collection(db,"registerTokens"),
+       collection(db,"tokens"),
        where("token","==",tokenAktivasi)
      )
    );
@@ -460,11 +464,19 @@ form.addEventListener("submit",async(e)=>{
      throw new Error("Token sudah pernah digunakan.");
    }
 
-   /*
-     Token yang berada di registerTokens adalah token khusus
-     registrasi pengguna baru yang dibuat dari halaman Admin.
-     Masa aktif registrasi ditetapkan 90 hari saat akun dibuat.
-   */
+   const tokenTipe=String(tokenInfo.tipe||tokenInfo.jenis||"").toLowerCase();
+   if(tokenTipe!=="aktivasi_baru"){
+     throw new Error("Token ini bukan token registrasi pengguna baru.");
+   }
+
+   const paketHari=
+     Number(tokenInfo.paketHari||0) ||
+     Number(String(tokenInfo.paket||"").replace(/[^0-9]/g,"")) ||
+     0;
+
+   if(paketHari!==90){
+     throw new Error("Token registrasi harus paket 3 bulan / 90 hari.");
+   }
 
    /* -----------------------------------------------------
       2. BUAT AUTH
@@ -557,7 +569,7 @@ form.addEventListener("submit",async(e)=>{
       ----------------------------------------------------- */
 
    await updateDoc(
-     doc(db,"registerTokens",tokenId),
+     doc(db,"tokens",tokenId),
      {
        used:true,
        status:"terpakai",
