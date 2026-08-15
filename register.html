@@ -179,9 +179,9 @@ form.addEventListener("submit", async (e)=>{
 
    await setDoc(doc(db,"users",uid),{
      uid,idKonter:"FX-"+Date.now(),aplikasi:"Fixzy",namaKonter,namaPemilik,whatsapp,email,alamat,
-     paket:"3 Bulan",jenisLisensi:"Aktivasi Token",durasi:"90 Hari",harga:Number(tokenData.harga||0),
-     status:"active",statusPembayaran:"paid",masaAktif:"aktif",perpanjangan:false,perpanjanganStatus:"none",
-     role:"user",tokenAktivasi,tokenType:"aktivasi_baru",tokenId:tokenDoc.id,
+     paket:"trial",jenisLisensi:"Aktivasi Token",durasi:"90 Hari",harga:Number(tokenData.harga||0),
+     status:"aktif",statusPembayaran:"paid",masaAktif:"aktif",trial:true,perpanjangan:false,perpanjanganStatus:"none",
+     role:"owner",tokenAktivasi,tokenType:"aktivasi_baru",tokenId:tokenDoc.id,
      createdAt:serverTimestamp(),tanggalDaftar:serverTimestamp(),tanggalAktivasi: tanggalAktivasi.toISOString(),
      tanggalBerakhir:tanggalBerakhir.toISOString(),device:navigator.userAgent,versi:"Fixzy V1",lastLogin:null
    });
