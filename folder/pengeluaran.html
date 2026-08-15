@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FIXZY | Pengeluaran</title>
+<meta name="theme-color" content="#ffc107">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f1f3f7;color:#182235}
+.top{height:108px;background:#0d1728;color:#fff;display:flex;align-items:center;padding:18px 24px;gap:18px}
+.menu{width:58px;height:58px;border:0;border-radius:18px;background:#111d30;color:#fff;font-size:28px}
+.brand h1{margin:0;font-size:25px} .brand p{margin:5px 0 0;color:#cbd5e1}
+.wrap{max-width:1100px;margin:auto;padding:20px}
+.card{background:#fff;border-radius:24px;padding:22px;margin-bottom:18px;box-shadow:0 5px 20px #0000000d}
+.hero{background:#172235;color:#fff;border-radius:28px;padding:26px}
+.hero h2{margin:0 0 8px;font-size:30px} .hero p{margin:0;color:#d6deea;line-height:1.55}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px}
+.stat{background:#fff;border-radius:20px;padding:18px} .stat small{display:block;color:#64748b;font-weight:700}
+.stat b{display:block;font-size:25px;margin-top:8px}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+label{display:block;font-weight:700;color:#475569;margin-bottom:7px}
+input,select,textarea{width:100%;padding:14px 15px;border:1px solid #cbd5e1;border-radius:14px;font-size:16px;background:#fff}
+textarea{min-height:90px;resize:vertical}
+.full{grid-column:1/-1}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:15px}
+button.action{border:0;border-radius:14px;padding:14px 20px;font-size:16px;font-weight:800;cursor:pointer}
+.save{background:#ffc107;color:#111} .refresh{background:#0d6efd;color:#fff} .clear{background:#e2e8f0;color:#111}
+.tablewrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th{background:#0d6efd;color:#fff;padding:14px;text-align:left} td{padding:13px;border-bottom:1px solid #e5e7eb}
+.amount{font-weight:800;color:#dc2626;white-space:nowrap}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-weight:700}
+.danger{color:#dc2626;font-weight:800}
+.empty{padding:30px;text-align:center;color:#64748b}
+@media(max-width:700px){
+.top{height:96px;padding:14px 16px} .wrap{padding:14px}
+.grid{grid-template-columns:1fr 1fr} .formgrid{grid-template-columns:1fr}
+.full{grid-column:auto} .hero h2{font-size:25px}
+.card{padding:17px;border-radius:20px}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+<div class="brand"><h1>FIXZY <span style="color:#ffc107">PENGELUARAN</span></h1><p>Catat pengeluaran toko & kasbon karyawan</p></div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h2>💸 Pengeluaran</h2>
+    <p>Semua pengeluaran dicatat di sini. Pilih <b>Kasbon Karyawan</b> untuk mencatat uang yang diambil karyawan. Kasbon tersebut otomatis dapat mengurangi sisa upah di halaman Upah Karyawan.</p>
+  </section>
+
+  <section class="grid">
+    <div class="stat"><small>Pengeluaran Bulan Ini</small><b id="totalMonth">Rp 0</b></div>
+    <div class="stat"><small>Kasbon Karyawan</small><b id="totalKasbon" style="color:#dc2626">Rp 0</b></div>
+    <div class="stat"><small>Pengeluaran Lain</small><b id="totalOther">Rp 0</b></div>
+    <div class="stat"><small>Jumlah Transaksi</small><b id="totalCount">0</b></div>
+  </section>
+
+  <section class="card">
+    <h2 style="margin-top:0">➕ Tambah Pengeluaran</h2>
+    <div class="formgrid">
+      <div>
+        <label>Tanggal</label>
+        <input id="tanggal" type="date">
+      </div>
+      <div>
+        <label>Jenis Pengeluaran</label>
+        <select id="jenis" onchange="toggleKaryawan()">
+          <option value="Makan">Makan</option>
+          <option value="Belanja">Belanja</option>
+          <option value="Kasbon Karyawan">Kasbon Karyawan</option>
+          <option value="Transportasi">Transportasi</option>
+          <option value="Listrik / Internet">Listrik / Internet</option>
+          <option value="Servis / Operasional">Servis / Operasional</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+      </div>
+      <div id="karyawanBox" style="display:none">
+        <label>Nama Karyawan</label>
+        <select id="karyawan"><option value="">Pilih karyawan</option></select><small id="karyawanStatus" style="display:block;margin-top:6px;color:#64748b">Memuat data karyawan...</small>
+      </div>
+      <div id="nominalBox">
+        <label>Nominal</label>
+        <input id="nominal" type="number" min="0" inputmode="numeric" placeholder="Contoh: 50000">
+      </div>
+      <div class="full">
+        <label>Keterangan</label>
+        <textarea id="keterangan" placeholder="Contoh: makan siang karyawan / belanja kebutuhan toko / kasbon"></textarea>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="action save" onclick="simpan()">💾 Simpan</button>
+      <button class="action clear" onclick="bersihkan()">Bersihkan</button>
+      <button class="action refresh" onclick="muatData()">↻ Refresh</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+      <h2 style="margin:0">📒 Riwayat Pengeluaran</h2>
+      <input id="filterBulan" type="month" style="max-width:180px" onchange="render()">
+    </div>
+    <div class="tablewrap" style="margin-top:15px">
+      <table>
+        <thead><tr><th>Tanggal</th><th>Jenis</th><th>Nama Karyawan</th><th>Keterangan</th><th>Nominal</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {getFirestore,collection,query,where,getDocs,addDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+const firebaseConfig={
+  apiKey:"AIzaSyCwMbJsuORhIq4QCmp4c1r6OsjAUlfxU5Y",
+  authDomain:"fixzy-f056f.firebaseapp.com",
+  projectId:"fixzy-f056f",
+  storageBucket:"fixzy-f056f.firebasestorage.app",
+  messagingSenderId:"838081521031",
+  appId:"1:838081521031:web:50fdee909b56460b055f22"
+};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+let uid=null;
+let rows=[];
+let employees=[];
+
+const $=id=>document.getElementById(id);
+const money=n=>"Rp "+Number(n||0).toLocaleString("id-ID");
+
+function today(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function monthNow(){
+  return today().slice(0,7);
+}
+function clean(v){return String(v??"").trim().toLowerCase().replace(/\s+/g," ")}
+
+window.tutupHalaman=function(){
+  try{window.close()}catch(e){}
+  setTimeout(()=>{
+    try{
+      if(history.length>1){history.back();return;}
+    }catch(e){}
+    location.href="index.html";
+  },120);
+};
+
+window.toggleKaryawan=function(){
+  $("karyawanBox").style.display=$("jenis").value==="Kasbon Karyawan"?"block":"none";
+};
+
+window.bersihkan=function(){
+  $("nominal").value="";
+  $("keterangan").value="";
+  $("jenis").value="Makan";
+  $("karyawan").value="";
+  toggleKaryawan();
+};
+
+async function loadEmployees(){
+  if(!uid) return;
+
+  const snap=await getDocs(
+    query(collection(db,"karyawan"),where("uid","==",uid))
+  );
+
+  employees=snap.docs.map(d=>({id:d.id,...d.data()}));
+
+  const select=$("karyawan");
+  select.innerHTML='<option value="">Pilih karyawan</option>';
+
+  let count=0;
+
+  employees.forEach(e=>{
+    // Data Karyawan FIXZY memakai field nama dan status.
+    const name=String(e.nama||e.namaKaryawan||e.namaTeknisi||e.name||e.namaLengkap||e.nama_lengkap||"").trim();
+    if(!name) return;
+
+    const status=String(e.status||"Aktif").trim().toLowerCase();
+    if(status!=="aktif" && status!=="active") return;
+
+    const op=document.createElement("option");
+    op.value=e.id;
+    op.textContent=name;
+    op.dataset.name=name;
+    select.appendChild(op);
+    count++;
+  });
+
+  const statusEl=$("karyawanStatus");
+  if(count===0){
+    select.innerHTML='<option value="">Tidak ada karyawan aktif</option>';
+    if(statusEl) statusEl.textContent="Tidak ada karyawan aktif untuk akun ini.";
+  }else{
+    if(statusEl) statusEl.textContent=count+" karyawan aktif ditemukan.";
+  }
+}
+
+async function loadRows(){
+  if(!uid) return;
+
+  const snap=await getDocs(
+    query(collection(db,"pengeluaran"),where("uid","==",uid))
+  );
+
+  rows=snap.docs.map(d=>({id:d.id,...d.data()}));
+}
+
+window.simpan=async function(){
+  const tanggal=$("tanggal").value||today();
+  const jenis=$("jenis").value;
+  const nominal=Number($("nominal").value||0);
+  const keterangan=$("keterangan").value.trim();
+
+  if(!nominal||nominal<1){alert("Nominal belum diisi.");return;}
+
+  let karyawanId="";
+  let namaKaryawan="";
+  if(jenis==="Kasbon Karyawan"){
+    const op=$("karyawan").selectedOptions[0];
+    karyawanId=$("karyawan").value;
+    namaKaryawan=op?.dataset?.name||op?.textContent||"";
+    if(!karyawanId){alert("Pilih karyawan untuk kasbon.");return;}
+  }
+
+  if(!uid){alert("Login Firebase belum siap. Silakan login kembali.");return;}
+
+  try{
+    await addDoc(collection(db,"pengeluaran"),{
+    uid,
+    tanggal,
+    jenis,
+    nominal,
+    keterangan,
+    karyawanId,
+    namaKaryawan,
+    createdAt:serverTimestamp()
+    });
+
+    alert("Pengeluaran berhasil disimpan.");
+    bersihkan();
+    await muatData();
+  }catch(e){
+    console.error("FIXZY SIMPAN PENGELUARAN:",e);
+    alert("Gagal menyimpan pengeluaran.\n\n"+(e.code||"")+"\n"+(e.message||e));
+  }
+};
+
+window.muatData=async function(){
+  try{
+    await loadEmployees();
+    await loadRows();
+    render();
+  }catch(e){
+    console.error("FIXZY PENGELUARAN:",e);
+    alert("Gagal mengambil data Firebase.\n\nKode: "+(e.code||"-")+"\n"+(e.message||e));
+  }
+};
+
+window.render=function(){
+  const period=$("filterBulan").value||monthNow();
+  const data=rows
+    .filter(r=>String(r.tanggal||"").startsWith(period))
+    .sort((a,b)=>String(b.tanggal||"").localeCompare(String(a.tanggal||"")));
+
+  const total=data.reduce((s,r)=>s+Number(r.nominal||0),0);
+  const kasbon=data.filter(r=>r.jenis==="Kasbon Karyawan").reduce((s,r)=>s+Number(r.nominal||0),0);
+
+  $("totalMonth").textContent=money(total);
+  $("totalKasbon").textContent=money(kasbon);
+  $("totalOther").textContent=money(total-kasbon);
+  $("totalCount").textContent=data.length;
+
+  if(!data.length){
+    $("tbody").innerHTML='<tr><td colspan="5" class="empty">Belum ada pengeluaran pada bulan ini.</td></tr>';
+    return;
+  }
+
+  $("tbody").innerHTML=data.map(r=>{
+    const kas=r.jenis==="Kasbon Karyawan";
+    return `<tr>
+      <td>${r.tanggal||"-"}</td>
+      <td><span class="badge">${r.jenis||"-"}</span></td>
+      <td>${r.namaKaryawan||"-"}</td>
+      <td>${r.keterangan||"-"}</td>
+      <td class="amount">${money(r.nominal)}</td>
+    </tr>`;
+  }).join("");
+};
+
+$("tanggal").value=today();
+$("filterBulan").value=monthNow();
+toggleKaryawan();
+
+onAuthStateChanged(auth,async user=>{
+  if(!user){
+    $("karyawanStatus").textContent="Belum login Firebase.";
+    alert("Sesi login Firebase tidak ditemukan. Silakan login kembali.");
+    return;
+  }
+
+  uid=user.uid;
+
+  try{
+    await muatData();
+  }catch(e){
+    console.error("FIXZY PENGELUARAN:",e);
+  }
+});
+</script>
+</body>
+</html>

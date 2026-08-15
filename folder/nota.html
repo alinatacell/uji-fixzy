@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FIXZY | Input Servis</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#eef2f6;color:#111827;font-family:Arial,Helvetica,sans-serif}
+header{
+  background:#111827;
+  color:#fff;
+  padding:10px 14px;
+  position:sticky;
+  top:0;
+  z-index:50;
+  border-bottom:1px solid #1e293b;
+}
+.head{
+  width:100%;
+  max-width:920px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:52px;
+}
+.head-logo{
+  width:52px;
+  height:52px;
+  border-radius:14px;
+  object-fit:contain;
+  background:#000;
+  padding:4px;
+  border:1px solid #ffffff20;
+  flex:0 0 52px;
+}
+.head-info{
+  min-width:0;
+  flex:1;
+  line-height:1.2;
+}
+.head-title-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+.head h1{
+  font-size:18px;
+  margin:0;
+  font-weight:900;
+  white-space:nowrap;
+}
+.head-email{
+  display:block;
+  margin-top:2px;
+  font-size:11px;
+  color:#9ca3af;
+  font-weight:700;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:480px;
+}
+.role-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:5px 9px;
+  border-radius:999px;
+  background:#16c75b;
+  color:#fff;
+  font-size:11px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.head-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:none;
+}
+.head button{
+  border-radius:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.refresh{
+  background:#1e293b;
+  color:#fff;
+  border:2px solid #334155;
+  height:44px;
+  padding:9px 14px;
+  font-size:12px;
+}
+.refresh:hover{
+  background:#facc15;
+  color:#000;
+}
+.theme-btn{
+  width:44px;
+  height:44px;
+  padding:0;
+  border:2px solid #334155;
+  background:#1e293b;
+  color:#fff;
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.theme-btn:hover{
+  background:#facc15;
+  color:#000;
+}
+body.dark{
+  background:#0b0f14;
+  color:#f3f4f6;
+}
+body.dark header{
+  background:#0b0f14;
+  color:#f3f4f6;
+  border-bottom-color:#263241;
+}
+body.dark .card{
+  background:#151b23;
+  color:#f3f4f6;
+}
+body.dark .title{
+  border-bottom-color:#2b3440;
+}
+body.dark label,
+body.dark .check,
+body.dark .status-msg,
+body.dark .money,
+body.dark .pmeta{
+  color:#aeb7c4;
+}
+body.dark input,
+body.dark select,
+body.dark textarea{
+  background:#0f141b;
+  color:#f3f4f6;
+  border-color:#2b3440;
+}
+body.dark .readonly{
+  background:#10161e;
+  color:#cbd5e1;
+}
+body.dark .info{
+  border-color:#2b3440;
+}
+body.dark .info-row{
+  border-bottom-color:#2b3440;
+}
+body.dark .info-row span{
+  color:#aeb7c4;
+}
+body.dark .results{
+  background:#151b23;
+  border-color:#2b3440;
+}
+body.dark .result{
+  background:#151b23;
+  color:#f3f4f6;
+  border-bottom-color:#2b3440;
+}
+body.dark .result:hover{
+  background:#1d2631;
+}
+body.dark .selected.empty{
+  background:#10161e;
+  color:#aeb7c4;
+  border-color:#3b4654;
+}
+body.dark .secondary{
+  background:#2b3440;
+  color:#f3f4f6;
+}
+body.dark .popup-box{
+  background:#151b23;
+  color:#f3f4f6;
+}
+body.dark .popup-box p{
+  color:#aeb7c4;
+}
+main{max-width:920px;margin:auto;padding:12px}
+.card{background:#fff;border-radius:12px;padding:15px;margin-bottom:12px;box-shadow:0 2px 10px #0001}
+.title{font-size:16px;font-weight:900;border-bottom:1px solid #e5e7eb;padding-bottom:9px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.full{grid-column:1/-1}
+label{display:block;font-size:12px;font-weight:800;color:#4b5563;margin-bottom:5px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font:inherit}
+textarea{min-height:78px;resize:vertical}
+.readonly{background:#f8fafc;color:#475467}
+.info{border:1px solid #e5e7eb;border-radius:9px;overflow:hidden}
+.info-row{display:flex;justify-content:space-between;gap:12px;padding:9px 11px;border-bottom:1px solid #eee;font-size:12px}
+.info-row:last-child{border-bottom:0}.info-row span{color:#667085;font-weight:700}.info-row b{text-align:right}
+.checks{display:flex;flex-wrap:wrap;gap:10px}
+.check{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#475467}
+.check input{width:auto}
+.product-search{position:relative}
+.results{display:none;position:absolute;z-index:30;left:0;right:0;top:100%;background:#fff;border:1px solid #ddd;border-radius:0 0 9px 9px;max-height:270px;overflow:auto;box-shadow:0 7px 18px #0002}
+.results.show{display:block}
+.result{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid #eee;background:#fff;padding:10px;cursor:pointer}
+.result:hover{background:#f8fafc}
+.pname{font-weight:900}.pmeta{font-size:11px;color:#667085;margin-top:3px}
+.selected{margin-top:7px;padding:9px;border:1px dashed #16a34a;background:#f0fdf4;border-radius:8px;font-size:12px}
+.selected.empty{border-color:#d1d5db;background:#f8fafc;color:#667085}
+.money{font-size:12px;color:#667085;margin-top:7px}
+.money strong{color:#111827}
+.actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+button.action{border:0;border-radius:9px;padding:12px;font-weight:900;cursor:pointer}
+.danger{background:#fee2e2;color:#991b1b}.secondary{background:#e5e7eb}.primary{background:#111827;color:#fff}
+.status-msg{font-size:12px;color:#667085;margin-top:8px}
+.popup{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;z-index:100}
+.popup.show{display:flex}
+.popup-box{width:min(420px,calc(100% - 30px));background:#fff;border-radius:14px;padding:18px;box-shadow:0 15px 45px #0004}
+.popup-box h3{margin:0 0 8px}.popup-box p{font-size:13px;color:#475467;line-height:1.5}
+.popup-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:13px}.popup-actions button{border:0;border-radius:8px;padding:10px 14px;font-weight:800}
+#garansiWrap{display:none}
+#printArea{display:none}
+@media(max-width:650px){
+  .grid{grid-template-columns:1fr}
+  .full{grid-column:auto}
+  .actions{grid-template-columns:1fr 1fr}
+  header{padding:10px 14px}
+  .head{gap:8px;min-height:52px}
+  .head-logo{width:52px;height:52px;flex-basis:52px}
+  .head h1{font-size:16px}
+  .head-email{font-size:10px;max-width:240px}
+  .role-badge{font-size:10px;padding:4px 7px}
+  .head-actions{gap:6px}
+  .refresh{height:44px;padding:9px 12px;font-size:12px}
+  .theme-btn{width:44px;height:44px;font-size:18px}
+}
+@media print{
+ body{background:#fff}
+ header,main,.popup{display:none!important}
+ #printArea{display:block!important}
+ @page{size:80mm auto;margin:0}
+ .print-paper{width:80mm;padding:5mm;font:9px Arial;color:#111}
+ .print-shop{text-align:center;border-bottom:2px solid #111;padding-bottom:7px}
+ .print-shop h2{font-size:16px;margin:0 0 3px;text-transform:uppercase}
+ .print-shop div{font-size:8px;color:#555;margin:2px 0}
+ .print-meta{display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;padding:7px 0;border-bottom:1px dashed #777}
+ .print-section{padding:7px 0;border-bottom:1px dashed #777}
+ .print-section b.tt{display:block;font-size:9px;text-transform:uppercase;margin-bottom:4px}
+ .print-grid{display:grid;grid-template-columns:75px 1fr;gap:3px}
+ .print-money{width:100%;border-collapse:collapse}.print-money td{padding:2px 0}.print-money td:last-child{text-align:right;font-weight:700}
+ .print-total td{border-top:2px solid #111;padding-top:5px!important;font-size:11px;font-weight:900}
+ .print-status{text-align:center;padding:7px;border:1px solid #aaa;margin-top:7px;font-weight:900;text-transform:uppercase}
+ .barcode-wrap{text-align:center;padding:9px 0}
+ .barcode-wrap svg{width:62mm!important;height:16mm!important}
+ .barcode-code{font:8px monospace;font-weight:700;margin-top:2px}
+ .print-footer{text-align:center;border-top:1px dashed #777;padding-top:7px;margin-top:6px;font-size:8px;color:#555;line-height:1.45}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head">
+    <img class="head-logo" src="logo.png" alt="FIXZY">
+
+    <div class="head-info">
+      <div class="head-title-row">
+        <h1>Input Servis</h1>
+        <span id="headerRole" class="role-badge">USER</span>
+      </div>
+      <span id="headerEmail" class="head-email">-</span>
+    </div>
+
+    <div class="head-actions">
+      <button class="refresh" type="button" onclick="location.reload()">Refresh</button>
+      <button class="theme-btn" id="themeBtn" type="button" onclick="toggleDarkMode()" aria-label="Mode gelap">🌙</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <div class="title">1. Informasi Transaksi</div>
+    <input type="hidden" id="nomorNota">
+    <input type="hidden" id="barcode">
+    <input type="hidden" id="tanggalNota">
+    <div class="info">
+      <div class="info-row"><span>Akun</span><b id="infoAkun">Memuat...</b></div>
+      <div class="info-row"><span>Usaha</span><b id="infoUsaha">Memuat...</b></div>
+      <div class="info-row"><span>Nomor Nota</span><b id="infoNota">Memuat...</b></div>
+      <div class="info-row"><span>Tanggal</span><b id="infoTanggal">Memuat...</b></div>
+      <div class="info-row"><span>Barcode</span><b id="infoBarcode">Memuat...</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">2. Pelanggan</div>
+    <div class="grid">
+      <div><label>NAMA PELANGGAN *</label><input id="namaPelanggan" autocomplete="name"></div>
+      <div><label>NO. WA *</label><input id="waPelanggan" inputmode="tel" autocomplete="tel"></div>
+      <div class="full"><label>ALAMAT</label><textarea id="alamatPelanggan"></textarea></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">3. Data Servisan</div>
+    <div class="grid">
+      <div><label>BRAND / TIPE HP *</label><input id="brandTipe"></div>
+      <div><label>IMEI</label><input id="imei"></div>
+      <div class="full"><label>JENIS KERUSAKAN *</label><textarea id="kerusakan"></textarea></div>
+      <div class="full"><label>KELENGKAPAN</label>
+        <div class="checks">
+          <label class="check"><input class="kelengkapan" type="checkbox" value="charger"> Charger</label>
+          <label class="check"><input class="kelengkapan" type="checkbox" value="simcard"> SIM Card</label>
+          <label class="check"><input class="kelengkapan" type="checkbox" value="memoricard"> Memory Card</label>
+          <label class="check"><input class="kelengkapan" type="checkbox" value="case/silicon"> Case / Silicon</label>
+        </div>
+      </div>
+      <div class="full"><label>SANDI / POLA <span style="font-weight:400">(disimpan internal, tidak dicetak)</span></label><input id="sandiPola"></div>
+      <div><label>TEKNISI *</label><select id="teknisi"><option value="">-- Pilih Teknisi --</option></select></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">4. Sparepart / Produk yang Digunakan</div>
+    <div class="grid">
+      <div class="full">
+        <label>CARI PRODUK STOK</label>
+        <div class="product-search">
+          <input id="cariProduk" placeholder="Ketik nama atau kode produk..." autocomplete="off">
+          <div id="hasilProduk" class="results"></div>
+        </div>
+        <div id="produkTerpilih" class="selected empty">Belum memilih produk.</div>
+      </div>
+      <div><label>QTY</label><input id="qtyProduk" value="1" inputmode="numeric"></div>
+      <div><label>PRODUK MANUAL JIKA TIDAK ADA DI STOK</label><input id="produkManual"></div>
+      <div class="full">
+        <div class="money">
+          Harga/modal produk **tidak ditampilkan pada input**. Sistem tetap menyimpan nilai modal internal untuk perhitungan stok dan laba.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">5. Pembayaran Servis</div>
+    <div class="grid">
+      <div><label>BIAYA SERVIS *</label><input id="biayaService" inputmode="numeric" placeholder="0"></div>
+      <div><label>DISKON</label><input id="diskon" inputmode="numeric" value="0"></div>
+      <div><label>DP</label><input id="dp" inputmode="numeric" value="0"></div>
+      <div><label>METODE PEMBAYARAN</label>
+        <select id="metodePembayaran">
+          <option value="tunai">Tunai</option>
+          <option value="transfer">Transfer</option>
+          <option value="qris">QRIS</option>
+          <option value="debit">Debit</option>
+          <option value="lainnya">Lainnya</option>
+        </select>
+      </div>
+      <div class="full">
+        <div class="money">
+          <span>Total: <strong id="previewTotal">Rp 0</strong></span>
+          &nbsp; • &nbsp;
+          <span>Sisa: <strong id="previewSisa">Rp 0</strong></span>
+        </div>
+      </div>
+      <div class="full"><label>CATATAN</label><textarea id="catatan"></textarea></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">6. Status Servis</div>
+    <div class="grid">
+      <div>
+        <label>STATUS AWAL *</label>
+        <select id="status">
+          <option value="masuk">Masuk Antrian</option>
+          <option value="nunggu sparepart">Nunggu Part</option>
+          <option value="proses">Proses</option>
+          <option value="selesai">Selesai</option>
+          <option value="diambil">Diambil</option>
+          <option value="batal">Batal</option>
+        </select>
+      </div>
+      <div id="garansiWrap">
+        <label>GARANSI</label>
+        <select id="garansiDurasi">
+          <option value="0">Tanpa Garansi</option>
+          <option value="7">7 Hari</option>
+          <option value="14">14 Hari</option>
+          <option value="30">30 Hari</option>
+          <option value="60">60 Hari</option>
+          <option value="90">90 Hari</option>
+        </select>
+      </div>
+      <div class="full"><label>CATATAN STATUS</label><textarea id="catatanStatus" placeholder="Opsional"></textarea></div>
+    </div>
+    <div class="status-msg">Status ini menjadi status awal transaksi. Setelah tersimpan, status dapat diubah dari Data Servis.</div>
+  </div>
+
+  <div class="card">
+    <div class="title">7. Simpan & Nota</div>
+    <div class="actions">
+      <button class="action danger" onclick="batalForm()">Batal</button>
+      <button class="action secondary" onclick="simpan(false)">Simpan</button>
+      <button class="action primary" onclick="simpan(true)">Simpan & Cetak Nota</button>
+    </div>
+    <div id="saveStatus" class="status-msg">Menunggu input.</div>
+  </div>
+</main>
+
+<div id="popupGaransi" class="popup">
+  <div class="popup-box">
+    <h3>🛡️ Garansi Servis</h3>
+    <p>Status akan menjadi <b>DIAMBIL</b>. Tentukan garansi sebelum transaksi disimpan.</p>
+    <select id="popupGaransiDurasi" style="width:100%">
+      <option value="0">Tanpa Garansi</option>
+      <option value="7">7 Hari</option>
+      <option value="14">14 Hari</option>
+      <option value="30">30 Hari</option>
+      <option value="60">60 Hari</option>
+      <option value="90">90 Hari</option>
+    </select>
+    <div class="popup-actions">
+      <button onclick="batalGaransi()" style="background:#e5e7eb">Kembali</button>
+      <button onclick="konfirmasiGaransi()" style="background:#111827;color:#fff">Lanjut Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div id="printArea"></div>
+
+<div id="fixzyErrorPopup" class="popup">
+  <div class="popup-box">
+    <h3 id="fixzyErrorTitle">⚠️ Pemberitahuan</h3>
+    <p id="fixzyErrorText"></p>
+    <div class="popup-actions">
+      <button type="button" onclick="tutupErrorPopup()" style="background:#111827;color:#fff">OK</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {
+  getFirestore,collection,query,where,getDocs,doc,getDoc,
+  setDoc,runTransaction,serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+const cfg={apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",authDomain:"fixzy-update.firebaseapp.com",projectId:"fixzy-update",storageBucket:"fixzy-update.firebasestorage.app",messagingSenderId:"995892519622",appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"};
+const app=initializeApp(cfg);
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+let authUser=null, uid=null, businessUid=null;
+let profile={}, products=[], employees=[], selectedProduct=null;
+let pendingSave=null;
+
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const num=id=>Number(String($(id)?.value||"").replace(/[^\d]/g,""))||0;
+const rupiah=n=>"Rp "+(Number(n)||0).toLocaleString("id-ID");
+
+function notaBaru(){
+  const d=new Date(),p=n=>String(n).padStart(2,"0");
+  return "SRV-"+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+"-"+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds())+String(d.getMilliseconds()).padStart(3,"0");
+}
+function makeBarcode(nota){return "FX-"+nota.replace(/^SRV-/,"");}
+function namaProduk(p){return String(p.nama||p.namaProduk||p.produk||p.name||p.kode||"-")}
+function kodeProduk(p){return String(p.kode||p.kodeProduk||p.sku||p.code||"").trim()}
+function stokProduk(p){return Number(p.sisa??p.stok??p.stock??0)||0}
+function modalProduk(p){return Number(p.hargaModal??p.hargaBeli??p.modal??p.hargaPokok??p.harga??0)||0}
+
+function businessOwner(data,user){
+  if(data.role==="owner") return user.uid;
+  if(data.ownerUid) return data.ownerUid;
+  if(data.role==="superadmin") return user.uid;
+  return user.uid;
+}
+function dateOnly(){return new Date().toISOString().slice(0,10)}
+
+function setInfo(){
+  $("infoAkun").textContent=profile.namaKaryawan||profile.nama||authUser?.email||authUser?.uid||"-";
+  $("infoUsaha").textContent=profile.namaKonter||profile.namaToko||profile.namaUsaha||profile.nama||"FIXZY";
+  $("infoNota").textContent=$("nomorNota").value;
+  $("infoTanggal").textContent=$("tanggalNota").value;
+  $("infoBarcode").textContent=$("barcode").value;
+}
+
+function hitung(){
+  const biaya=num("biayaService"),diskon=num("diskon"),dp=num("dp");
+  const total=Math.max(0,biaya-diskon);
+  const sisa=Math.max(0,total-dp);
+  $("previewTotal").textContent=rupiah(total);
+  $("previewSisa").textContent=rupiah(sisa);
+  return {biaya,diskon,dp,total,sisa};
+}
+
+["biayaService","diskon","dp"].forEach(id=>$(id).addEventListener("input",hitung));
+
+function updateGaransiUI(){
+  $("garansiWrap").style.display=$("status").value==="diambil"?"block":"none";
+}
+$("status").addEventListener("change",()=>{
+  updateGaransiUI();
+});
+
+async function loadProfile(){
+  // Karyawan TIDAK membaca dokumen users milik Owner.
+  // Rules memang tidak memberi akses ke profil Owner dari akun karyawan.
+  // Profil akun yang sedang login sudah dimuat di onAuthStateChanged().
+  if(profile && profile.role === "employee") return;
+
+  // Owner hanya membaca profilnya sendiri.
+  if(profile && profile.role === "owner" && businessUid === uid) return;
+
+  // Superadmin/akun lain: jangan memaksa membaca profil Owner karena
+  // halaman Input Servis tidak boleh gagal hanya karena profil bisnis.
+}
+
+async function loadEmployees(){
+  // Semua akun dibuat di collection `users` dan dihubungkan ke Owner
+  // melalui field `ownerUid`. Daftar teknisi adalah data penugasan,
+  // bukan penentu hak akses halaman. Hak akses tetap berasal dari izin Owner.
+  const snap=await getDocs(
+    query(
+      collection(db,"users"),
+      where("ownerUid","==",businessUid),
+      where("role","==","employee"),
+      where("status","==","aktif")
+    )
+  );
+
+  employees=snap.docs
+    .map(d=>({id:d.id,...d.data()}));
+
+  $("teknisi").innerHTML='<option value="">-- Pilih Teknisi --</option>'+
+    employees.map(x=>`<option value="${esc(x.id)}">${esc(x.nama||x.name||x.namaKaryawan||x.email||x.id||"-")}${x.jabatan?" • "+esc(x.jabatan):""}</option>`).join("");
+
+  if(!employees.length){
+    $("teknisi").innerHTML='<option value="">Belum ada teknisi aktif</option>';
+  }
+}
+
+async function loadProducts(){
+  const snap=await getDocs(query(collection(db,"stok"),where("uid","==",businessUid)));
+  products=snap.docs.map(d=>({id:d.id,...d.data()}));
+}
+
+function filterProduk(q=""){
+  const box=$("hasilProduk"),key=String(q).trim().toLowerCase();
+  const list=products.filter(p=>namaProduk(p).toLowerCase().includes(key)||kodeProduk(p).toLowerCase().includes(key)).slice(0,50);
+  box.innerHTML=list.length?list.map(p=>{
+    const stok=stokProduk(p);
+    return `<button type="button" class="result" data-id="${esc(p.id)}" ${stok<=0?"disabled":""}>
+      <div class="pname">${esc(namaProduk(p))}</div>
+      <div class="pmeta">${kodeProduk(p)?`Kode: ${esc(kodeProduk(p))} • `:""}Stok: <b>${stok}</b>${stok<=0?" • Stok kosong":""}</div>
+    </button>`;
+  }).join(""):'<div class="result">Produk tidak ditemukan.</div>';
+  box.classList.add("show");
+}
+$("cariProduk").addEventListener("input",e=>filterProduk(e.target.value));
+$("cariProduk").addEventListener("focus",e=>filterProduk(e.target.value));
+$("hasilProduk").addEventListener("click",e=>{
+  const b=e.target.closest(".result[data-id]");if(!b)return;
+  const p=products.find(x=>x.id===b.dataset.id);if(!p)return;
+  if(stokProduk(p)<=0)return;
+  selectedProduct=p;
+  $("cariProduk").value=namaProduk(p);
+  $("produkManual").value="";
+  $("produkTerpilih").className="selected";
+  $("produkTerpilih").innerHTML=`<b>${esc(namaProduk(p))}</b> • Stok tersedia: <b>${stokProduk(p)}</b>`;
+  $("hasilProduk").classList.remove("show");
+});
+$("produkManual").addEventListener("input",()=>{
+  if($("produkManual").value.trim()){
+    selectedProduct=null;
+    $("cariProduk").value="";
+    $("produkTerpilih").className="selected";
+    $("produkTerpilih").textContent="Produk manual dipilih.";
+  }
+});
+document.addEventListener("click",e=>{
+  const w=document.querySelector(".product-search");
+  if(w&&!w.contains(e.target))$("hasilProduk").classList.remove("show");
+});
+
+function buildData(){
+  if(!uid||!businessUid)throw new Error("Sesi Firebase belum siap.");
+  const nama=$("namaPelanggan").value.trim(),wa=$("waPelanggan").value.trim();
+  const hp=$("brandTipe").value.trim(),kerusakan=$("kerusakan").value.trim();
+  if(!nama)throw new Error("Nama pelanggan wajib diisi.");
+  if(!wa)throw new Error("No. WA pelanggan wajib diisi.");
+  if(!hp)throw new Error("Brand/tipe HP wajib diisi.");
+  if(!kerusakan)throw new Error("Jenis kerusakan wajib diisi.");
+  if(!$("teknisi").value)throw new Error("Pilih teknisi terlebih dahulu.");
+
+  const q=Math.max(1,num("qtyProduk")||1);
+  const manual=$("produkManual").value.trim();
+  if(!selectedProduct&&!manual)throw new Error("Pilih sparepart dari stok atau isi produk manual.");
+  if(selectedProduct&&stokProduk(selectedProduct)<q)
+    throw new Error(`Stok ${namaProduk(selectedProduct)} tidak cukup. Tersedia ${stokProduk(selectedProduct)}.`);
+
+  const pay=hitung();
+  if(pay.diskon>pay.biaya)throw new Error("Diskon tidak boleh lebih besar dari biaya servis.");
+  if(pay.dp>pay.total)throw new Error("DP tidak boleh lebih besar dari total servis.");
+
+  const status=$("status").value;
+  let garansi={aktif:false,durasi:0,satuan:"hari",mulai:null,berakhir:null};
+  if(status==="diambil"){
+    const dur=Number($("garansiDurasi").value)||0;
+    if(dur>0){
+      const mulai=new Date();
+      const akhir=new Date(mulai.getTime()+dur*86400000);
+      garansi={aktif:true,durasi:dur,satuan:"hari",mulai:mulai.toISOString(),berakhir:akhir.toISOString()};
+    }
+  }
+
+  const produk=selectedProduct?{
+    produkId:selectedProduct.id,nama:namaProduk(selectedProduct),
+    kode:kodeProduk(selectedProduct),qty:q,
+    modalSatuan:modalProduk(selectedProduct),
+    totalModal:modalProduk(selectedProduct)*q,
+    sumber:"firebase"
+  }:{
+    produkId:null,nama:manual,kode:"",qty:q,modalSatuan:0,totalModal:0,sumber:"manual"
+  };
+
+  return {
+    uid:businessUid,
+    createdBy:uid,
+    createdByRole:profile.role||"",
+    nomorNota:$("nomorNota").value,
+    barcode:$("barcode").value,
+    tanggal:$("tanggalNota").value,
+    namaKonter:profile.namaKonter||profile.namaToko||profile.namaUsaha||profile.nama||"FIXZY",
+
+    teknisiId:$("teknisi").value,
+    namaTeknisi:$("teknisi").selectedOptions[0]?.textContent||"",
+
+    pelanggan:{
+      nama,wa,alamat:$("alamatPelanggan").value.trim()
+    },
+
+    servisan:{
+      brandTipe:hp,
+      imei:$("imei").value.trim(),
+      jenisKerusakan:kerusakan,
+      kelengkapan:[...document.querySelectorAll(".kelengkapan:checked")].map(x=>x.value),
+      sandiPola:$("sandiPola").value.trim()
+    },
+
+    penggunaanProduk:produk,
+
+    estimasi:{
+      biayaService:pay.biaya,
+      diskon:pay.diskon,
+      total:pay.total,
+      dp:pay.dp,
+      sisa:pay.sisa
+    },
+
+    pembayaran:{
+      metode:$("metodePembayaran").value,
+      catatan:$("catatan").value.trim()
+    },
+
+    status,
+    pendapatan:status==="diambil"?pay.total:0,
+    garansi,
+    catatanStatus:$("catatanStatus").value.trim(),
+    stokDikurangi:false,
+    createdAt:serverTimestamp(),
+    updatedAt:serverTimestamp()
+  };
+}
+
+async function saveData(d){
+  if(!authUser){
+    throw new Error("Sesi login Firebase tidak ditemukan. Silakan login kembali.");
+  }
+
+  const notaRef=doc(db,"servis",d.nomorNota);
+
+  // Pastikan nomor nota belum dipakai.
+  const existing=await getDoc(notaRef);
+  if(existing.exists()){
+    throw new Error("Nomor nota sudah digunakan. Silakan Refresh untuk membuat nomor nota baru.");
+  }
+
+  // Simpan servis terlebih dahulu jika produk manual.
+  if(d.penggunaanProduk.sumber!=="firebase"){
+    await setDoc(notaRef,{
+      ...d,
+      stokDikurangi:false
+    });
+    return;
+  }
+
+  // Produk dari stok:
+  // Semua baca + ubah stok + simpan nota dilakukan dalam SATU transaction.
+  const stockRef=doc(db,"stok",d.penggunaanProduk.produkId);
+
+  await runTransaction(db,async tx=>{
+    const stockSnap=await tx.get(stockRef);
+
+    if(!stockSnap.exists()){
+      throw new Error("Produk stok tidak ditemukan di Firebase.");
+    }
+
+    const notaSnap=await tx.get(notaRef);
+    if(notaSnap.exists()){
+      throw new Error("Nomor nota sudah digunakan. Silakan Refresh untuk nomor nota baru.");
+    }
+
+    const stock=stockSnap.data()||{};
+    const lama=stokProduk(stock);
+    const qty=Number(d.penggunaanProduk.qty)||1;
+
+    if(lama<qty){
+      throw new Error(`Stok ${namaProduk(stock)} tidak cukup. Tersedia ${lama}.`);
+    }
+
+    const baru=lama-qty;
+
+    tx.update(stockRef,{
+      sisa:baru,
+      stok:baru,
+      status:baru>0?"tersedia":"kosong",
+      updatedAt:serverTimestamp()
+    });
+
+    tx.set(notaRef,{
+      ...d,
+      stokDikurangi:true,
+      stokProdukId:stockSnap.id,
+      stokSebelum:lama,
+      stokSesudah:baru
+    });
+  });
+}
+
+function makePrint(d){
+  const footer=profile.templateNota?.footer||"Terima kasih telah mempercayakan servis kepada kami.";
+  $("printArea").innerHTML=`
+  <div class="print-paper">
+    <div class="print-shop">
+      <h2>${esc(d.namaKonter)}</h2>
+      <div>${esc(profile.alamat||profile.alamatUsaha||profile.alamatToko||"")}</div>
+      <div>${esc(profile.whatsapp||profile.noWa||profile.wa||"")}</div>
+    </div>
+    <div class="print-meta">
+      <div>No. Nota: <b>${esc(d.nomorNota)}</b></div>
+      <div>Tanggal: <b>${esc(d.tanggal)}</b></div>
+      <div>Teknisi: <b>${esc(d.namaTeknisi)}</b></div>
+      <div>Status: <b>${esc(d.status)}</b></div>
+    </div>
+    <div class="print-section">
+      <b class="tt">Pelanggan</b>
+      <div class="print-grid">
+        <span>Nama</span><b>${esc(d.pelanggan.nama)}</b>
+        <span>No. WA</span><span>${esc(d.pelanggan.wa)}</span>
+        <span>Alamat</span><span>${esc(d.pelanggan.alamat||"-")}</span>
+      </div>
+    </div>
+    <div class="print-section">
+      <b class="tt">Perangkat</b>
+      <div class="print-grid">
+        <span>HP</span><b>${esc(d.servisan.brandTipe)}</b>
+        <span>IMEI</span><span>${esc(d.servisan.imei||"-")}</span>
+        <span>Keluhan</span><span>${esc(d.servisan.jenisKerusakan)}</span>
+        <span>Kelengkapan</span><span>${esc(d.servisan.kelengkapan.join(", ")||"-")}</span>
+      </div>
+    </div>
+    <div class="print-section">
+      <b class="tt">Pembayaran</b>
+      <table class="print-money">
+        <tr><td>Biaya Servis</td><td>${rupiah(d.estimasi.biayaService)}</td></tr>
+        <tr><td>Diskon</td><td>${rupiah(d.estimasi.diskon)}</td></tr>
+        <tr class="print-total"><td>Total</td><td>${rupiah(d.estimasi.total)}</td></tr>
+        <tr><td>DP</td><td>${rupiah(d.estimasi.dp)}</td></tr>
+        <tr><td>Sisa</td><td>${rupiah(d.estimasi.sisa)}</td></tr>
+      </table>
+    </div>
+    <div class="print-status">STATUS: ${esc(d.status)}</div>
+    ${d.garansi?.aktif?`<div class="print-status">GARANSI ${d.garansi.durasi} HARI<br>Berlaku sampai ${new Date(d.garansi.berakhir).toLocaleDateString("id-ID")}</div>`:""}
+    <div class="barcode-wrap"><svg id="printBarcode"></svg><div class="barcode-code">${esc(d.barcode)}</div></div>
+    <div class="print-footer">${esc(footer)}</div>
+  </div>`;
+  try{JsBarcode("#printBarcode",d.barcode,{format:"CODE128",width:1.4,height:48,displayValue:false,margin:0})}catch(e){}
+}
+
+function printNow(){setTimeout(()=>window.print(),200)}
+
+function tampilError(judul,pesan){
+  $("fixzyErrorTitle").textContent=judul||"⚠️ Pemberitahuan";
+  $("fixzyErrorText").textContent=String(pesan||"Terjadi kesalahan.");
+  $("fixzyErrorPopup").classList.add("show");
+}
+function tutupErrorPopup(){
+  $("fixzyErrorPopup").classList.remove("show");
+}
+window.tutupErrorPopup=tutupErrorPopup;
+
+async function executeSave(printAfter){
+  let d;
+  try{
+    d=buildData();
+  }catch(e){
+    $("saveStatus").textContent=e.message;
+    tampilError("⚠️ Data Belum Lengkap",e.message);
+    return false;
+  }
+
+  try{
+    $("saveStatus").textContent="Menyimpan transaksi dan stok...";
+    await saveData(d);
+
+    $("saveStatus").textContent=`Berhasil disimpan • ${d.nomorNota}`;
+    tampilError("✅ Berhasil Disimpan",`Transaksi ${d.nomorNota} berhasil disimpan ke Firebase.`);
+
+    if(printAfter){
+      makePrint(d);
+      printNow();
+    }
+    return true;
+
+  }catch(e){
+    console.error("FIREBASE SAVE ERROR:",e);
+
+    const code=e?.code ? ` (${e.code})` : "";
+    const detail=e?.message || String(e);
+
+    $("saveStatus").textContent="Gagal menyimpan ke Firebase.";
+    tampilError(
+      "❌ Gagal Menyimpan",
+      `Firebase${code}: ${detail}`
+    );
+    return false;
+  }
+}
+
+function simpan(printAfter=false){
+  if($("status").value==="diambil"){
+    pendingSave={printAfter};
+    $("popupGaransiDurasi").value=$("garansiDurasi").value||"0";
+    $("popupGaransi").classList.add("show");
+    return;
+  }
+  executeSave(printAfter);
+}
+window.simpan=simpan;
+
+window.konfirmasiGaransi=async()=>{
+  $("garansiDurasi").value=$("popupGaransiDurasi").value;
+  $("popupGaransi").classList.remove("show");
+  const p=pendingSave;pendingSave=null;
+  if(p)await executeSave(p.printAfter);
+};
+window.batalGaransi=()=>{
+  $("popupGaransi").classList.remove("show");
+  pendingSave=null;
+};
+function batalForm(){
+  const old=document.getElementById("fixzyConfirmPopup");
+  if(old)old.remove();
+
+  const wrap=document.createElement("div");
+  wrap.id="fixzyConfirmPopup";
+  wrap.className="popup show";
+  wrap.innerHTML=`<div class="popup-box">
+    <h3>⚠️ Batalkan Input?</h3>
+    <p>Data servis yang belum disimpan akan hilang.</p>
+    <div class="popup-actions">
+      <button type="button" id="fixzyConfirmNo" style="background:#e5e7eb">Batal</button>
+      <button type="button" id="fixzyConfirmYes" style="background:#111827;color:#fff">Ya, Kembali</button>
+    </div>
+  </div>`;
+  document.body.appendChild(wrap);
+  $("fixzyConfirmNo").onclick=()=>wrap.remove();
+  $("fixzyConfirmYes").onclick=()=>history.back();
+}
+window.batalForm=batalForm;
+
+function applyDarkMode(on){
+  document.body.classList.toggle("dark",!!on);
+  const btn=document.getElementById("themeBtn");
+  if(btn){
+    btn.textContent=on?"☀️":"🌙";
+    btn.setAttribute("aria-label",on?"Mode terang":"Mode gelap");
+  }
+}
+function toggleDarkMode(){
+  applyDarkMode(!document.body.classList.contains("dark"));
+}
+window.toggleDarkMode=toggleDarkMode;
+
+onAuthStateChanged(auth,async user=>{
+  authUser=user;
+  if(!user){
+    $("saveStatus").textContent="Belum login. Silakan login terlebih dahulu.";
+    $("teknisi").innerHTML='<option value="">Login terlebih dahulu</option>';
+    return;
+  }
+  try{
+    const userSnap=await getDoc(doc(db,"users",user.uid));
+    if(!userSnap.exists())throw new Error("Profil pengguna tidak ditemukan.");
+    const data=userSnap.data()||{};
+    const izin=Array.isArray(data.izin)?data.izin:(Array.isArray(data.permissions)?data.permissions:[]);
+    const izinLower=izin.map(x=>String(x).toLowerCase());
+    const punyaServis=izinLower.includes("servis") || izinLower.includes("input-servis") || izinLower.includes("nota");
+    // FIX: owner auto lolos semua izin, karyawan cek izin tapi kalau izin kosong tetap izinkan (untuk akun lama)
+    if(data.role!=="owner" && data.role!=="superadmin"){
+      if(izin.length>0 && !punyaServis){
+        throw new Error("Akun ini tidak memiliki izin untuk Input Servis. Minta Owner aktifkan di Kelola Karyawan.");
+      }
+    }
+
+    uid=user.uid;
+    businessUid=businessOwner(data,user);
+    profile={...data};
+
+    $("headerRole").textContent=(data.role||"USER").toUpperCase();
+    $("headerEmail").textContent=user.email||data.email||"-";
+
+    $("nomorNota").value=notaBaru();
+    $("barcode").value=makeBarcode($("nomorNota").value);
+    $("tanggalNota").value=dateOnly();
+    setInfo();
+
+    await loadProfile();
+    if(data.role==="superadmin" && !data.ownerUid){
+      employees=[];
+      $("teknisi").innerHTML='<option value="">Pilih Owner terlebih dahulu</option>';
+    }else{
+      await loadEmployees();
+      await loadProducts();
+    }
+
+    setInfo();
+    $("saveStatus").textContent=`Firebase aktif • ${products.length} produk stok tersedia • ${employees.length} teknisi aktif`;
+    hitung();
+  }catch(e){
+    console.error(e);
+    $("saveStatus").textContent="Gagal memuat data Firebase.";
+    tampilError("❌ Gagal Memuat Input Servis",e.message||e);
+  }
+});
+</script>
+</body>
+</html>

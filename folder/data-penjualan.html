@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="id">
+<head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fixzy - Data Penjualan</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f1f5f9;color:#111827;font-family:Inter,system-ui,sans-serif;transition:background .3s,color .3s}
+body.dark{background:#0f172a;color:#e5e7eb}
+header{background:#111827;color:#fff;padding:10px 14px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;border-bottom:1px solid #1e293b}
+.logo{width:52px;height:52px;background:#000;border-radius:14px;display:flex;align-items:center;justify-content:center;border:1px solid #ffffff20;overflow:hidden;flex:0 0 52px}
+.logo img{width:100%;height:100%;object-fit:contain;padding:4px;background:#000;display:block}
+.brand{line-height:1.2}.brand small{display:block;margin-top:2px}
+.brand b{color:#fff;font-weight:900;font-size:18px;letter-spacing:0.5px}
+.brand b span{color:#facc15}
+.btn{padding:9px 14px;border-radius:12px;font-weight:800;font-size:12px;border:2px solid #111827;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
+.btn-refresh{background:#1e293b;color:#fff;border-color:#334155}
+.btn-refresh:hover{background:#facc15;color:#000}
+.btn-moon{background:#1e293b;color:#fff;border-color:#334155;width:44px;height:44px;justify-content:center;font-size:18px}
+.btn-moon:hover{background:#facc15;color:#000}
+main{max-width:1400px;margin:auto;padding:12px}
+.toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.search{flex:1;min-width:260px;background:#fff;border:2px solid #111827;padding:11px 14px;border-radius:12px;font-weight:600;box-shadow:2px 2px 0 #111827}
+body.dark .search{background:#1e293b;color:#e5e7eb;border-color:#334155}
+select.filter{background:#fff;border:2px solid #111827;padding:11px 14px;border-radius:12px;font-weight:700;min-width:150px;box-shadow:2px 2px 0 #111827}
+body.dark select.filter{background:#1e293b;color:#e5e7eb;border-color:#334155}
+.excel-wrap{background:#fff;border:2px solid #111827;border-radius:16px;overflow:auto;box-shadow:4px 4px 0 #111827;max-height:75vh}
+body.dark .excel-wrap{background:#1e293b;border-color:#334155}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th{background:#111827;color:#fff;font-size:10px;font-weight:900;text-transform:uppercase;padding:12px 10px;white-space:nowrap;position:sticky;top:0;z-index:10;text-align:left;border-bottom:1px solid #334155}
+th.yellow{background:#111827;color:#fff}
+td{padding:10px;border-bottom:1px solid #e5e7eb;font-size:12px;vertical-align:top}
+body.dark td{border-color:#334155;color:#e5e7eb}
+tr:hover td{background:#fffbeb}
+body.dark tr:hover td{background:#1e293b}
+.badge{padding:3px 8px;border-radius:999px;font-size:9px;font-weight:900;border:1px solid #111827;display:inline-block}
+.badge.masuk{background:#fff;color:#111827}.badge.tagihan{background:#fef3c7;color:#92400e}.badge.tunai{background:#facc15;color:#000}.badge.batal{background:#111827;color:#fff}
+.btn-lihat{background:#facc15;color:#000;border:2px solid #111827;padding:6px 12px;border-radius:8px;font-weight:900;font-size:11px;cursor:pointer;box-shadow:1px 1px 0 #111827}
+.btn-sm{padding:5px 8px;border-radius:8px;font-size:10px;font-weight:900;border:1px solid #111827;cursor:pointer}
+.btn-sm.edit{background:#111827;color:#fff}.btn-sm.masuk{background:#fff;color:#111827}.btn-sm.tagihan{background:#fef3c7;color:#92400e}.btn-sm.tunai{background:#facc15;color:#000}.btn-sm.batal{background:#fff;color:#ef4444;border-color:#ef4444}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;padding:12px}
+.modal.show{display:flex}
+.modal-box{width:min(600px,100%);max-height:90vh;overflow:auto;background:#fff;border:3px solid #111827;border-radius:18px;box-shadow:8px 8px 0 #111827}
+body.dark .modal-box{background:#1e293b;border-color:#334155}
+.modal-head{padding:14px 16px;background:#111827;color:#fff;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #334155;position:sticky;top:0;z-index:5}
+.modal-body{padding:16px}
+.section-title{font-size:10px;font-weight:900;text-transform:uppercase;background:#fff;padding:6px 10px;border-radius:8px;border:1px solid #111827;border-left:4px solid #facc15;width:fit-content;margin-bottom:8px}
+body.dark .section-title{background:#0f172a;color:#fff}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.info{background:#f8fafc;border:2px solid #111827;border-radius:10px;padding:10px}
+body.dark .info{background:#0f172a;border-color:#334155}
+.info .k{font-size:9px;color:#64748b;font-weight:800;text-transform:uppercase}
+.info .v{font-size:13px;font-weight:800;margin-top:3px}
+.product{background:#fff;border:2px solid #111827;border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;box-shadow:2px 2px 0 #111827}
+body.dark .product{background:#0f172a;border-color:#334155}
+.product-price{background:#facc15;padding:4px 8px;border-radius:8px;font-weight:900;border:1px solid #111827;font-size:12px;color:#000}
+.price-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.price-box{background:#f8fafc;border:2px solid #111827;border-radius:10px;padding:10px;text-align:center}
+body.dark .price-box{background:#0f172a;border-color:#334155}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.summary{border:2px solid #111827;border-radius:12px;padding:10px;box-shadow:2px 2px 0 #111827}
+.summary.black{background:#111827;color:#fff}.summary.yellow{background:#fffbeb}.summary.white{background:#fff}
+body.dark .summary.white{background:#0f172a;color:#fff}
+.wa-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;align-items:center;justify-content:center;padding:16px}
+.wa-modal.show{display:flex}
+.wa-box{width:min(400px,100%);background:#fff;border:3px solid #111827;border-radius:18px;padding:20px;box-shadow:8px 8px 0 #111827;text-align:center}
+.wa-box h3{font-weight:900;font-size:16px;margin:0 0 8px}
+.wa-box p{font-size:13px;color:#64748b;margin-bottom:16px;line-height:1.5}
+.wa-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-wa{background:#25D366;color:#fff;border:2px solid #111827;padding:12px;border-radius:12px;font-weight:900;cursor:pointer}
+.btn-wa-no{background:#fff;color:#111827;border:2px solid #111827;padding:12px;border-radius:12px;font-weight:900;cursor:pointer}
+
+body.dark .wa-box{background:#1e293b !important;color:#e5e7eb !important;border-color:#334155 !important}
+body.dark .wa-box h3{color:#fff !important}
+body.dark #waInfo{color:#94a3b8 !important}
+body.dark #waMessage{background:#0f172a !important;color:#e5e7eb !important;border-color:#334155 !important}
+body.dark .btn-wa-no{background:#334155 !important;color:#e5e7eb !important;border-color:#475569 !important}
+body.dark .modal-box{background:#1e293b !important;color:#e5e7eb !important}
+body.dark .modal-body{color:#e5e7eb !important}
+body.dark .section-title{background:#0f172a !important;color:#fff !important}
+
+@media(max-width:800px){
+  .toolbar{flex-direction:column}
+  .search,select.filter{width:100%;min-width:100%}
+  table{min-width:700px}
+}
+
+/* ===== HEADER + RINGKASAN PENJUALAN ===== */
+header{
+  background:#111827;
+  color:#fff;
+  padding:10px 14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  position:sticky;
+  top:0;
+  z-index:100;
+  border-bottom:1px solid #facc15;
+  box-shadow:0 1px 6px rgba(15,23,42,.18);
+  min-height:68px;
+}
+.logo{
+  width:52px;height:52px;background:#000;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid #facc15;overflow:hidden;flex:0 0 52px;
+}
+.logo img{width:100%;height:100%;object-fit:contain;padding:4px;background:#000;display:block}
+.brand{line-height:1.15;min-width:0}
+.brand b{color:#fff;font-weight:900;font-size:18px;letter-spacing:.3px;white-space:nowrap}
+.brand small{display:block;margin-top:4px;color:#94a3b8;font-size:11px;font-weight:700}
+.header-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn-refresh{background:#1e293b;color:#fff;border:1px solid #334155;border-radius:12px}
+.btn-refresh:hover{background:#1e293b;color:#fff;border-color:#facc15}
+.btn-moon{background:#1e293b;color:#fff;border:1px solid #334155;border-radius:12px;width:44px;height:44px;justify-content:center;font-size:18px}
+.btn-moon:hover{background:#1e293b;color:#fff;border-color:#facc15}
+.sales-summary{
+  margin:6px 0 14px;
+  background:#fff;
+  border:2px solid #111827;
+  border-radius:16px;
+  padding:14px 18px;
+  min-height:70px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#64748b;
+  box-shadow:4px 4px 0 #111827;
+  font-size:15px;
+  line-height:1.25;
+}
+.sales-summary .sum-icon{font-size:20px;color:#cbd5e1;flex:0 0 auto}
+.sales-summary .sum-title{font-weight:500;color:#64748b}
+.sales-summary .sum-title strong{color:#111827;font-weight:900}
+.sales-summary .sum-income{color:#047857;font-weight:900;font-size:17px;margin-left:2px}
+body.dark .sales-summary{background:#1e293b;color:#94a3b8;border-color:#334155;box-shadow:4px 4px 0 #020617}
+body.dark .sales-summary .sum-title{color:#94a3b8}
+body.dark .sales-summary .sum-title strong{color:#fff}
+body.dark .sales-summary .sum-income{color:#34d399}
+@media(max-width:900px){
+  header{padding:8px 10px;gap:8px;min-height:62px}
+  .logo{width:46px;height:46px;flex-basis:46px;border-radius:13px}
+  .brand b{font-size:15px}
+  .brand small{font-size:10px;margin-top:3px}
+  .btn-refresh{padding:8px 10px;font-size:11px}
+  .btn-moon{width:42px;height:42px}
+  .sales-summary{margin:6px 0 12px;padding:13px 14px;min-height:68px;font-size:14px;border-radius:15px;box-shadow:4px 4px 0 #111827}
+  .sales-summary .sum-income{font-size:16px}
+}
+@media(max-width:520px){
+  .sales-summary{font-size:13px;padding:12px 13px;gap:6px}
+  .sales-summary .sum-icon{font-size:18px}
+  .sales-summary .sum-income{font-size:15px}
+}
+
+</style>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = { apiKey: "AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI", authDomain: "fixzy-update.firebaseapp.com", projectId: "fixzy-update", storageBucket: "fixzy-update.appspot.com", messagingSenderId: "431404655232", appId: "1:431404655232:web:5f7d9c9a1b2c3d4e5f6a7" };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+let allRows=[], filteredRows=[], currentDetail=null, pendingWA=null;
+let konterName="FIXZY";
+
+onAuthStateChanged(auth, async u=>{
+  if(!u){ location.href="login.html"; return; }
+  // Ambil nama konter terdaftar dari data register - coba beberapa sumber
+  try{
+    const { getDoc, doc, collection, query, where, getDocs } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+    let found=false;
+    // 1. Coba users/uid
+    try{
+      const d1 = await getDoc(doc(db,"users",u.uid));
+      if(d1.exists()){
+        const p=d1.data();
+        konterName=p.namaKonter||p.konterName||p.namaToko||p.toko||p.konter||p.nama||p.name||p.konterNama||"";
+        if(konterName && konterName!=="FIXZY") found=true;
+      }
+    }catch(e){}
+    // 2. Cari by email di users
+    if(!found){
+      try{
+        const snap = await getDocs(query(collection(db,"users"), where("email","==",u.email)));
+        if(!snap.empty){
+          const p=snap.docs[0].data();
+          const k=p.namaKonter||p.konterName||p.namaToko||p.toko||p.konter||p.nama||p.name||p.konterNama||"";
+          if(k){ konterName=k; found=true; }
+        }
+      }catch(e){}
+    }
+    // 3. Coba collection konter
+    if(!found){
+      try{
+        const snap = await getDocs(query(collection(db,"konter"), where("email","==",u.email)));
+        if(!snap.empty){
+          const p=snap.docs[0].data();
+          const k=p.namaKonter||p.konterName||p.namaToko||p.toko||p.nama||"";
+          if(k){ konterName=k; found=true; }
+        }
+      }catch(e){}
+    }
+    // 4. Coba localStorage atau fallback
+    if(!found || !konterName || konterName==="FIXZY"){
+      // Cek apakah ada di penjualan pertama
+      try{
+        const snap = await getDocs(query(collection(db,"penjualan"), where("akunLogin","==",u.email)));
+        if(!snap.empty){
+          const p=snap.docs[0].data();
+          const k=p.namaKonter||p.konter||"";
+          if(k){ konterName=k; found=true; }
+        }
+      }catch(e){}
+    }
+    if(!konterName || konterName.trim()==="") konterName="FIXZY";
+    console.log("Konter terdaftar:", konterName);
+    // Update header tulisan FIXZY jadi nama konter dari register + Data penjualan di bawahnya
+    try{
+      const headerEl=document.getElementById('konterNameHeader');
+      if(headerEl && konterName && konterName!=="FIXZY"){
+        headerEl.textContent=konterName;
+      }
+    }catch(e){}
+
+  }catch(e){ 
+    console.log("Gagal ambil konter, pakai FIXZY", e);
+    konterName="FIXZY"; 
+  }
+  await load();
+});
+
+function getKonterNameFromData(d){
+  // Ambil dari data register yang ada di dokumen penjualan atau global
+  return d.namaKonter||d.konter||d.namaToko||konterName||"FIXZY";
+}
+
+async function load(){
+  try{
+    const snap=await getDocs(collection(db,"penjualan"));
+    allRows=snap.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=>new Date(b.tanggal||b.createdAt?.seconds*1000||0)-new Date(a.tanggal||a.createdAt?.seconds*1000||0));
+    // Jika konterName masih FIXZY, coba ambil dari data penjualan pertama (register)
+    if((!konterName || konterName==="FIXZY") && allRows.length>0){
+      const first=allRows[0];
+      const k=first.namaKonter||first.konter||first.namaToko||"";
+      if(k){
+        konterName=k;
+        const headerEl=document.getElementById('konterNameHeader');
+        if(headerEl) headerEl.textContent=k;
+        console.log("Konter dari penjualan:", k);
+      }
+    }
+    render();
+  }catch(e){
+    console.error(e);
+  }
+}
+
+function getTanggal(d){ return d.tanggal|| (d.createdAt?.seconds? new Date(d.createdAt.seconds*1000).toLocaleDateString('id-ID'):'-'); }
+function getNota(d){ return d.nomorNota||d.nota||'-'; }
+function getTeknisi(d){ return d.teknisiNama||d.teknisi||'-'; }
+function getNamaPel(d){ return d.pelanggan?.nama||d.nama||'-'; }
+function getWa(d){ return d.pelanggan?.wa||d.noHp||d.wa||'-'; }
+function getAlamat(d){ return d.pelanggan?.alamat||d.alamat||'-'; }
+function getItems(d){ return d.items||[]; }
+function getTotal(d){ return Number(d.total||0); }
+function getDiskon(d){ return Number(d.diskon||0); }
+function getDp(d){ return Number(d.dp||0); }
+function getSisa(d){ return Number(d.sisa ?? (getTotal(d)-getDiskon(d)-getDp(d))); }
+function getModal(d){ const it=getItems(d); if(it.length>0) return it.reduce((s,x)=>s+Number(x.modal||0)*Number(x.qty||1),0); return Number(d.modal||0); }
+function getPendapatan(d){ return getTotal(d)-getDiskon(d); }
+function getLaba(d){ return getPendapatan(d)-getModal(d); }
+function getStatus(d){ return (d.status||'masuk').toLowerCase(); }
+
+function render(){
+  const q=document.getElementById('q').value.toLowerCase();
+  const f=document.getElementById('f').value;
+  filteredRows=allRows.filter(d=>{ const st=getStatus(d); if(f!=='semua'&&st!==f) return false; if(!q) return true; const hay=`${getTanggal(d)} ${getTeknisi(d)} ${getNamaPel(d)} ${getWa(d)} ${getAlamat(d)} ${getNota(d)}`.toLowerCase(); return hay.includes(q); });
+
+  // Ringkasan otomatis mengikuti data yang sedang tampil.
+  // Batal tidak dihitung sebagai penghasilan.
+  const summaryRows=filteredRows.filter(d=>getStatus(d)!=='batal');
+  const summaryTotal=summaryRows.length;
+  const summaryIncome=summaryRows.reduce((sum,d)=>sum+getPendapatan(d),0);
+  const summaryEl=document.getElementById('salesSummary');
+  if(summaryEl){
+    summaryEl.innerHTML=`
+      <span class="sum-icon">☁️</span>
+      <span class="sum-title">Data <strong>penjualan</strong> • Total: <strong>${summaryTotal}</strong> • Penghasilan: <span class="sum-income">Rp ${summaryIncome.toLocaleString('id-ID')}</span></span>
+    `;
+  }
+
+  document.getElementById('info').textContent=`${filteredRows.length} dari ${allRows.length} data - Excel tanggal teknisi nama WA alamat - Lihat untuk panel`;
+  const tbody=document.getElementById('tbody'); tbody.innerHTML='';
+  if(filteredRows.length===0){ tbody.innerHTML=`<tr><td colspan="8" style="padding:20px;text-align:center;color:#64748b">Belum ada data</td></tr>`; return; }
+  filteredRows.forEach((d,i)=>{
+    const st=getStatus(d),total=getTotal(d);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><span style="background:#111827;color:#facc15;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:10px">${i+1}</span></td>
+      <td><div style="font-weight:800;font-size:11px">${getTanggal(d)}</div><div style="font-size:10px;color:#64748b">${getNota(d)}</div><span class="badge ${st}">${st.toUpperCase()}</span></td>
+      <td style="font-weight:700">${getTeknisi(d)}</td>
+      <td style="font-weight:800">${getNamaPel(d)}</td>
+      <td>${getWa(d)}</td>
+      <td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${getAlamat(d)}">${getAlamat(d)}</td>
+      <td style="text-align:right"><b>Rp ${total.toLocaleString('id-ID')}</b></td>
+      <td style="text-align:center"><button class="btn-lihat" onclick="lihatPanel('${d.id}')"><i class="ri-eye-line"></i> Lihat</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+window.lihatPanel=(id)=>{
+  const d=allRows.find(x=>x.id===id);
+  if(!d) return;
+  currentDetail=d;
+  const st=getStatus(d),items=getItems(d),total=getTotal(d),diskon=getDiskon(d),dp=getDp(d),sisa=getSisa(d),modalVal=getModal(d),pendVal=getPendapatan(d),labaVal=getLaba(d);
+  document.getElementById('modalTitle').textContent=`${getNota(d)} - ${getNamaPel(d)}`;
+  document.getElementById('modalBody').innerHTML=`
+    <div class="section-title">TANGGAL & TEKNISI</div>
+    <div class="info-grid">
+      <div class="info"><div class="k">Tanggal</div><div class="v">${getTanggal(d)}</div></div>
+      <div class="info"><div class="k">No Nota</div><div class="v">${getNota(d)}</div></div>
+      <div class="info"><div class="k">Teknisi</div><div class="v">${getTeknisi(d)}</div></div>
+      <div class="info"><div class="k">Status</div><div class="v"><span class="badge ${st}">${st.toUpperCase()}</span></div></div>
+    </div>
+    <div class="section-title">PELANGGAN</div>
+    <div class="info-grid">
+      <div class="info"><div class="k">Nama</div><div class="v" style="font-weight:900">${getNamaPel(d)}</div></div>
+      <div class="info"><div class="k">WA</div><div class="v">${getWa(d)}</div></div>
+      <div class="info" style="grid-column:1/-1"><div class="k">Alamat</div><div class="v">${getAlamat(d)}</div></div>
+    </div>
+    <div class="section-title">PEMBELIAN - Y20 X1 = HARGA</div>
+    <div>
+      ${items.length>0?items.map(it=>`<div class="product"><div><b>${it.nama}</b> x${it.qty||1} = Rp ${Number(it.harga||0).toLocaleString('id-ID')} <span style="background:#facc15;padding:2px 6px;border-radius:6px;font-size:10px;border:1px solid #111827;margin-left:6px">auto</span></div><div class="product-price">Rp ${Number(it.subtotal||it.harga||0).toLocaleString('id-ID')}</div></div>`).join(''):`<div class="product"><div><b>Y20</b> x1 = Rp ${total.toLocaleString('id-ID')}</div><div class="product-price">Rp ${total.toLocaleString('id-ID')}</div></div>`}
+    </div>
+    <div class="price-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
+      <div class="price-box"><div style="font-size:9px;color:#64748b">Total</div><div style="font-weight:900">Rp ${total.toLocaleString('id-ID')}</div></div>
+      <div class="price-box"><div style="font-size:9px;color:#64748b">Diskon</div><div style="font-weight:900">Rp ${diskon.toLocaleString('id-ID')}</div></div>
+      <div class="price-box"><div style="font-size:9px;color:#64748b">DP / Sisa</div><div style="font-weight:900">Rp ${dp.toLocaleString('id-ID')} / Rp ${sisa.toLocaleString('id-ID')}</div></div>
+    </div>
+    <div class="summary-grid" style="margin-top:12px">
+      <div class="summary black"><div style="font-size:9px;opacity:0.7">Modal Belanja</div><div style="font-weight:900;font-size:16px">Rp ${modalVal.toLocaleString('id-ID')}</div></div>
+      <div class="summary yellow"><div style="font-size:9px">Pendapatan</div><div style="font-weight:900;font-size:16px">Rp ${pendVal.toLocaleString('id-ID')}</div></div>
+      <div class="summary white"><div style="font-size:9px;color:#64748b">Laba</div><div style="font-weight:900;font-size:16px">Rp ${labaVal.toLocaleString('id-ID')}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;margin-top:16px">
+      <button class="btn-sm edit" onclick="editData('${d.id}')"><i class="ri-edit-line"></i> Edit</button>
+      <button class="btn-sm masuk" onclick="setStatus('${d.id}','masuk')">Masuk</button>
+      <button class="btn-sm tagihan" onclick="setStatus('${d.id}','tagihan')">Tagihan</button>
+      <button class="btn-sm tunai" onclick="setStatus('${d.id}','tunai')">Tunai</button>
+      <button class="btn-sm batal" onclick="setStatus('${d.id}','batal')">Batal</button>
+    </div>
+  `;
+  document.getElementById('modal').classList.add('show');
+}
+
+window.closeModal=()=>{ document.getElementById('modal').classList.remove('show'); }
+
+window.editData=(id)=>{localStorage.setItem('fixzy_edit_id',id);location.href=`input-penjualan.html?edit=${id}`;}
+
+window.setStatus=async(id,st)=>{
+  try{
+    const d=allRows.find(x=>x.id===id);
+    await updateDoc(doc(db,"penjualan",id),{status:st,updatedAt:new Date().toISOString()});
+    // JANGAN TUTUP PANEL - biar pengguna yang tutup
+    // Update allRows
+    if(d) d.status=st;
+    render();
+    // Jika panel sedang terbuka, update badge di modal juga
+    if(currentDetail && currentDetail.id===id){
+      currentDetail.status=st;
+      const badgeInModal=document.querySelector('#modalBody .badge');
+      if(badgeInModal){
+        badgeInModal.className=`badge ${st}`;
+        badgeInModal.textContent=st.toUpperCase();
+      }
+      // Tampilkan popup WA jika tagihan atau tunai
+      if(st==='tagihan' || st==='tunai'){
+        showWAPopup(d, st);
+      }
+    } else {
+      // Jika ganti dari tabel langsung
+      if(st==='tagihan' || st==='tunai'){
+        const target=allRows.find(x=>x.id===id);
+        if(target) showWAPopup(target, st);
+      }
+    }
+  }catch(e){ console.error(e); }
+}
+
+function showWAPopup(data, status){
+  pendingWA={data, status};
+  const nama=getNamaPel(data);
+  const wa=getWa(data);
+  const nota=getNota(data);
+  const total=getTotal(data);
+  const alamat=getAlamat(data);
+  const sisa=getSisa(data);
+  const items=getItems(data);
+  const barang=items.length>0?items.map(i=>i.nama).join(', '):'Y20';
+  const konterReal=getKonterNameFromData(data);
+  let msg='';
+  if(status==='tagihan'){
+    msg=`Halo Kak ${nama} 🙏
+
+Saya dari *${konterReal}*,
+Mau infokan tagihan:
+
+📄 Nota: ${nota}
+📦 Barang: ${barang}
+💰 Total: Rp ${total.toLocaleString('id-ID')}
+💳 Sisa Tagihan: Rp ${sisa.toLocaleString('id-ID')}
+📍 Alamat: ${alamat}
+
+Mohon segera diselesaikan ya Kak. Bisa transfer atau datang langsung ke konter.
+
+Terima kasih 🙏
+*${konterReal}*`;
+  } else {
+    msg=`Halo Kak ${nama} 🙏
+
+Terima kasih sudah berbelanja di *${konterReal}* 🤝
+
+📄 Nota: ${nota}
+📦 Barang: ${barang}
+💰 Total: Rp ${total.toLocaleString('id-ID')} - *LUNAS / TUNAI* ✅
+📍 Alamat: ${alamat}
+
+Barang sudah LUNAS dan bisa diambil kapan saja ya Kak. Ditunggu kedatangannya!
+
+Terima kasih 🙏
+*${konterReal}* - Melayani dengan Amanah`;
+  }
+  document.getElementById('waMessage').textContent=msg;
+  document.getElementById('waInfo').textContent=`Akan dikirim ke WA pelanggan: ${nama} (${wa}) - ${konterReal}`;
+  document.getElementById('waModal').classList.add('show');
+  // Simpan konterReal untuk dipakai saat kirim
+  pendingWA.konterReal=konterReal;
+}
+
+window.closeWAModal=()=>{ document.getElementById('waModal').classList.remove('show'); pendingWA=null; }
+
+window.sendWA=()=>{
+  try{
+    if(!pendingWA || !pendingWA.data){
+      console.error('Data WA tidak ada');
+      return;
+    }
+
+    const data=pendingWA.data;
+    let waRaw=(getWa(data)||'').toString().trim();
+    let waDigits=waRaw.replace(/[^0-9]/g,'');
+
+    if(!waDigits || waDigits.length<10){
+      console.error('No WA pelanggan tidak valid:', waRaw);
+      return;
+    }
+
+    let waNumber=waDigits;
+    if(waNumber.startsWith('0')){
+      waNumber='62'+waNumber.substring(1);
+    }else if(!waNumber.startsWith('62')){
+      waNumber='62'+waNumber;
+    }
+
+    const msgEl=document.getElementById('waMessage');
+    const msg=msgEl ? msgEl.textContent.trim() : '';
+
+    if(!msg){
+      console.error('Pesan WA kosong');
+      return;
+    }
+
+    const waUrl='https://wa.me/'+waNumber+'?text='+encodeURIComponent(msg);
+
+    // Buka WA sebagai TAB BARU dari klik tombol langsung.
+    // Jangan pindahkan halaman FIXZY ke wa.me.
+    // Interceptor di bawah juga sudah dibuat melewati link WhatsApp.
+    const a=document.createElement('a');
+    a.href=waUrl;
+    a.target='_blank';
+    a.rel='noopener noreferrer';
+    a.style.position='fixed';
+    a.style.left='-9999px';
+    a.style.top='-9999px';
+    document.body.appendChild(a);
+
+    // Klik langsung dalam event tombol pengguna.
+    a.click();
+
+    setTimeout(()=>{
+      try{ a.remove(); }catch(e){}
+    },1000);
+
+    closeWAModal();
+
+  }catch(err){
+    console.error('Gagal buka WA:', err);
+  }
+}
+
+// Pengiriman WA menggunakan sendWA() di atas.
+
+
+window.refreshData=()=>{
+  location.reload();
+}
+
+window.toggleDarkMode=()=>{
+  document.body.classList.toggle('dark');
+  const isDark=document.body.classList.contains('dark');
+  localStorage.setItem('fixzy-dark', isDark?'1':'0');
+  document.getElementById('moonIcon').className=isDark?'ri-sun-fill':'ri-moon-fill';
+}
+
+// Init dark mode
+const savedDark=localStorage.getItem('fixzy-dark');
+if(savedDark==='1'){ document.body.classList.add('dark'); }
+
+document.getElementById('q').addEventListener('input',render);
+document.getElementById('f').addEventListener('change',render);
+</script>
+
+<style id="sales-summary-auto">
+.sales-summary{
+  width:100%;
+  min-height:76px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:16px 20px;
+  margin:0 0 14px;
+  background:#fff;
+  border:2px solid #111827;
+  border-radius:14px;
+  box-shadow:5px 5px 0 #111827;
+  color:#64748b;
+}
+.sales-summary .sum-icon{font-size:24px;flex:0 0 auto}
+.sales-summary .sum-title{font-size:18px;line-height:1.35}
+.sales-summary .sum-income{color:#047857;font-weight:900}
+@media(max-width:600px){
+  .sales-summary{min-height:72px;padding:14px 16px}
+  .sales-summary .sum-title{font-size:16px}
+  .sales-summary .sum-icon{font-size:21px}
+}
+</style>
+
+</head>
+<body>
+<header>
+  <div class="logo"><img src="logo.png" alt="Fixzy Logo"></div>
+  <div class="brand">
+    <b id="konterNameHeader">FIXZY</b>
+    <small>Data penjualan</small>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-refresh" onclick="refreshData()"><i class="ri-refresh-line"></i> Refresh</button>
+    <button class="btn btn-moon" onclick="toggleDarkMode()" aria-label="Mode gelap"><i id="moonIcon" class="ri-moon-fill"></i></button>
+  </div>
+</header>
+<main>
+  <div class="sales-summary" id="salesSummary">
+    <span class="sum-icon">☁️</span>
+    <span class="sum-title">Data <strong>penjualan</strong> • Total: <strong>0</strong> • Penghasilan: <span class="sum-income">Rp 0</span></span>
+  </div>
+  <div class="toolbar">
+    <input id="q" class="search" placeholder="Cari tanggal / teknisi / nama / WA / alamat...">
+    <select id="f" class="filter"><option value="semua">Semua Status</option><option value="masuk">Masuk</option><option value="tagihan">Tagihan</option><option value="tunai">Tunai</option><option value="batal">Batal</option></select>
+  </div>
+  <div class="excel-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Tanggal / Nota</th>
+          <th>Teknisi</th>
+          <th>Nama Pelanggan</th>
+          <th>WA</th>
+          <th>Alamat</th>
+          <th style="text-align:right">Total</th>
+          <th style="text-align:center" class="yellow">Lihat</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div id="info" style="font-size:11px;color:#64748b;margin-top:10px;text-align:center">Data penjualan • Firebase • Refresh & Mode Gelap aktif</div>
+</main>
+<div class="modal" id="modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div><b id="modalTitle">Detail Penjualan</b><br><small style="opacity:0.7">Y20 x1 = harga - Tekan X untuk tutup</small></div>
+      <button onclick="closeModal()" style="background:#facc15;color:#000;border:2px solid #000;width:36px;height:36px;border-radius:10px;font-weight:900">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+<div class="wa-modal" id="waModal" onclick="if(event.target===this) closeWAModal()">
+  <div class="wa-box">
+    <div style="width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:#fff;font-size:28px"><i class="ri-whatsapp-fill"></i></div>
+    <h3>Kirim Pesan WA?</h3>
+    <p id="waInfo">Kirim ke pelanggan</p>
+    <div style="background:#f8fafc;border:2px solid #111827;border-radius:12px;padding:12px;text-align:left;font-size:12px;margin-bottom:16px;white-space:pre-wrap" id="waMessage"></div>
+    <div class="wa-actions">
+      <button class="btn-wa-no" onclick="closeWAModal()">Tidak</button>
+      <button class="btn-wa" onclick="sendWA()"><i class="ri-whatsapp-fill"></i> Kirim WA</button>
+    </div>
+  </div>
+</div>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){
+if(/^(https?:\/\/)?(wa\.me|api\.whatsapp\.com|web\.whatsapp\.com)\b/i.test(a.href))return;if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){
+if(/^(https?:\/\/)?(wa\.me|api\.whatsapp\.com|web\.whatsapp\.com)\b/i.test(dataHref.href))return;if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
+</html>

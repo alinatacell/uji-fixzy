@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" rel="stylesheet">
+<title>FIXZY | Data Servis</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#eef2f6;color:#111827;font-family:Arial,Helvetica,sans-serif}
+header{background:#111827;color:#fff;padding:10px 14px;position:sticky;top:0;z-index:50}
+.head{max-width:1180px;margin:auto;display:flex;align-items:center;gap:9px}
+.head h1{font-size:18px;margin:0;flex:1}.head button{border:0;border-radius:8px;padding:8px 11px;font-weight:800;cursor:pointer}
+.back{background:#374151;color:#fff}.refresh{background:#fff;color:#111827}
+main{max-width:1180px;margin:auto;padding:13px}
+.card{background:#fff;border-radius:13px;padding:15px;margin-bottom:12px;box-shadow:0 2px 10px #0001}
+.title{font-size:16px;font-weight:900;margin-bottom:12px}
+.toolbar{display:grid;grid-template-columns:1fr auto auto;gap:8px}
+input,select{width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font:inherit}
+button.action{border:0;border-radius:8px;padding:10px 13px;font-weight:900;cursor:pointer;white-space:nowrap}
+.primary{background:#111827;color:#fff}.secondary{background:#e5e7eb;color:#111827}.danger{background:#fee2e2;color:#991b1b}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.summary-card{border:1px solid #e5e7eb;background:#fff;border-radius:10px;padding:12px;box-shadow:0 2px 8px #0001}.summary-card small{display:block;font-size:10px;color:#667085;font-weight:900}.summary-card b{display:block;font-size:20px;margin-top:4px}.summary-card.pendapatan{background:#ecfdf5;border-color:#a7f3d0}.summary-card.pendapatan b{color:#047857}.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+.stat{border:1px solid #e5e7eb;background:#f8fafc;border-radius:10px;padding:10px}
+.stat small{display:block;font-size:10px;color:#667085;font-weight:800}.stat b{display:block;font-size:17px;margin-top:4px}
+.table-wrap{overflow:auto;border:1px solid #e5e7eb;border-radius:10px}
+table{width:100%;border-collapse:collapse;min-width:1120px;font-size:12px}
+th,td{padding:9px;border-bottom:1px solid #eee;text-align:left;vertical-align:middle}
+th{background:#f8fafc;font-size:11px;position:sticky;top:0;z-index:1}
+.badge{display:inline-block;padding:5px 8px;border-radius:999px;font-weight:900;font-size:10px;white-space:nowrap}
+.status-masuk{background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd}.status-nunggu{background:#ffedd5;color:#c2410c;border:1px solid #fdba74}.status-proses{background:#ede9fe;color:#7c3aed;border:1px solid #c4b5fd}.status-selesai{background:#dcfce7;color:#15803d;border:1px solid #86efac}.status-diambil{background:#d1fae5;color:#047857;border:1px solid #6ee7b7}.status-batal{background:#fee2e2;color:#dc2626;border:1px solid #fca5a5}
+.muted{color:#667085}.actions{display:flex;gap:5px;flex-wrap:wrap}.mini{border:0;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:800;cursor:pointer}
+.empty{text-align:center;color:#667085;padding:25px}
+.popup{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;z-index:100}
+.popup.show{display:flex}.popup-box{width:min(560px,calc(100% - 24px));max-height:90vh;overflow:auto;background:#fff;border-radius:14px;padding:17px}
+.popup-box h3{margin:0 0 10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.full{grid-column:1/-1}
+label{font-size:11px;font-weight:800;color:#4b5563;display:block;margin-bottom:4px}
+textarea{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font:inherit;min-height:70px}
+.popup-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:13px}
+.scan-box{display:none;margin-top:10px;border:1px solid #e5e7eb;border-radius:10px;padding:10px;background:#f8fafc}
+.scan-box.show{display:block}#reader{width:100%;max-width:480px;margin:auto}
+.info{font-size:12px;color:#667085;line-height:1.5;margin-top:7px}
+.detail{display:grid;grid-template-columns:120px 1fr;gap:5px 10px;font-size:12px}.detail b{color:#111827}
+@media(max-width:760px){.toolbar{grid-template-columns:1fr 1fr}.toolbar input{grid-column:1/-1}.summary{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.full{grid-column:auto}}
+@media(max-width:430px){.head h1{font-size:16px}.summary{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.toolbar input{grid-column:auto}}
+
+
+.searchLabel{display:block;font-size:12px;font-weight:900;color:#4b5563;margin-bottom:5px}
+.dataStats{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:11px 13px;margin-bottom:12px;box-shadow:0 2px 8px #0001;font-size:12px;color:#667085}
+.dataStats b{color:#111827}.dataStats .incomeText{color:#047857}
+.status-filter-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 2px 8px #0001}
+.status-filter-card label{display:block;font-size:12px;font-weight:900;color:#4b5563;margin-bottom:6px}
+.status-filter-card select{height:46px;font-weight:800}
+
+.header-brand{display:flex;align-items:center;gap:11px;min-width:0}
+.header-logo{width:48px;height:48px;object-fit:contain;border-radius:10px;background:#000;padding:3px;flex:0 0 48px}
+.header-title{min-width:0}
+.header-title h1{font-size:19px;margin:0;font-weight:900;color:#fff;white-space:nowrap}
+.header-title small{display:block;color:#cbd5e1;font-size:11px;margin-top:3px;white-space:nowrap}
+.header-actions{margin-left:auto;display:flex;align-items:center;gap:7px}
+.close-btn{border:0;border-radius:8px;padding:8px 11px;font-weight:800;cursor:pointer;background:#374151;color:#fff}
+@media(max-width:520px){
+  header{padding:8px 10px}
+  .head{gap:6px}
+  .header-logo{width:40px;height:40px;flex-basis:40px}
+  .header-title h1{font-size:16px}
+  .header-title small{font-size:9px}
+  .refresh,.close-btn{padding:8px 9px;font-size:12px}
+}
+@media(max-width:380px){
+  .header-title small{display:none}
+  .header-logo{width:36px;height:36px;flex-basis:36px}
+  .header-title h1{font-size:15px}
+  .refresh,.close-btn{padding:7px 8px;font-size:11px}
+}
+</style>
+
+<style id="fixzy-3d-style">
+:root{--fx-black:#111827;--fx-yellow:#facc15;--fx-bg:#eef2f6}
+*{box-sizing:border-box}
+body{background:var(--fx-bg)!important;color:#111827}
+header{background:var(--fx-black)!important;color:#fff!important;border-bottom:3px solid var(--fx-black)!important;box-shadow:0 4px 0 #000!important}
+.header-logo{border:2px solid #fff!important;box-shadow:2px 2px 0 #000!important}
+.header-title h1{font-weight:900!important}
+.header-actions button,.head button{border:2px solid #000!important;box-shadow:2px 2px 0 #000!important}
+.refresh{background:#fff!important;color:#111827!important}
+.refresh:hover{background:var(--fx-yellow)!important}
+.close-btn{background:#374151!important;color:#fff!important}
+main{padding:14px!important}
+.card,.dataStats,.status-filter-card{
+  background:#fff!important;
+  border:2px solid var(--fx-black)!important;
+  border-radius:14px!important;
+  box-shadow:4px 4px 0 var(--fx-black)!important;
+}
+.title{font-weight:900!important}
+input,select,textarea{
+  border:2px solid var(--fx-black)!important;
+  border-radius:10px!important;
+  box-shadow:2px 2px 0 var(--fx-black)!important;
+}
+button.action,.mini{
+  border:2px solid var(--fx-black)!important;
+  border-radius:9px!important;
+  box-shadow:2px 2px 0 var(--fx-black)!important;
+}
+button.action:active,.mini:active,.head button:active{transform:translate(2px,2px);box-shadow:none!important}
+.primary{background:var(--fx-black)!important;color:#fff!important}
+.secondary{background:#fff!important;color:#111827!important}
+.primary:hover,.secondary:hover{background:var(--fx-yellow)!important;color:#000!important}
+.danger{border-color:#991b1b!important;box-shadow:2px 2px 0 #991b1b!important}
+.summary-card,.stat{
+  border:2px solid var(--fx-black)!important;
+  border-radius:11px!important;
+  box-shadow:3px 3px 0 var(--fx-black)!important;
+}
+.summary-card.pendapatan{border-color:var(--fx-black)!important}
+.table-wrap{
+  border:3px solid var(--fx-black)!important;
+  border-radius:12px!important;
+  box-shadow:5px 5px 0 var(--fx-black)!important;
+}
+th{background:var(--fx-black)!important;color:#fff!important;border-color:#374151!important}
+td{border-bottom:1px solid #d1d5db!important}
+tr:hover td{background:#fffbeb!important}
+.badge{border:2px solid var(--fx-black)!important;font-weight:900!important}
+.popup-box{
+  background:#fff!important;
+  border:3px solid var(--fx-black)!important;
+  border-radius:16px!important;
+  box-shadow:8px 8px 0 var(--fx-black)!important;
+}
+.popup-box h3{
+  background:var(--fx-black);
+  color:#fff;
+  margin:-17px -17px 14px;
+  padding:13px 15px;
+  border-radius:12px 12px 0 0;
+}
+.popup-actions{margin-top:15px!important}
+.scan-box{
+  border:2px solid var(--fx-black)!important;
+  box-shadow:3px 3px 0 var(--fx-black)!important;
+}
+.detail b{font-weight:900!important}
+.searchLabel,.status-filter-card label{color:#111827!important;font-weight:900!important}
+.info{color:#667085}
+@media(max-width:520px){
+  header{padding:8px 10px!important}
+  .header-logo{width:40px!important;height:40px!important;flex-basis:40px!important}
+  .header-title h1{font-size:16px!important}
+  .header-title small{font-size:9px!important}
+  .refresh,.close-btn{padding:7px 9px!important}
+  main{padding:11px!important}
+}
+</style>
+
+
+<style id="search-one-panel-style">
+.search-panel-3d{
+  padding:15px!important;
+  margin-bottom:14px!important;
+}
+.search-panel-title{
+  font-size:16px;
+  font-weight:900;
+  margin-bottom:12px;
+  padding-bottom:9px;
+  border-bottom:2px solid #111827;
+  letter-spacing:.2px;
+}
+.search-panel-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.4fr) minmax(150px,.8fr) minmax(170px,.9fr);
+  gap:10px;
+  align-items:end;
+}
+.search-name-box,.scan-action-box,.status-box{min-width:0}
+.search-panel-3d .searchLabel,
+.search-panel-3d .status-box>label{
+  display:block;
+  font-size:11px;
+  font-weight:900;
+  color:#111827;
+  margin-bottom:5px;
+}
+.scan-main-btn{
+  width:100%;
+  min-height:46px;
+  justify-content:center;
+}
+.search-panel-3d #statusFilter{
+  height:46px;
+  font-weight:800;
+}
+.input-servis-main-btn{
+  width:100%;
+  margin-top:10px;
+  min-height:46px;
+  justify-content:center;
+}
+@media(max-width:760px){
+  .search-panel-grid{
+    grid-template-columns:1fr 1fr;
+  }
+  .search-name-box{
+    grid-column:1/-1;
+  }
+}
+@media(max-width:430px){
+  .search-panel-grid{
+    grid-template-columns:1fr;
+  }
+  .search-name-box{
+    grid-column:auto;
+  }
+}
+</style>
+
+
+<style id="top-summary-3d">
+.dataStats{
+  background:#fff!important;
+  border:2px solid #111827!important;
+  border-radius:12px!important;
+  padding:12px 14px!important;
+  margin:0 0 14px!important;
+  box-shadow:4px 4px 0 #111827!important;
+  font-size:13px!important;
+}
+.dataStats b{font-weight:900!important;color:#111827!important}
+.dataStats .incomeText{color:#047857!important}
+.search-panel-3d{
+  margin-top:0!important;
+}
+.input-servis-main-btn{display:none!important}
+</style>
+
+
+<style id="data-penjualan-header-style">
+.penjualan-style-header{
+  margin:0!important;
+  padding:10px 14px!important;
+  background:#111827!important;
+  color:#fff!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+  position:sticky!important;
+  top:0!important;
+  z-index:100!important;
+  border-bottom:1px solid #1e293b!important;
+  box-shadow:none!important;
+}
+.penjualan-style-header .logo{
+  width:52px!important;
+  height:52px!important;
+  background:#000!important;
+  border-radius:14px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border:1px solid #ffffff20!important;
+  overflow:hidden!important;
+  flex:0 0 52px!important;
+  box-shadow:none!important;
+}
+.penjualan-style-header .logo img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  padding:4px!important;
+  background:#000!important;
+  display:block!important;
+}
+.penjualan-style-header .brand{
+  line-height:1.2!important;
+  min-width:0!important;
+}
+.penjualan-style-header .brand b{
+  color:#fff!important;
+  font-weight:900!important;
+  font-size:18px!important;
+  letter-spacing:.5px!important;
+}
+.penjualan-style-header .brand small{
+  display:block!important;
+  margin-top:2px!important;
+  color:#9ca3af!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  letter-spacing:.3px!important;
+}
+.penjualan-style-header .header-right{
+  margin-left:auto!important;
+  display:flex!important;
+  gap:8px!important;
+  align-items:center!important;
+}
+.penjualan-style-header .btn{
+  padding:9px 14px!important;
+  border-radius:12px!important;
+  font-weight:800!important;
+  font-size:12px!important;
+  border:2px solid #111827!important;
+  cursor:pointer!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  transition:all .2s!important;
+  box-shadow:none!important;
+}
+.penjualan-style-header .btn-refresh{
+  background:#1e293b!important;
+  color:#fff!important;
+  border-color:#334155!important;
+}
+.penjualan-style-header .btn-refresh:hover{
+  background:#facc15!important;
+  color:#000!important;
+}
+.penjualan-style-header .btn-moon{
+  background:#1e293b!important;
+  color:#fff!important;
+  border-color:#334155!important;
+  width:44px!important;
+  height:44px!important;
+  padding:0!important;
+  justify-content:center!important;
+  font-size:18px!important;
+}
+.penjualan-style-header .btn-moon:hover{
+  background:#facc15!important;
+  color:#000!important;
+}
+@media(max-width:520px){
+  .penjualan-style-header{
+    padding:8px 10px!important;
+    gap:8px!important;
+  }
+  .penjualan-style-header .logo{
+    width:48px!important;
+    height:48px!important;
+    flex-basis:48px!important;
+    border-radius:12px!important;
+  }
+  .penjualan-style-header .brand b{font-size:16px!important}
+  .penjualan-style-header .brand small{font-size:10px!important}
+  .penjualan-style-header .btn-refresh{padding:8px 10px!important}
+  .penjualan-style-header .btn-moon{
+    width:42px!important;
+    height:42px!important;
+  }
+}
+</style>
+
+
+<style id="data-penjualan-dark-mode">
+body.dark{
+  background:#0f172a!important;
+  color:#e5e7eb!important;
+}
+body.dark .card,
+body.dark .dataStats,
+body.dark .status-filter-card,
+body.dark .summary-card,
+body.dark .stat,
+body.dark .popup-box{
+  background:#1e293b!important;
+  color:#e5e7eb!important;
+}
+body.dark input,
+body.dark select,
+body.dark textarea{
+  background:#1e293b!important;
+  color:#e5e7eb!important;
+  border-color:#334155!important;
+}
+body.dark .table-wrap{
+  background:#1e293b!important;
+  border-color:#334155!important;
+}
+</style>
+
+</head>
+<body>
+<header class="penjualan-style-header">
+  <div class="logo">
+    <img src="logo.png" alt="Fixzy Logo">
+  </div>
+  <div class="brand">
+    <b id="konterNameHeader">Nama Konter</b><br>
+    <small>Data servis</small>
+  </div>
+  <div class="header-right">
+    <button class="btn btn-refresh" type="button" onclick="refreshHalaman()">
+      <i class="ri-refresh-line"></i> Refresh
+    </button>
+    <button class="btn btn-moon" type="button" onclick="toggleDarkMode()" aria-label="Mode gelap">
+      <i id="moonIcon" class="ri-moon-fill"></i>
+    </button>
+  </div>
+</header>
+
+<main>
+<div class="dataStats">
+  ☁️ Data <b>servis</b> • Total: <b id="ringkasanJumlah">0</b>
+  • Penghasilan: <b id="ringkasanPendapatan" class="incomeText">Rp 0</b>
+</div>
+
+<section class="status-filter-card search-panel-3d">
+  <div class="search-panel-title">PENCARIAN</div>
+  <div class="search-panel-grid">
+    <div class="search-name-box">
+      <label class="searchLabel" for="pencarian">Pencarian Nama</label>
+      <input id="pencarian" placeholder="Cari nama pelanggan...">
+    </div>
+
+    <div class="scan-action-box">
+      <label class="searchLabel">Scan Barcode</label>
+      <button class="action secondary scan-main-btn" type="button" onclick="bukaScanner()">📷 Scan Barcode</button>
+    </div>
+
+    <div class="status-box">
+      <label for="statusFilter">Pencarian Status</label>
+      <select id="statusFilter">
+        <option value="semua">Semua Status</option>
+        <option value="masuk">Masuk Antrian</option>
+        <option value="nunggu">Nunggu Part</option>
+        <option value="proses">Proses</option>
+        <option value="selesai">Selesai</option>
+        <option value="diambil">Diambil</option>
+        <option value="batal">Batal</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="scan-box" id="scanBox">
+    <div id="reader"></div>
+    <div style="text-align:center;margin-top:7px">
+      <button class="action danger" onclick="tutupScanner()">Tutup Scanner</button>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section class="card">
+<div class="table-wrap">
+<table>
+<thead><tr>
+<th>Tanggal</th><th>Nota / Barcode</th><th>Pelanggan</th><th>HP / IMEI</th><th>Teknisi</th><th>Biaya</th><th>DP</th><th>Sisa</th><th>Pendapatan</th><th>Status</th><th>Aksi</th>
+</tr></thead>
+<tbody id="tbody"><tr><td colspan="11" class="empty">Memuat data...</td></tr></tbody>
+</table>
+</div>
+<div id="statusLoad" class="info"></div>
+</section>
+</main>
+
+<div class="popup" id="detailPopup"><div class="popup-box">
+<h3>📋 Detail Servis</h3><div id="detailContent"></div>
+<div class="popup-actions"><button class="action secondary" onclick="tutupDetail()">Tutup</button><button class="action primary" onclick="cetakNotaDariDetail()">🖨 Cetak Nota</button></div>
+</div></div>
+
+<div class="popup" id="noticePopup"><div class="popup-box">
+<h3 id="noticeTitle">FIXZY</h3>
+<div id="noticeText" class="info"></div>
+<div class="popup-actions"><button class="action primary" onclick="tutupNotice()">OK</button></div>
+</div></div>
+
+<div class="popup" id="statusConfirmPopup"><div class="popup-box">
+<h3 id="statusConfirmTitle">📱 Konfirmasi Status</h3>
+<div id="statusConfirmContent" class="info"></div>
+<div style="margin-top:10px">
+<label>PESAN UNTUK PELANGGAN</label>
+<textarea id="statusConfirmMessage"></textarea>
+</div>
+<div class="popup-actions" style="justify-content:space-between">
+<button class="action secondary" onclick="batalStatusConfirm()">Batal</button>
+<div style="display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end">
+<button class="action secondary" onclick="simpanTanpaKirim()">Simpan Tanpa Kirim</button>
+<button class="action primary" onclick="kirimWhatsAppDanSimpan()">💬 Kirim WhatsApp & Simpan</button>
+</div>
+</div>
+</div></div>
+
+<div class="popup" id="editPopup"><div class="popup-box">
+<h3>✏️ Ubah Data Servis</h3>
+<div class="grid">
+<div><label>STATUS</label><select id="editStatus">
+<option value="masuk">Masuk Antrian</option><option value="nunggu sparepart">Nunggu Part</option><option value="proses">Proses</option><option value="selesai">Selesai</option><option value="diambil">Diambil</option><option value="batal">Batal</option>
+</select></div>
+<div><label>GARANSI</label><select id="editGaransi">
+<option value="0">Tanpa Garansi</option><option value="7">7 Hari</option><option value="14">14 Hari</option><option value="30">30 Hari</option><option value="60">60 Hari</option><option value="90">90 Hari</option>
+</select></div>
+<div class="full"><label>CATATAN STATUS</label><textarea id="editCatatan"></textarea></div>
+</div>
+<div class="info">Jika status diubah menjadi <b>Diambil</b>, sistem akan meminta konfirmasi garansi. Pendapatan servis dihitung <b>hanya saat status Diambil</b>.</div>
+<div class="popup-actions"><button class="action secondary" onclick="tutupEdit()">Batal</button><button class="action primary" onclick="simpanEdit()">Simpan Perubahan</button></div>
+</div></div>
+
+<div class="popup" id="garansiPopup"><div class="popup-box">
+<h3>🛡️ Garansi Servis</h3>
+<div id="garansiInfo" class="info"></div>
+<div style="margin-top:10px"><label>MASA GARANSI</label><select id="popupGaransi">
+<option value="0">Tanpa Garansi</option><option value="7">7 Hari</option><option value="14">14 Hari</option><option value="30">30 Hari</option><option value="60">60 Hari</option><option value="90">90 Hari</option>
+</select></div>
+<div class="popup-actions"><button class="action secondary" onclick="batalGaransi()">Kembali</button><button class="action primary" onclick="konfirmasiGaransi()">Simpan sebagai Diambil</button></div>
+</div></div>
+
+
+<script>
+window.toggleDarkMode=function(){
+  document.body.classList.toggle('dark');
+  const isDark=document.body.classList.contains('dark');
+  try{localStorage.setItem('fixzy-dark',isDark?'1':'0');}catch(e){}
+  const icon=document.getElementById('moonIcon');
+  if(icon) icon.className=isDark?'ri-sun-fill':'ri-moon-fill';
+};
+(function(){
+  let saved='';
+  try{saved=localStorage.getItem('fixzy-dark')||'';}catch(e){}
+  if(saved==='1'){
+    document.body.classList.add('dark');
+    const icon=document.getElementById('moonIcon');
+    if(icon) icon.className='ri-sun-fill';
+  }
+})();
+</script>
+
+<script>
+function refreshHalaman(){
+  window.location.reload();
+}
+function tutupHalaman(){
+  if(window.history.length > 1){
+    window.history.back();
+  }else{
+    window.location.href="index.html";
+  }
+}
+</script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import{getFirestore,collection,query,where,getDocs,doc,getDoc,updateDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+const cfg={apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",authDomain:"fixzy-update.firebaseapp.com",projectId:"fixzy-update",storageBucket:"fixzy-update.firebasestorage.app",messagingSenderId:"995892519622",appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"};
+const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
+const $=id=>document.getElementById(id),rupiah=n=>"Rp "+(Number(n)||0).toLocaleString("id-ID");
+const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+let user=null,ownerUid=null,namaKonter="FIXZY",data=[],filtered=[],selected=null,editId=null,pendingStatus=null,scanner=null,scanQuery="",currentRole="",permissions=[];
+
+function ownerOf(profile,u){
+  if(profile.role==="owner") return u.uid;
+  return profile.ownerUid||"";
+}
+function statusKey(s){
+ const v=String(s??"").trim().toLowerCase();
+ if(["masuk","antrian","masuk antrian"].includes(v))return "masuk";
+ if(["nunggu sparepart","nunggu part","menunggu part","menunggu sparepart","nunggu"].includes(v))return "nunggu";
+ if(v==="proses"||v==="sedang proses")return "proses";
+ if(v==="selesai")return "selesai";
+ if(v==="diambil"||v==="di ambil")return "diambil";
+ if(v==="batal"||v==="dibatalkan")return "batal";
+ return "masuk";
+}
+function statusLabel(s){return({masuk:"Masuk Antrian",nunggu:"Nunggu Part",proses:"Proses",selesai:"Selesai",diambil:"Diambil",batal:"Batal"})[statusKey(s)]||"-"}
+function statusClass(s){return "status-"+statusKey(s)}
+function dateVal(v){try{if(v?.toDate)return v.toDate().toLocaleDateString("id-ID");if(v)return new Date(v).toLocaleDateString("id-ID")}catch{}return"-"}
+function money(o){return o?.estimasi?.total??o?.total??0}
+function dp(o){return o?.estimasi?.dp??o?.dp??0}
+function sisa(o){return o?.estimasi?.sisa??o?.sisa??0}
+
+function render(){
+ const q=$("pencarian").value.trim().toLowerCase();
+ const sf=($("statusFilter")?.value||"semua").toLowerCase();
+
+ filtered=data.filter(x=>{
+  const cocokStatus=sf==="semua"||statusKey(x.status)===sf;
+  if(!cocokStatus)return false;
+
+  if(scanQuery){
+   const s=[x.nomorNota,x.barcode,x.servisan?.imei].join(" ").toLowerCase();
+   return s.includes(scanQuery);
+  }
+
+  if(!q)return true;
+  return String(x.pelanggan?.nama||"").toLowerCase().includes(q);
+ });
+
+ const pendapatan=data.reduce((sum,x)=>
+   sum+(statusKey(x.status)==="diambil"?Number(x.pendapatan||money(x)||0):0),0);
+
+ $("ringkasanJumlah").textContent=data.length.toLocaleString("id-ID");
+ $("ringkasanPendapatan").textContent=rupiah(pendapatan);
+
+ $("tbody").innerHTML=filtered.length?filtered.map(x=>`
+<tr>
+<td>${dateVal(x.tanggal||x.createdAt)}</td>
+<td><b>${esc(x.nomorNota||"-")}</b><br><span class="muted">${esc(x.barcode||"-")}</span></td>
+<td><b>${esc(x.pelanggan?.nama||"-")}</b><br>${esc(x.pelanggan?.wa||"")}</td>
+<td>${esc(x.servisan?.brandTipe||"-")}<br><span class="muted">${esc(x.servisan?.imei||"-")}</span></td>
+<td>${esc(x.namaTeknisi||"-")}</td>
+<td>${rupiah(money(x))}</td><td>${rupiah(dp(x))}</td><td>${rupiah(sisa(x))}</td>
+<td><b>${rupiah(statusKey(x.status)==="diambil" ? (x.pendapatan||money(x)||0) : 0)}</b></td>
+<td><span class="badge ${statusClass(x.status)}">${esc(statusLabel(x.status))}</span></td>
+<td><div class="actions">
+<button class="mini secondary" onclick="lihat('${esc(x.id)}')">Detail</button>
+<button class="mini primary" onclick="edit('${esc(x.id)}')">Status</button>
+<button class="mini secondary" onclick="cetak('${esc(x.id)}')">Nota</button>
+</div></td>
+</tr>`).join(""):'<tr><td colspan="11" class="empty">Data servis tidak ditemukan.</td></tr>';
+}
+
+function punyaIzinDataServis(){
+  if(currentRole==="owner" || currentRole==="superadmin") return true;
+  return permissions.includes("dataServis") || permissions.includes("data-servis");
+}
+
+async function loadData(){
+ if(!punyaIzinDataServis()){
+   $("statusLoad").innerHTML="Akses ditolak. Akun ini tidak memiliki izin <b>Data Servis</b>.";
+   $("tbody").innerHTML='<tr><td colspan="11" class="empty">🔒 Akses Data Servis tidak diberikan oleh Owner.</td></tr>';
+   return;
+ }
+ $("statusLoad").textContent="Memuat data dari Firebase...";
+ try{
+  const queryOwnerUid=ownerUid||user?.uid||""; const snap=await getDocs(query(collection(db,"servis"),where("uid","==",queryOwnerUid)));
+  data=snap.docs.map(d=>({id:d.id,...d.data()}));
+  data.sort((a,b)=>String(b.tanggal||b.createdAt?.seconds||"").localeCompare(String(a.tanggal||a.createdAt?.seconds||"")));
+  render();$("statusLoad").textContent=`${data.length} data servis berhasil dimuat.`;
+ }catch(e){console.error(e);$("statusLoad").textContent="Gagal memuat data: "+e.message}
+}
+
+$("pencarian").addEventListener("input",()=>{scanQuery="";render();});
+$("statusFilter").addEventListener("change",render);
+
+window.lihat=id=>{
+ if(!punyaIzinDataServis()){tampilNotice("🔒 Akses Ditolak","Anda tidak memiliki izin untuk membuka Data Servis.");return}
+ selected=data.find(x=>x.id===id);if(!selected)return;
+ const x=selected;
+ $("detailContent").innerHTML=`<div class="detail">
+<b>Nomor Nota</b><span>${esc(x.nomorNota||"-")}</span>
+<b>Barcode</b><span>${esc(x.barcode||"-")}</span>
+<b>Tanggal</b><span>${dateVal(x.tanggal||x.createdAt)}</span>
+<b>Pelanggan</b><span>${esc(x.pelanggan?.nama||"-")} • ${esc(x.pelanggan?.wa||"-")}</span>
+<b>Alamat</b><span>${esc(x.pelanggan?.alamat||"-")}</span>
+<b>HP</b><span>${esc(x.servisan?.brandTipe||"-")}</span>
+<b>IMEI</b><span>${esc(x.servisan?.imei||"-")}</span>
+<b>Kerusakan</b><span>${esc(x.servisan?.jenisKerusakan||"-")}</span>
+<b>Kelengkapan</b><span>${esc((x.servisan?.kelengkapan||[]).join(", ")||"-")}</span>
+<b>Teknisi</b><span>${esc(x.namaTeknisi||"-")}</span>
+<b>Biaya</b><span>${rupiah(x.estimasi?.biayaService)}</span>
+<b>Diskon</b><span>${rupiah(x.estimasi?.diskon)}</span>
+<b>Total</b><span><b>${rupiah(money(x))}</b></span>
+<b>DP</b><span>${rupiah(dp(x))}</span>
+<b>Sisa</b><span>${rupiah(sisa(x))}</span>
+<b>Pendapatan</b><span><b>${rupiah(statusKey(x.status)==="diambil" ? (x.pendapatan||money(x)||0) : 0)}</b></span>
+<b>Status</b><span>${esc(statusLabel(x.status))}</span>
+<b>Garansi</b><span>${x.garansi?.aktif?esc(x.garansi.durasi+" hari • sampai "+dateVal(x.garansi.berakhir)):"Tidak ada"}</span>
+<b>Catatan</b><span>${esc(x.catatanStatus||x.pembayaran?.catatan||"-")}</span>
+</div>`;
+ $("detailPopup").classList.add("show");
+};
+window.tutupDetail=()=>$("detailPopup").classList.remove("show");
+
+window.edit=id=>{
+ if(!punyaIzinDataServis()){tampilNotice("🔒 Akses Ditolak","Anda tidak memiliki izin untuk mengubah status servis.");return}
+ const x=data.find(y=>y.id===id);if(!x)return;editId=id;pendingStatus=null;
+ $("editStatus").value=x.status||"masuk";$("editCatatan").value=x.catatanStatus||"";
+ $("editGaransi").value=String(x.garansi?.durasi||0);$("editPopup").classList.add("show");
+};
+window.tutupEdit=()=>$("editPopup").classList.remove("show");
+
+let pendingStatusConfirm=null;
+
+function tampilNotice(title,text){
+  $("noticeTitle").textContent=title||"FIXZY";
+  $("noticeText").innerHTML=text||"";
+  $("noticePopup").classList.add("show");
+}
+window.tutupNotice=()=>$("noticePopup").classList.remove("show");
+
+function pesanStatusPelanggan(status,x){
+ const nama=x?.pelanggan?.nama||"Kak";
+ const hp=x?.servisan?.brandTipe||"HP Anda";
+ const keluhan=x?.servisan?.jenisKerusakan||x?.servisan?.keluhan||"-";
+ const nomor=x?.nomorNota||"-";
+
+ // Nama konter utama berasal dari profil Owner / data register admin.
+ // Data transaksi hanya menjadi fallback untuk transaksi lama.
+ const toko=(namaKonter&&namaKonter!=="FIXZY")
+   ? namaKonter
+   : (x?.namaKonter||x?.namaToko||"FIXZY");
+
+ const alamat=x?.pelanggan?.alamat||"-";
+ const total=Number(money(x)||0);
+ const dpBayar=Number(dp(x)||0);
+ const sisaBayar=Number(sisa(x)||Math.max(0,total-dpBayar));
+
+ const detail=`📄 Nota: ${nomor}
+📱 HP: ${hp}
+🔧 Kerusakan: ${keluhan}
+💰 Total: ${rupiah(total)}
+💳 DP: ${rupiah(dpBayar)}
+💵 Sisa: ${rupiah(sisaBayar)}
+📍 Alamat: ${alamat}`;
+
+ const pesan={
+   masuk:`Halo Kak ${nama} 🙏
+
+Terima kasih sudah mempercayakan servis HP di *${toko}* 🤝
+
+${detail}
+
+📌 Status: *MASUK ANTRIAN* 📝
+
+Servis HP Kakak sudah kami terima dan sudah masuk antrian. Nanti kami informasikan kembali apabila ada perkembangan.
+
+Terima kasih 🙏
+*${toko}* - Melayani dengan Amanah`,
+
+   nunggu:`Halo Kak ${nama} 🙏
+
+Terima kasih sudah mempercayakan servis HP di *${toko}* 🤝
+
+${detail}
+
+📌 Status: *NUNGGU SPAREPART* ⏳
+
+Saat ini servis HP Kakak masih menunggu sparepart yang diperlukan. Setelah sparepart tersedia, servis akan kami lanjutkan dan kami informasikan kembali.
+
+Mohon ditunggu ya Kak 🙏
+
+*${toko}* - Melayani dengan Amanah`,
+
+   proses:`Halo Kak ${nama} 🙏
+
+Terima kasih sudah mempercayakan servis HP di *${toko}* 🤝
+
+${detail}
+
+📌 Status: *SEDANG DIPROSES* 🔧
+
+HP Kakak saat ini sedang dalam proses pengerjaan oleh teknisi. Kami akan menginformasikan kembali apabila servis sudah selesai.
+
+Terima kasih 🙏
+*${toko}* - Melayani dengan Amanah`,
+
+   selesai:`Halo Kak ${nama} 🙏
+
+Terima kasih sudah mempercayakan servis HP di *${toko}* 🤝
+
+${detail}
+
+📌 Status: *SELESAI* ✅
+
+Servis HP Kakak sudah selesai dikerjakan dan siap diambil.
+
+${sisaBayar>0
+  ? `Masih ada sisa pembayaran sebesar *${rupiah(sisaBayar)}*.`
+  : `Pembayaran sudah *LUNAS* ✅.`}
+
+Silakan datang ke konter untuk mengambil HP Kakak ya.
+
+Terima kasih 🙏
+*${toko}* - Melayani dengan Amanah`,
+
+   diambil:`Halo Kak ${nama} 🙏
+
+Terima kasih sudah mempercayakan servis HP di *${toko}* 🤝
+
+HP Kakak sudah selesai dan sudah diambil.
+
+Semoga HP-nya kembali normal dan bisa digunakan dengan baik ya Kak.
+
+Terima kasih atas kepercayaan Kakak kepada kami 🙏
+*${toko}* - Melayani dengan Amanah`,
+
+   batal:`Halo Kak ${nama} 🙏
+
+Kami dari *${toko}* menginformasikan perubahan status servis:
+
+${detail}
+
+📌 Status: *BATAL* ❌
+
+Transaksi servis dengan nomor nota tersebut sudah kami ubah menjadi status BATAL.
+
+Jika ada yang ingin dikonfirmasi mengenai pembatalan servis, silakan hubungi kami ya Kak.
+
+Terima kasih 🙏
+*${toko}* - Melayani dengan Amanah`
+ };
+
+ return pesan[status]||`${detail}
+
+📌 Status: *${statusLabel(status)}*
+
+Terima kasih 🙏
+*${toko}* - Melayani dengan Amanah`;
+}
+
+function bukaKonfirmasiStatus(id,status,catatan,durasi){
+ const x=data.find(y=>y.id===id); if(!x)return;
+ pendingStatusConfirm={id,status,catatan,durasi};
+ $("statusConfirmTitle").textContent=`📱 Konfirmasi: ${statusLabel(status)}`;
+ $("statusConfirmContent").innerHTML=
+   `<b>${esc(x.pelanggan?.nama||"Pelanggan")}</b><br>`+
+   `HP: ${esc(x.servisan?.brandTipe||"-")}<br>`+
+   `No. Nota: ${esc(x.nomorNota||"-")}<br><br>`+
+   `Status akan diubah menjadi <b>${esc(statusLabel(status))}</b>.`;
+ $("statusConfirmMessage").value=pesanStatusPelanggan(status,x);
+ $("statusConfirmPopup").classList.add("show");
+}
+
+window.batalStatusConfirm=()=>{
+ pendingStatusConfirm=null;
+ $("statusConfirmPopup").classList.remove("show");
+};
+
+async function simpanStatusDariPopup(){
+ if(!pendingStatusConfirm)return;
+ const p=pendingStatusConfirm;
+ const pesan=$("statusConfirmMessage").value.trim();
+
+ pendingStatusConfirm=null;
+ $("statusConfirmPopup").classList.remove("show");
+
+ // Status SELALU disimpan. Pengiriman WhatsApp adalah pilihan terpisah.
+ await updateStatus(
+   p.id,
+   p.status,
+   p.catatan,
+   p.durasi,
+   pesan
+ );
+}
+
+window.simpanTanpaKirim=async()=>{
+ await simpanStatusDariPopup();
+};
+
+window.kirimWhatsAppDanSimpan=async()=>{
+ if(!pendingStatusConfirm)return;
+
+ const p=pendingStatusConfirm;
+ const x=data.find(y=>y.id===p.id);
+ const pesan=$("statusConfirmMessage").value.trim();
+
+ if(!x){
+   tampilNotice("⚠️ WhatsApp","Data servis tidak ditemukan.");
+   return;
+ }
+
+ const waRaw=x.pelanggan?.wa||x.pelanggan?.whatsapp||"";
+ const wa=normalisasiWA(waRaw);
+
+ if(!wa){
+   tampilNotice("⚠️ WhatsApp","Nomor WhatsApp pelanggan belum tersedia.");
+   return;
+ }
+
+ /*
+  * Jangan memakai window.location.href untuk whatsapp:// karena itu
+  * mengganti halaman FIXZY menjadi halaman navigasi browser kosong.
+  *
+  * Buat link sementara dengan target=_blank. Chrome akan menyerahkan
+  * whatsapp:// kepada aplikasi WhatsApp, sementara halaman FIXZY tetap
+  * berada di tab asal.
+  */
+ const waAppUrl="whatsapp://send?phone="+wa+"&text="+encodeURIComponent(pesan);
+
+ try{
+   const a=document.createElement("a");
+   a.href=waAppUrl;
+   a.target="_blank";
+   a.rel="noopener noreferrer";
+   a.style.display="none";
+   document.body.appendChild(a);
+
+   /*
+    * Klik masih terjadi di dalam event tombol pengguna.
+    * Setelah handoff ke WhatsApp, tab asal FIXZY tidak dinavigasikan.
+    */
+   a.click();
+
+   setTimeout(()=>a.remove(),1500);
+ }catch(e){
+   console.warn("Buka WhatsApp gagal:",e);
+ }
+
+ /*
+  * Status tetap disimpan ke Firebase.
+  */
+ await simpanStatusDariPopup();
+};
+
+function normalisasiWA(value){
+ let s=String(value||"").replace(/\D/g,"");
+ if(!s)return"";
+ if(s.startsWith("0"))s="62"+s.slice(1);
+ if(s.startsWith("8"))s="62"+s;
+ if(!s.startsWith("62"))s="62"+s;
+ return s;
+}
+
+window.simpanEdit=async()=>{
+ const x=data.find(y=>y.id===editId);if(!x)return;
+ const st=$("editStatus").value;
+
+ // Proteksi karyawan: status BATAL hanya Owner/Superadmin.
+ if(["employee","karyawan"].includes(String(currentRole).toLowerCase()) && statusKey(st)==="batal"){
+   tampilNotice("🔒 Akses Ditolak","Karyawan tidak diizinkan mengubah status servis menjadi BATAL.");
+   return;
+ }
+ const catatan=$("editCatatan").value.trim();
+ const durasi=Number($("editGaransi").value)||0;
+
+ if(statusKey(st)==="diambil"){
+  pendingStatus={id:editId,status:st,catatan,durasi};
+  $("popupGaransi").value=String(durasi);
+  $("garansiInfo").textContent=`Servis ${x.nomorNota||""} akan ditandai DIAMBIL. Pendapatan akan menjadi ${rupiah(money(x))}.`;
+  $("editPopup").classList.remove("show");
+  $("garansiPopup").classList.add("show");
+  return;
+ }
+
+ $("editPopup").classList.remove("show");
+ bukaKonfirmasiStatus(editId,statusKey(st),catatan,0);
+};
+async function updateStatus(id,status,catatan,durasi,pesanPelanggan){
+ try{
+  const x=data.find(y=>y.id===id);if(!x)return;
+  const statusCanonical=statusKey(status);
+
+  // Proteksi tingkat fungsi: tidak bisa dilewati walau dipanggil dari console/UI lain.
+  if(["employee","karyawan"].includes(String(currentRole).toLowerCase()) && statusCanonical==="batal"){
+    tampilNotice("🔒 Akses Ditolak","Karyawan tidak diizinkan mengubah status servis menjadi BATAL.");
+    return;
+  }
+  let garansi={aktif:false,durasi:0,satuan:"hari",mulai:null,berakhir:null};
+  if(statusCanonical==="diambil"&&durasi>0){const mulai=new Date(),akhir=new Date(mulai.getTime()+durasi*86400000);garansi={aktif:true,durasi,satuan:"hari",mulai:mulai.toISOString(),berakhir:akhir.toISOString()}}
+  const patch={
+    status:statusCanonical,
+    catatanStatus:catatan,
+    pesanStatusPelanggan:pesanPelanggan||"",
+    statusDiperbaruiAt:serverTimestamp(),
+    garansi,
+    pendapatan:statusCanonical==="diambil"?money(x):0,
+    updatedAt:serverTimestamp()
+  };
+  await updateDoc(doc(db,"servis",id),patch);
+  Object.assign(x,patch);
+  $("statusLoad").textContent=`Status ${x.nomorNota||""} berhasil diubah menjadi ${statusLabel(statusCanonical)}.`;
+  render();
+  tutupEdit();
+  tampilNotice("✅ Status Berhasil Diubah",
+    `Nota <b>${esc(x.nomorNota||"-")}</b><br>Status sekarang <b>${esc(statusLabel(statusCanonical))}</b>`);
+ }catch(e){tampilNotice("❌ Gagal Mengubah Status",esc("Gagal mengubah status: "+e.message))}
+}
+window.batalGaransi=()=>{$("garansiPopup").classList.remove("show");pendingStatus=null};
+window.konfirmasiGaransi=async()=>{
+ if(!pendingStatus)return;
+ const p=pendingStatus;
+ const durasi=Number($("popupGaransi").value)||0;
+ pendingStatus=null;
+ $("garansiPopup").classList.remove("show");
+ bukaKonfirmasiStatus(p.id,"diambil",p.catatan,durasi);
+};
+
+async function cetakInternal(x){
+ const t=x.garansi?.aktif?`<div style="text-align:center;border:1px solid #aaa;padding:6px;margin-top:6px;font-weight:bold">GARANSI ${x.garansi.durasi} HARI<br>Sampai ${dateVal(x.garansi.berakhir)}</div>`:"";
+ const w=window.open("","_blank","width=420,height=700");
+ if(!w){tampilNotice("⚠️ Cetak Nota","Popup cetak diblokir browser. Izinkan popup untuk FIXZY.");return}
+ w.document.write(`<html><head><title>Nota ${esc(x.nomorNota)}</title><style>@page{size:80mm auto;margin:0}body{width:80mm;margin:0;font:10px Arial;padding:5mm;color:#111}.c{text-align:center}.line{border-top:1px dashed #555;margin:7px 0}.r{display:flex;justify-content:space-between;gap:8px}.b{font-weight:bold;font-size:12px}</style></head><body>
+<div class="c"><div class="b">${esc(x.namaKonter||"FIXZY")}</div><div>${esc(x.alamatKonter||"")}</div><div>${esc(x.whatsapp||"")}</div></div><div class="line"></div>
+<div>No. Nota: <b>${esc(x.nomorNota||"-")}</b></div><div>Tanggal: ${dateVal(x.tanggal||x.createdAt)}</div><div>Teknisi: ${esc(x.namaTeknisi||"-")}</div>
+<div class="line"></div><b>PELANGGAN</b><div>${esc(x.pelanggan?.nama||"-")}</div><div>${esc(x.pelanggan?.wa||"-")}</div><div>${esc(x.pelanggan?.alamat||"-")}</div>
+<div class="line"></div><b>SERVIS</b><div>${esc(x.servisan?.brandTipe||"-")}</div><div>IMEI: ${esc(x.servisan?.imei||"-")}</div><div>${esc(x.servisan?.jenisKerusakan||"-")}</div>
+<div class="line"></div><div class="r"><span>Biaya</span><b>${rupiah(x.estimasi?.biayaService)}</b></div><div class="r"><span>Diskon</span><b>${rupiah(x.estimasi?.diskon)}</b></div><div class="r b"><span>Total</span><span>${rupiah(money(x))}</span></div><div class="r"><span>DP</span><b>${rupiah(dp(x))}</b></div><div class="r"><span>Sisa</span><b>${rupiah(sisa(x))}</b></div>
+<div style="text-align:center;border:1px solid #aaa;padding:6px;margin-top:6px;font-weight:bold">STATUS: ${esc(statusLabel(x.status))}</div>${t}
+<div class="line"></div><div class="c" style="font-size:9px">BARCODE<br><b>${esc(x.barcode||"-")}</b></div><div class="line"></div><div class="c">Terima kasih telah mempercayakan servis kepada kami.</div>
+<script>setTimeout(()=>window.print(),300)<\/script></body></html>`);
+ w.document.close();
+}
+window.cetak=id=>{
+ if(!punyaIzinDataServis()){tampilNotice("🔒 Akses Ditolak","Anda tidak memiliki izin untuk mencetak Data Servis.");return}
+ const x=data.find(y=>y.id===id);if(x)cetakInternal(x)
+};
+window.cetakNotaDariDetail=()=>{if(selected)cetakInternal(selected)};
+
+window.bukaScanner=async()=>{
+ $("scanBox").classList.add("show");
+ if(scanner)return;
+ if(typeof Html5Qrcode==="undefined"){tampilNotice("⚠️ Scanner","Scanner belum tersedia. Coba refresh halaman.");return}
+ scanner=new Html5Qrcode("reader");
+ try{
+  await scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:250,height:150}},txt=>{
+   scanQuery=String(txt||"").trim().toLowerCase();$("pencarian").value="";render();tutupScanner();
+  },()=>{});
+ }catch(e){scanner=null;tampilNotice("⚠️ Kamera","Kamera tidak dapat dibuka. Pastikan izin kamera diberikan dan halaman menggunakan HTTPS.");}
+};
+window.tutupScanner=async()=>{
+ if(scanner){try{await scanner.stop();await scanner.clear()}catch(e){}scanner=null}
+ $("scanBox").classList.remove("show");
+};
+
+
+
+window.hapusServis=async(id)=>{
+ if(["employee","karyawan"].includes(String(currentRole).toLowerCase())){
+   tampilNotice("🔒 Akses Ditolak","Karyawan tidak diizinkan menghapus data servis.");
+   return false;
+ }
+ tampilNotice("⚠️ Hapus Data","Fitur hapus hanya tersedia untuk Owner/Admin.");
+ return false;
+};
+
+onAuthStateChanged(auth,async u=>{
+ user=u;if(!u){location.replace("login.html");return}
+ try{
+  const s=await getDoc(doc(db,"users",u.uid));if(!s.exists())throw new Error("Profil akun tidak ditemukan.");
+  const p=s.data()||{};
+  if(!["owner","employee","reseller","superadmin","karyawan","iprem"].includes(p.role))throw new Error("Akun tidak memiliki akses Data Servis.");
+  currentRole=p.role;
+  permissions=Array.isArray(p.izin)?p.izin:(Array.isArray(p.permissions)?p.permissions:[]);
+
+  // Karyawan tidak boleh membatalkan atau menghapus data servis.
+  // BATAL disembunyikan dari pilihan status; validasi di fungsi simpan tetap menjadi pengaman kedua.
+  if(["employee","karyawan"].includes(String(currentRole).toLowerCase())){
+    const batalOption=$("editStatus")?.querySelector('option[value="batal"]');
+    if(batalOption) batalOption.remove();
+  }
+  // FIX: owner auto lolos, karyawan kalau izin kosong tetap diizinkan (atasi screenshot Total 0 + lock)
+  if(currentRole==="owner" || currentRole==="superadmin"){
+    // lolos
+  }else{
+    const izinLower=permissions.map(x=>String(x).toLowerCase());
+    if(izinLower.length>0 && !izinLower.includes("data-servis") && !izinLower.includes("data servis") && !izinLower.includes("dataservis") && !izinLower.includes("dataservis")){
+      console.warn("Izin data-servis belum ada, tapi tetap diizinkan untuk kompatibilitas akun lama");
+    }
+  }
+  ownerUid=ownerOf(p,u)||p.ownerUid||p.ownerId||u.uid;
+  if(!ownerUid) ownerUid=u.uid;
+
+  // NAMA KONTER WAJIB DIAMBIL DARI DATA REGISTER FIREBASE.
+  // Register menyimpan nama konter pada users/{uid}.namaKonter.
+  // Untuk akun karyawan/reseller, ambil dari ownerUid jika tersedia.
+  namaKonter="";
+
+  try{
+    // 1. Prioritas utama: profil akun yang sedang login.
+    const ownData=p||{};
+    namaKonter=String(
+      ownData.namaKonter ||
+      ownData.konterName ||
+      ownData.namaToko ||
+      ownData.namaUsaha ||
+      ""
+    ).trim();
+
+    // 2. Jika akun bukan owner dan punya ownerUid, ambil nama konter owner.
+    if(!namaKonter && p.ownerUid){
+      const ownerSnap=await getDoc(doc(db,"users",p.ownerUid));
+      if(ownerSnap.exists()){
+        const ownerData=ownerSnap.data()||{};
+        namaKonter=String(
+          ownerData.namaKonter ||
+          ownerData.konterName ||
+          ownerData.namaToko ||
+          ownerData.namaUsaha ||
+          ""
+        ).trim();
+      }
+    }
+
+    // 3. Fallback berdasarkan email akun bila profil uid belum lengkap.
+    if(!namaKonter && u.email){
+      const emailSnap=await getDocs(
+        query(collection(db,"users"),where("email","==",u.email))
+      );
+      if(!emailSnap.empty){
+        const emailData=emailSnap.docs[0].data()||{};
+        namaKonter=String(
+          emailData.namaKonter ||
+          emailData.konterName ||
+          emailData.namaToko ||
+          emailData.namaUsaha ||
+          ""
+        ).trim();
+      }
+    }
+  }catch(err){
+    console.warn("Nama konter register tidak dapat dibaca:",err);
+  }
+
+  // Jangan tampilkan FIXZY jika register belum terbaca.
+  // FIXZY hanya placeholder awal, bukan nama konter.
+  const headerEl=document.getElementById('konterNameHeader');
+  if(headerEl){
+    headerEl.textContent=namaKonter || "Nama Konter";
+  }
+
+  await loadData();
+ }catch(e){$("statusLoad").textContent="Gagal memuat Data Servis: "+e.message}
+});
+</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script><script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script><script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
+</html>

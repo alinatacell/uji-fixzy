@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#FFC107">
+<title>FIXZY | Data Karyawan</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#f5f7fb;--card:#fff;--line:#e2e8f0;--text:#172033;--muted:#64748b;--yellow:#ffc107;--orange:#f59e0b;--green:#16a34a;--red:#dc2626}
+body{margin:0;background:linear-gradient(180deg,#fff,#f5f7fb 260px);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}
+.header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 2px 12px #0000000b}
+.header-in{max-width:1050px;margin:auto;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand{font-size:19px;font-weight:900}.brand span{color:var(--orange)}
+.actions{display:flex;gap:7px}
+.btn{border:0;border-radius:10px;padding:10px 13px;font-weight:900}.light{background:#e5e7eb}.yellow{background:var(--yellow)}.dark{background:#111827;color:#fff}.red{background:#fee2e2;color:#b91c1c}.green{background:#dcfce7;color:#166534}
+.wrap{max-width:1050px;margin:auto;padding:15px 10px 70px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:0 5px 20px #17203308}
+.head{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:900;display:flex;justify-content:space-between;align-items:center;gap:8px}.body{padding:14px 16px}
+.status{font-size:11px;color:var(--muted);line-height:1.5}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:5px}label{font-size:11px;font-weight:900;color:#475569}
+input,select{width:100%;height:42px;border:1px solid #cbd5e1;border-radius:10px;padding:0 11px;background:#fff;outline:none}
+input:focus,select:focus{border-color:var(--orange);box-shadow:0 0 0 3px #f59e0b18}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px}
+table{width:100%;min-width:720px;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid var(--line);font-size:11px;text-align:left}
+th{background:#f8fafc;color:#475569;font-size:10px}
+.badge{display:inline-block;padding:5px 8px;border-radius:99px;font-size:9px;font-weight:900}
+.active{background:#dcfce7;color:#166534}.inactive{background:#fee2e2;color:#b91c1c}
+.acts{display:flex;gap:5px}.mini{border:0;border-radius:8px;padding:7px 9px;font-size:9px;font-weight:900}.edit{background:#fef3c7;color:#92400e}.del{background:#fee2e2;color:#b91c1c}
+.modal{display:none;position:fixed;inset:0;z-index:100;background:#0f172a99;align-items:center;justify-content:center;padding:15px}.modal.show{display:flex}
+.modalbox{width:min(520px,100%);background:#fff;border-radius:18px;padding:17px;box-shadow:0 25px 70px #0003}.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.modalhead h2{margin:0;font-size:17px}
+.close{border:0;background:#e5e7eb;border-radius:9px;width:35px;height:35px;font-size:18px}
+.form-actions{display:flex;gap:7px;margin-top:12px}
+.toast{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:11px 14px;border-radius:10px;font-size:11px;font-weight:800;z-index:200}
+.toast.show{display:block}
+@media(max-width:600px){.header-in{padding:9px}.brand{font-size:16px}.actions .btn{padding:9px 8px;font-size:11px}.grid{grid-template-columns:1fr}.full{grid-column:auto}.body,.head{padding:12px}}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-in">
+    <div class="brand">FIXZY <span>DATA KARYAWAN</span></div>
+    <div class="actions">
+      <button class="btn light" type="button" onclick="tutupHalaman()">✕ Tutup</button>
+      <button class="btn yellow" type="button" onclick="muatKaryawan()">↻ Refresh</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <div class="body">
+      <div id="status" class="status">Memeriksa login Firebase...</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="head">
+      <span id="formTitle">Tambah Data Karyawan Baru</span>
+      <button class="btn light" type="button" onclick="resetForm()">Form Baru</button>
+    </div>
+    <div class="body">
+      <input type="hidden" id="editId">
+      <div class="grid">
+        <div class="field"><label>Nama Karyawan / Teknisi</label><input id="nama" placeholder="Contoh: Budi"></div>
+        <div class="field"><label>Jabatan</label><select id="jabatan"><option value="Teknisi">Teknisi</option><option value="Admin">Admin</option><option value="Kasir">Kasir</option><option value="Kurir">Kurir</option><option value="Lainnya">Lainnya</option></select></div>
+        <div class="field"><label>No. WhatsApp / HP</label><input id="hp" inputmode="tel" placeholder="08xxxxxxxxxx"></div>
+        <div class="field"><label>Nominal Upah</label><input id="upah" type="number" inputmode="numeric" min="0" step="1000" placeholder="Contoh: 100000"></div>
+        <div class="field"><label>Status</label><select id="statusKaryawan"><option value="Aktif">Aktif</option><option value="Nonaktif">Nonaktif</option></select></div>
+        <div class="field full"><label>Catatan</label><input id="catatan" placeholder="Catatan karyawan"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn yellow" type="button" onclick="simpanKaryawan()">💾 Simpan</button>
+        <button class="btn light" type="button" onclick="resetForm()">Bersihkan</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="head">
+      <span>👥 Daftar Karyawan</span>
+      <span id="count">0 karyawan</span>
+    </div>
+    <div class="body">
+      <div class="field">
+        <label>Cari</label>
+        <input id="cari" placeholder="Cari nama, jabatan, nomor..." oninput="render()">
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nama</th><th>Jabatan</th><th>No. HP</th><th>Upah</th><th>Status</th><th>Catatan</th><th>Aksi</th></tr></thead>
+        <tbody id="tbody"><tr><td colspan="7">Memuat Firebase...</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<div id="modal" class="modal">
+  <div class="modalbox">
+    <div class="modalhead"><h2>Hapus Karyawan</h2><button class="close" onclick="tutupModal()">×</button></div>
+    <p style="font-size:13px;color:#64748b">Karyawan akan dihapus dari Firebase. Lanjutkan?</p>
+    <button class="btn red" onclick="konfirmasiHapus()">Hapus</button>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {getFirestore,collection,query,where,getDocs,doc,setDoc,deleteDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyCwMbJsuORhIq4QCmp4c1r6OsjAUlfxU5Y",
+ authDomain:"fixzy-f056f.firebaseapp.com",
+ projectId:"fixzy-f056f",
+ storageBucket:"fixzy-f056f.firebasestorage.app",
+ messagingSenderId:"838081521031",
+ appId:"1:838081521031:web:50fdee909b56460b055f22"
+};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+let uid=null,rows=[],deleteId=null;
+
+const $=id=>document.getElementById(id);
+function toast(t){$("toast").textContent=t;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2400)}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+function tutupHalaman(){
+ try{if(window.frameElement){window.frameElement.remove();return}}catch(e){}
+ try{if(window.parent!==window){window.parent.postMessage({type:"FIXZY_CLOSE_KARYAWAN"},"*");return}}catch(e){}
+ try{window.close()}catch(e){}
+}
+window.tutupHalaman=tutupHalaman;
+window.tutupModal=()=>{$("modal").classList.remove("show")};
+
+onAuthStateChanged(auth,async user=>{
+ if(!user){$("status").textContent="Belum login Firebase.";return}
+ uid=user.uid;
+ await muatKaryawan();
+});
+
+async function muatKaryawan(){
+ if(!uid)return;
+ $("status").textContent="Mengambil data karyawan dari Firebase...";
+ try{
+  const snap=await getDocs(query(collection(db,"karyawan"),where("uid","==",uid)));
+  rows=snap.docs.map(d=>({id:d.id,...d.data()}));
+  render();
+  $("status").textContent=`Firebase aktif • ${rows.length} karyawan dimuat dari koleksi karyawan.`;
+ }catch(e){
+  console.error(e);
+  $("status").textContent="Gagal membaca Firebase: "+e.message;
+  $("tbody").innerHTML=`<tr><td colspan="7">${esc(e.message)}</td></tr>`;
+ }
+}
+window.muatKaryawan=muatKaryawan;
+
+function render(){
+ const q=$("cari").value.toLowerCase().trim();
+ const data=rows.filter(r=>[r.nama,r.jabatan,r.hp,r.upah,r.status,r.catatan].join(" ").toLowerCase().includes(q));
+ $("count").textContent=`${data.length} karyawan`;
+ if(!data.length){$("tbody").innerHTML='<tr><td colspan="7" style="padding:22px;text-align:center;color:#64748b">Belum ada karyawan.</td></tr>';return}
+ $("tbody").innerHTML=data.map(r=>`<tr>
+   <td><b>${esc(r.nama||"-")}</b></td>
+   <td>${esc(r.jabatan||"-")}</td>
+   <td>${esc(r.hp||"-")}</td>
+   <td><b>Rp ${Number(r.upah||0).toLocaleString("id-ID")}</b></td>
+   <td><span class="badge ${r.status==="Aktif"?"active":"inactive"}">${esc(r.status||"Nonaktif")}</span></td>
+   <td>${esc(r.catatan||"-")}</td>
+   <td><div class="acts"><button class="mini edit" onclick="editKaryawan('${esc(r.id)}')">Edit</button><button class="mini del" onclick="hapusKaryawan('${esc(r.id)}')">Hapus</button></div></td>
+ </tr>`).join("");
+}
+window.render=render;
+
+function resetForm(){
+ $("editId").value="";$("nama").value="";$("jabatan").value="Teknisi";$("hp").value="";$("upah").value="";$("statusKaryawan").value="Aktif";$("catatan").value="";
+ $("formTitle").textContent="Tambah Karyawan";
+}
+window.resetForm=resetForm;
+
+async function simpanKaryawan(){
+ if(!uid)return alert("Belum login Firebase.");
+ const nama=$("nama").value.trim();
+ if(!nama)return alert("Nama karyawan wajib diisi.");
+ const d={
+  uid,
+  nome:nomeFix(),
+  nama,
+  jabatan:$("jabatan").value,
+  hp:$("hp").value.trim(),
+  upah:Number($("upah").value||0),
+  status:$("statusKaryawan").value,
+  catatan:$("catatan").value.trim(),
+  updatedAt:serverTimestamp()
+ };
+ try{
+  const editId=$("editId").value;
+  const id=editId||crypto.randomUUID();
+  if(!editId)d.createdAt=serverTimestamp();
+  await setDoc(doc(db,"karyawan",id),d,{merge:true});
+  toast(editId?"Karyawan diperbarui di Firebase.":"Karyawan ditambahkan ke Firebase.");
+  resetForm();await muatKaryawan();
+ }catch(e){alert("Gagal menyimpan karyawan: "+e.message)}
+}
+function nomeFix(){return $("nama").value.trim()}
+window.simpanKaryawan=simpanKaryawan;
+
+window.editKaryawan=id=>{
+ const r=rows.find(x=>x.id===id);if(!r)return;
+ $("editId").value=id;$("nama").value=r.nama||"";$("jabatan").value=r.jabatan||"Teknisi";$("hp").value=r.hp||"";
+ $("upah").value=Number(r.upah||0)||"";
+ $("statusKaryawan").value=r.status||"Aktif";$("catatan").value=r.catatan||"";
+ $("formTitle").textContent="Edit Karyawan";
+ window.scrollTo({top:0,behavior:"smooth"});
+};
+
+window.hapusKaryawan=id=>{deleteId=id;$("modal").classList.add("show")};
+async function konfirmasiHapus(){
+ if(!deleteId)return;
+ try{
+  await deleteDoc(doc(db,"karyawan",deleteId));
+  toast("Karyawan dihapus dari Firebase.");
+  deleteId=null;$("modal").classList.remove("show");await muatKaryawan();
+ }catch(e){alert("Gagal menghapus: "+e.message)}
+}
+window.konfirmasiHapus=konfirmasiHapus;
+</script>
+</body>
+</html>

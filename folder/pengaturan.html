@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Pengaturan - FIXZY</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#0b0b0c;color:#fff;font-family:Arial,sans-serif}
+body{min-height:100vh}
+.header{
+  position:sticky;top:0;z-index:20;
+  height:72px;
+  background:#080808;
+  border-bottom:1px solid #2d2d2d;
+  padding:8px 14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+.back,.refresh{
+  border:1px solid #3b3b3b;
+  background:#151515;
+  color:#ffb800;
+  border-radius:12px;
+  width:42px;
+  height:42px;
+  font-size:27px;
+  font-weight:900;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:none;
+}
+.refresh{font-size:25px}
+.logo{
+  width:48px;
+  height:48px;
+  object-fit:contain;
+  display:block;
+}
+.header-title{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  color:#ffb800;
+  font-size:18px;
+  font-weight:900;
+  letter-spacing:.5px;
+  white-space:nowrap;
+}
+.wrap{max-width:900px;margin:0 auto;padding:18px}
+.card{
+  background:#171717;border:1px solid #3e3e3e;border-radius:20px;
+  padding:18px;margin-bottom:16px;box-shadow:0 8px 30px rgba(0,0,0,.25)
+}
+.card h2{margin:0 0 6px;color:#ffb800;font-size:20px}
+.card p{margin:0 0 16px;color:#aaa;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.field label{display:block;color:#ffb800;font-weight:800;margin-bottom:7px;font-size:13px}
+.field input,.field select,.field textarea{
+  width:100%;border:1px solid #3c3c3c;background:#222;color:#fff;
+  border-radius:12px;padding:13px;font-size:15px;outline:none
+}
+.field textarea{min-height:90px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#ffb800}
+.full{grid-column:1/-1}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.btn{
+  border:0;border-radius:12px;padding:13px 18px;font-weight:900;
+  cursor:pointer;background:#ffb800;color:#111
+}
+.btn.secondary{background:#2b2b2b;color:#fff;border:1px solid #444}
+.btn.danger{background:#8b1e1e;color:#fff}
+.table-wrap{overflow:auto;border:1px solid #333;border-radius:14px}
+table{width:100%;border-collapse:collapse;min-width:720px}
+th,td{padding:11px;border-bottom:1px solid #303030;text-align:left;font-size:13px}
+th{background:#222;color:#ffb800}
+td{color:#ddd}
+.badge{display:inline-block;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800}
+.badge.on{background:#173e25;color:#75e29b}
+.badge.off{background:#442020;color:#ff9c9c}
+.money{font-weight:900;color:#ffd45c}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.stat{background:#222;border:1px solid #333;border-radius:14px;padding:13px}
+.stat small{display:block;color:#999;margin-bottom:5px}
+.stat strong{font-size:18px;color:#ffb800}
+.empty{padding:20px;text-align:center;color:#888}
+.toast{
+  position:fixed;left:50%;bottom:22px;transform:translateX(-50%);
+  background:#202020;border:1px solid #ffb800;color:#fff;padding:13px 18px;
+  border-radius:12px;display:none;z-index:99;max-width:90%;text-align:center
+}
+.loading{
+  position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;
+  display:flex;align-items:center;justify-content:center;color:#ffb800;font-weight:900
+}
+@media(max-width:650px){
+  .header{height:66px;padding:7px 10px}
+  .logo{width:46px;height:46px}
+  .header-title{font-size:16px}
+
+  .grid{grid-template-columns:1fr}
+  .summary{grid-template-columns:1fr}
+  .wrap{padding:12px}
+}
+</style>
+</head>
+<body>
+
+<div id="loading" class="loading">Memeriksa akun FIXZY...</div>
+
+<header class="header">
+  <div class="header-left">
+    <button class="back" onclick="kembali()" aria-label="Kembali">‹</button>
+    <img class="logo" src="logo.png" alt="FIXZY">
+  </div>
+
+  <div class="header-title">PENGATURAN</div>
+
+  <button class="refresh" onclick="refreshHalaman()" aria-label="Refresh">↻</button>
+</header>
+
+<main class="wrap">
+
+  <section class="card">
+    <h2>👥 Data Karyawan</h2>
+    <p>Kelola admin, kasir, teknisi, dan kurir. Data disimpan ke Firebase.</p>
+
+    <div class="grid">
+      <div class="field">
+        <label>Nama Karyawan</label>
+        <input id="kNama" placeholder="Nama lengkap">
+      </div>
+      <div class="field">
+        <label>Jabatan</label>
+        <select id="kJabatan">
+          <option value="admin">Admin</option>
+          <option value="kasir">Kasir</option>
+          <option value="teknisi">Teknisi</option>
+          <option value="kurir">Kurir</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>No. WhatsApp</label>
+        <input id="kWhatsapp" inputmode="tel" placeholder="08xxxxxxxxxx">
+      </div>
+      <div class="field">
+        <label>Tanggal Mulai</label>
+        <input id="kTanggal" type="date">
+      </div>
+      <div class="field">
+        <label>Gaji / Upah</label>
+        <input id="kGaji" type="number" min="0" placeholder="0">
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select id="kStatus">
+          <option value="Aktif">Aktif</option>
+          <option value="Nonaktif">Nonaktif</option>
+        </select>
+      </div>
+      <div class="field full">
+        <label>Alamat</label>
+        <textarea id="kAlamat" placeholder="Alamat karyawan"></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" onclick="simpanKaryawan()">Simpan Karyawan</button>
+      <button class="btn secondary" onclick="resetKaryawan()">Bersihkan</button>
+    </div>
+
+    <div id="karyawanList" style="margin-top:16px"></div>
+  </section>
+
+  <section class="card">
+    <h2>💰 Anggaran Biaya</h2>
+    <p>Catat biaya berdasarkan tanggal supaya pengeluaran operasional mudah dipantau.</p>
+
+    <div class="grid">
+      <div class="field">
+        <label>Tanggal</label>
+        <input id="bTanggal" type="date">
+      </div>
+      <div class="field">
+        <label>Kategori</label>
+        <select id="bKategori">
+          <option value="Listrik">Listrik</option>
+          <option value="Internet">Internet</option>
+          <option value="Sewa">Sewa</option>
+          <option value="Gaji">Gaji</option>
+          <option value="Transportasi">Transportasi</option>
+          <option value="Operasional">Operasional</option>
+          <option value="Perlengkapan">Perlengkapan</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Nominal</label>
+        <input id="bNominal" type="number" min="0" placeholder="0">
+      </div>
+      <div class="field">
+        <label>Keterangan</label>
+        <input id="bKeterangan" placeholder="Contoh: bayar listrik bulan ini">
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" onclick="simpanBiaya()">Simpan Biaya</button>
+      <button class="btn secondary" onclick="resetBiaya()">Bersihkan</button>
+    </div>
+
+    <div class="summary">
+      <div class="stat"><small>Biaya Hari Ini</small><strong id="totalHari">Rp0</strong></div>
+      <div class="stat"><small>Biaya Bulan Ini</small><strong id="totalBulan">Rp0</strong></div>
+      <div class="stat"><small>Semua Biaya</small><strong id="totalSemua">Rp0</strong></div>
+    </div>
+
+    <div id="biayaList" style="margin-top:16px"></div>
+  </section>
+
+  <section class="card">
+    <h2>🏪 Profil Toko</h2>
+    <p>Disiapkan sebagai pusat data profil toko untuk nota dan laporan berikutnya.</p>
+    <div class="grid">
+      <div class="field">
+        <label>Nama Toko</label>
+        <input id="pNama" placeholder="Nama toko">
+      </div>
+      <div class="field">
+        <label>No. WhatsApp</label>
+        <input id="pWhatsapp" placeholder="08xxxxxxxxxx">
+      </div>
+      <div class="field full">
+        <label>Alamat</label>
+        <textarea id="pAlamat" placeholder="Alamat toko"></textarea>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="simpanProfil()">Simpan Profil</button>
+    </div>
+  </section>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc, getDocs, getDoc, doc, setDoc,
+  query, where, orderBy, limit, Timestamp, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+const cfg={apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",authDomain:"fixzy-update.firebaseapp.com",projectId:"fixzy-update",storageBucket:"fixzy-update.firebasestorage.app",messagingSenderId:"995892519622",appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"};
+
+const app=getApps().length ? getApp() : initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+let currentUser=null;
+let currentProfile=null;
+
+const rupiah=n=>new Intl.NumberFormat("id-ID",{
+  style:"currency",currency:"IDR",maximumFractionDigits:0
+}).format(Number(n)||0);
+
+const todayISO=()=>{
+  const d=new Date();
+  const z=n=>String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`;
+};
+
+document.getElementById("kTanggal").value=todayISO();
+document.getElementById("bTanggal").value=todayISO();
+
+function toast(msg){
+  const el=document.getElementById("toast");
+  el.textContent=msg;
+  el.style.display="block";
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer=setTimeout(()=>el.style.display="none",2400);
+}
+
+function setLoading(show,text="Memproses..."){
+  const el=document.getElementById("loading");
+  el.textContent=text;
+  el.style.display=show?"flex":"none";
+}
+
+window.kembali=()=>{
+  // Jika Pengaturan dibuka di dalam iframe FIXZY, minta parent menutup iframe.
+  if(window.parent && window.parent !== window){
+    window.parent.postMessage({type:"FIXZY_CLOSE_SETTINGS"},"*");
+    return;
+  }
+
+  // Jika dibuka sebagai halaman mandiri, kembali ke index.
+  window.location.replace("index.html?auth=1");
+};
+
+window.refreshHalaman=()=>{
+  window.location.reload();
+};
+
+function roleBolehKelola(){
+  return ["owner","superadmin"].includes(currentProfile?.role||"");
+}
+
+async function validasi(){
+  return new Promise(resolve=>{
+    onAuthStateChanged(auth,async user=>{
+      if(!user){
+        window.location.replace("login.html");
+        return;
+      }
+
+      try{
+        const snap=await getDoc(doc(db,"users",user.uid));
+        if(!snap.exists()) throw new Error("Profil akun tidak ditemukan.");
+
+        const p=snap.data()||{};
+        if(!["owner","employee","reseller","superadmin"].includes(p.role||"")) throw new Error("Role tidak dikenali.");
+        if(p.status!=="aktif") throw new Error("Akun belum aktif.");
+
+        currentUser=user;
+        currentProfile=p;
+
+        if(!roleBolehKelola()){
+          document.querySelectorAll("button").forEach(b=>{
+            if(!["‹"].includes(b.textContent.trim())) b.disabled=true;
+          });
+          toast("Pengaturan ini hanya dapat dikelola Owner/Superadmin.");
+        }
+
+        setLoading(false);
+        resolve(true);
+        await muatSemua();
+      }catch(e){
+        console.error(e);
+        await signOut(auth).catch(()=>{});
+        window.location.replace("login.html");
+      }
+    });
+  });
+}
+
+async function simpanKaryawan(){
+  if(!roleBolehKelola()) return toast("Tidak punya hak mengelola karyawan.");
+
+  const nama=document.getElementById("kNama").value.trim();
+  if(!nama) return toast("Nama karyawan wajib diisi.");
+
+  const data={
+    uid:currentUser.uid,
+    nama,
+    jabatan:document.getElementById("kJabatan").value,
+    whatsapp:document.getElementById("kWhatsapp").value.trim(),
+    tanggalMulai:document.getElementById("kTanggal").value,
+    gaji:Number(document.getElementById("kGaji").value)||0,
+    status:document.getElementById("kStatus").value,
+    alamat:document.getElementById("kAlamat").value.trim(),
+    createdAt:serverTimestamp()
+  };
+
+  try{
+    await addDoc(collection(db,"karyawan"),data);
+    toast("Data karyawan tersimpan.");
+    resetKaryawan();
+    await muatKaryawan();
+  }catch(e){
+    console.error(e);
+    toast("Gagal menyimpan karyawan: "+(e.message||"akses ditolak"));
+  }
+}
+window.simpanKaryawan=simpanKaryawan;
+
+window.resetKaryawan=()=>{
+  ["kNama","kWhatsapp","kGaji","kAlamat"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("kTanggal").value=todayISO();
+  document.getElementById("kStatus").value="Aktif";
+};
+
+async function muatKaryawan(){
+  const box=document.getElementById("karyawanList");
+  try{
+    const snap=await getDocs(query(
+      collection(db,"karyawan"),
+      where("uid","==",currentUser.uid)
+    ));
+
+    if(snap.empty){
+      box.innerHTML='<div class="empty">Belum ada data karyawan.</div>';
+      return;
+    }
+
+    const rows=snap.docs.map(d=>({id:d.id,...d.data()}));
+    rows.sort((a,b)=>String(a.nama||"").localeCompare(String(b.nama||"")));
+
+    box.innerHTML=`
+      <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Nama</th><th>Jabatan</th><th>WhatsApp</th>
+          <th>Mulai</th><th>Upah</th><th>Status</th>
+        </tr></thead>
+        <tbody>
+          ${rows.map(x=>`
+            <tr>
+              <td>${esc(x.nama)}</td>
+              <td>${esc(x.jabatan)}</td>
+              <td>${esc(x.whatsapp||"-")}</td>
+              <td>${esc(x.tanggalMulai||"-")}</td>
+              <td class="money">${rupiah(x.gaji)}</td>
+              <td><span class="badge ${x.status==="Aktif"?"on":"off"}">${esc(x.status||"-")}</span></td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+      </div>`;
+  }catch(e){
+    console.error(e);
+    box.innerHTML='<div class="empty">Data karyawan tidak dapat dibaca. Periksa Rules Firebase.</div>';
+  }
+}
+
+async function simpanBiaya(){
+  if(!roleBolehKelola()) return toast("Tidak punya hak mengelola anggaran.");
+
+  const tanggal=document.getElementById("bTanggal").value;
+  const nominal=Number(document.getElementById("bNominal").value)||0;
+  if(!tanggal) return toast("Tanggal wajib diisi.");
+  if(nominal<=0) return toast("Nominal harus lebih dari 0.");
+
+  const data={
+    uid:currentUser.uid,
+    tanggal,
+    kategori:document.getElementById("bKategori").value,
+    nominal,
+    keterangan:document.getElementById("bKeterangan").value.trim(),
+    createdAt:serverTimestamp()
+  };
+
+  try{
+    await addDoc(collection(db,"anggaran"),data);
+    toast("Anggaran biaya tersimpan.");
+    resetBiaya();
+    await muatBiaya();
+  }catch(e){
+    console.error(e);
+    toast("Gagal menyimpan biaya: "+(e.message||"akses ditolak"));
+  }
+}
+window.simpanBiaya=simpanBiaya;
+
+window.resetBiaya=()=>{
+  document.getElementById("bTanggal").value=todayISO();
+  document.getElementById("bNominal").value="";
+  document.getElementById("bKeterangan").value="";
+};
+
+async function muatBiaya(){
+  const box=document.getElementById("biayaList");
+  try{
+    const snap=await getDocs(query(
+      collection(db,"anggaran"),
+      where("uid","==",currentUser.uid)
+    ));
+
+    const rows=snap.docs.map(d=>({id:d.id,...d.data()}));
+    rows.sort((a,b)=>String(b.tanggal||"").localeCompare(String(a.tanggal||"")));
+
+    const now=new Date();
+    const bulan=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+    const hari=todayISO();
+
+    let hariTotal=0,bulanTotal=0,semuaTotal=0;
+    rows.forEach(x=>{
+      const n=Number(x.nominal)||0;
+      semuaTotal+=n;
+      if(x.tanggal===hari) hariTotal+=n;
+      if(String(x.tanggal||"").startsWith(bulan)) bulanTotal+=n;
+    });
+
+    document.getElementById("totalHari").textContent=rupiah(hariTotal);
+    document.getElementById("totalBulan").textContent=rupiah(bulanTotal);
+    document.getElementById("totalSemua").textContent=rupiah(semuaTotal);
+
+    if(!rows.length){
+      box.innerHTML='<div class="empty">Belum ada catatan biaya.</div>';
+      return;
+    }
+
+    box.innerHTML=`
+      <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Tanggal</th><th>Kategori</th><th>Keterangan</th><th>Nominal</th>
+        </tr></thead>
+        <tbody>
+          ${rows.map(x=>`
+            <tr>
+              <td>${esc(x.tanggal||"-")}</td>
+              <td>${esc(x.kategori||"-")}</td>
+              <td>${esc(x.keterangan||"-")}</td>
+              <td class="money">${rupiah(x.nominal)}</td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+      </div>`;
+  }catch(e){
+    console.error(e);
+    box.innerHTML='<div class="empty">Anggaran tidak dapat dibaca. Periksa Rules Firebase.</div>';
+  }
+}
+
+async function simpanProfil(){
+  if(!roleBolehKelola()) return toast("Tidak punya hak mengubah profil toko.");
+
+  const data={
+    namaToko:document.getElementById("pNama").value.trim(),
+    whatsapp:document.getElementById("pWhatsapp").value.trim(),
+    alamat:document.getElementById("pAlamat").value.trim(),
+    updatedAt:serverTimestamp()
+  };
+
+  try{
+    await setDoc(doc(db,"pengaturan",currentUser.uid),data,{merge:true});
+    toast("Profil toko tersimpan.");
+  }catch(e){
+    console.error(e);
+    toast("Profil belum dapat disimpan: "+(e.message||"akses ditolak"));
+  }
+}
+window.simpanProfil=simpanProfil;
+
+async function muatProfil(){
+  try{
+    const snap=await getDoc(doc(db,"pengaturan",currentUser.uid));
+    if(!snap.exists()) return;
+    const p=snap.data()||{};
+    document.getElementById("pNama").value=p.namaToko||"";
+    document.getElementById("pWhatsapp").value=p.whatsapp||"";
+    document.getElementById("pAlamat").value=p.alamat||"";
+  }catch(e){
+    console.warn("Profil toko belum tersedia:",e);
+  }
+}
+
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",
+    '"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+async function muatSemua(){
+  await Promise.all([muatKaryawan(),muatBiaya(),muatProfil()]);
+}
+
+validasi();
+</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
+</html>

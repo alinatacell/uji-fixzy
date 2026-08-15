@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Fixzy | Registrasi</title>
+<meta name="theme-color" content="#FFC107">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+html{scroll-behavior:smooth;}
+body{background:#0d0d0d;background-image:radial-gradient(circle at top, rgba(255,193,7,.18), transparent 60%);color:#fff;min-height:100vh;overflow-x:hidden;}
+.container{width:100%;max-width:430px;margin:auto;padding:20px 15px 40px;}
+.card{background:#1b1b1b;border-radius:25px;padding:25px;border:1px solid rgba(255,193,7,.15);box-shadow:0 15px 35px rgba(0,0,0,.45);}
+.logo-area{text-align:center;margin-bottom:25px;}
+.logo{width:170px;height:170px;object-fit:contain;padding:10px;border-radius:30px;background:#111;box-shadow:0 0 25px rgba(255,193,7,.35),0 0 60px rgba(255,193,7,.15);animation:logoGlow 2.5s infinite alternate;}
+@keyframes logoGlow{0%{transform:scale(1);box-shadow:0 0 20px rgba(255,193,7,.25);}100%{transform:scale(1.03);box-shadow:0 0 40px rgba(255,193,7,.5);}}
+.logo-area h1{margin-top:18px;font-size:30px;font-weight:700;color:#FFC107;}
+.logo-area p{margin-top:8px;font-size:15px;color:#bdbdbd;}
+.input-box{margin-bottom:18px;}
+.input-box label{display:block;margin-bottom:8px;font-size:14px;font-weight:600;color:#FFC107;}
+.input-box input,.input-box textarea{width:100%;padding:14px;background:#252525;border:1px solid #333;border-radius:14px;font-size:15px;color:#fff;outline:none;transition:.25s;}
+.input-box textarea{resize:none;min-height:90px;}
+.input-box input:focus,.input-box textarea:focus{border-color:#FFC107;box-shadow:0 0 12px rgba(255,193,7,.25);}
+.password{display:flex;align-items:center;background:#252525;border:1px solid #333;border-radius:14px;overflow:hidden;}
+.password input{border:none!important;background:transparent!important;box-shadow:none!important;margin:0;}
+.password button{width:55px;height:50px;border:none;background:#FFC107;color:#111;font-size:20px;cursor:pointer;transition:.3s;}
+.password button:hover{background:#FFD54F;}
+.trial{margin:20px 0;padding:15px;text-align:center;border-radius:14px;background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.25);color:#FFC107;font-weight:700;}
+.check{display:flex;gap:10px;margin:18px 0;font-size:14px;color:#ddd;}
+.check input{margin-top:4px;transform:scale(1.15);accent-color:#FFC107;}
+#btnDaftar{width:100%;padding:16px;border:none;border-radius:16px;background:linear-gradient(90deg,#FFC107,#FF9800);color:#111;font-size:17px;font-weight:700;cursor:pointer;transition:.3s;box-shadow:0 10px 25px rgba(255,193,7,.30);}
+#btnDaftar:hover{transform:translateY(-2px);box-shadow:0 15px 35px rgba(255,193,7,.45);}
+#loading{display:none;margin-top:15px;text-align:center;color:#FFC107;font-weight:600;}
+@media(max-width:480px){.container{padding:15px;}.logo{width:150px;height:150px;}.logo-area h1{font-size:26px;}.card{padding:20px;}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="card">
+<div class="logo-area">
+<img src="logo.png" class="logo" alt="Fixzy Logo">
+<h1>Registrasi Akun</h1>
+</div>
+<form id="registerForm">
+<div class="input-box"><label>Nama Konter</label><input type="text" id="namaKonter" placeholder="Masukkan nama konter" required></div>
+<div class="input-box"><label>Nama Pemilik</label><input type="text" id="namaPemilik" placeholder="Masukkan nama pemilik" required></div>
+<div class="input-box"><label>No WhatsApp</label><input type="tel" id="whatsapp" placeholder="08xxxxxxxxxx" maxlength="15" inputmode="numeric" required></div>
+<div class="input-box"><label>Email</label><input type="email" id="email" placeholder="email@gmail.com" required></div>
+<div class="input-box"><label>Alamat</label><textarea id="alamat" placeholder="Masukkan alamat lengkap"></textarea></div>
+<div class="input-box"><label>Password</label><div class="password"><input type="password" id="password" placeholder="Minimal 8 karakter" required><button type="button" id="lihatPassword">👁</button></div></div>
+<div class="input-box"><label>Konfirmasi Password</label><input type="password" id="konfirmasiPassword" placeholder="Ulangi password" required></div>
+<div class="trial">🎁 Trial Gratis 3 Bulan - Langsung Aktif!</div>
+<label class="check"><input type="checkbox" id="setuju" required><span>Saya menyetujui syarat dan ketentuan penggunaan aplikasi Fixzy.</span></label>
+<button id="btnDaftar" type="submit">DAFTAR SEKARANG</button>
+<div id="loading">Sedang membuat akun...</div>
+<!-- FIX: Tombol login bawah sekarang langsung ke login.html -->
+<div style="margin-top:20px;text-align:center;">Sudah punya akun? <a href="login.html" style="color:#FFC107;font-weight:bold;text-decoration:none;">Login</a></div>
+</form>
+</div>
+</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+const cfg={apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",authDomain:"fixzy-update.firebaseapp.com",projectId:"fixzy-update",storageBucket:"fixzy-update.firebasestorage.app",messagingSenderId:"995892519622",appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"};
+const app = initializeApp(cfg);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const form = document.getElementById("registerForm");
+const btn = document.getElementById("btnDaftar");
+const loading = document.getElementById("loading");
+const lihatPassword = document.getElementById("lihatPassword");
+const passwordInput = document.getElementById("password");
+lihatPassword.addEventListener("click",()=>{ passwordInput.type= passwordInput.type==="password" ? "text" : "password"; });
+document.getElementById("whatsapp").addEventListener("input",function(){ this.value=this.value.replace(/[^0-9]/g,""); });
+form.addEventListener("submit", async (e)=>{
+e.preventDefault();
+btn.disabled=true;
+loading.style.display="block";
+const namaKonter= document.getElementById("namaKonter").value.trim();
+const namaPemilik= document.getElementById("namaPemilik").value.trim();
+const whatsapp= document.getElementById("whatsapp").value.trim();
+const email= document.getElementById("email").value.trim();
+const alamat= document.getElementById("alamat").value.trim();
+const password= document.getElementById("password").value;
+const konfirmasi= document.getElementById("konfirmasiPassword").value;
+if(password.length<8){ tampilPopup("Fixzy","Password minimal 8 karakter."); btn.disabled=false; loading.style.display="none"; return; }
+if(whatsapp.length < 10){ tampilPopup("Fixzy","Nomor WhatsApp minimal 10 digit."); btn.disabled=false; loading.style.display="none"; return; }
+if(password!==konfirmasi){ tampilPopup("Fixzy","Konfirmasi password tidak sama."); btn.disabled=false; loading.style.display="none"; return; }
+if(namaKonter.length < 3){ tampilPopup("Fixzy","Nama konter minimal 3 karakter."); btn.disabled=false; loading.style.display="none"; return; }
+if(namaPemilik.length < 3){ tampilPopup("Fixzy","Nama pemilik minimal 3 karakter."); btn.disabled=false; loading.style.display="none"; return; }
+if(alamat.length < 5){ tampilPopup("Fixzy","Alamat minimal 5 karakter."); btn.disabled=false; loading.style.display="none"; return; }
+if(!document.getElementById("setuju").checked){ tampilPopup("Fixzy","Silakan setujui syarat dan ketentuan."); btn.disabled=false; loading.style.display="none"; return; }
+try{
+const userCredential= await createUserWithEmailAndPassword(auth,email,password);
+const uid=userCredential.user.uid;
+const tanggalBerakhir=new Date();
+tanggalBerakhir.setMonth(tanggalBerakhir.getMonth()+3);
+await setDoc(doc(db,"users",uid),{
+uid,
+idKonter:"FX-"+Date.now(),
+aplikasi:"Fixzy",
+namaKonter,
+namaPemilik,
+whatsapp,
+email,
+alamat,
+paket:"trial",
+jenisLisensi:"Trial Gratis",
+durasi:"3 Bulan",
+harga:0,
+status:"aktif",
+statusPembayaran:"free",
+masaAktif:"trial",
+trial:true,
+perpanjangan:false,
+perpanjanganStatus:"none",
+role:"owner",
+createdAt:serverTimestamp(),
+tanggalDaftar:serverTimestamp(),
+trialMulai:serverTimestamp(),
+trialSelesai:tanggalBerakhir.toISOString(),
+tanggalAktivasi:serverTimestamp(),
+tanggalBerakhir:tanggalBerakhir.toISOString(),
+device:navigator.userAgent,
+versi:"Fixzy V1",
+lastLogin:null
+});
+tampilPopup("Fixzy","Pendaftaran berhasil!\n\nTrial 3 Bulan kamu LANGSUNG AKTIF.\nSilakan login sekarang.");
+// Setelah registrasi, Firebase otomatis membuat sesi.
+// Logout dulu agar alur tetap: Register -> Login -> Index.
+setTimeout(async ()=>{
+  try{
+    await signOut(auth);
+  }catch(e){
+    console.warn("Logout setelah registrasi gagal:",e);
+  }
+
+  if(window.parent && window.parent!==window){
+    window.parent.postMessage({type:"FIXZY_REGISTER_SUCCESS"},"*");
+  }
+
+  window.location.href="login.html";
+},1500);
+}catch(err){
+let pesan="Terjadi kesalahan.";
+switch(err.code){
+case "auth/email-already-in-use": pesan="Email sudah digunakan."; break;
+case "auth/invalid-email": pesan="Format email tidak valid."; break;
+case "auth/weak-password": pesan="Password terlalu lemah."; break;
+default: pesan=err.code+" | "+err.message; console.error("REGISTER ERR:",err);
+}
+tampilPopup("Fixzy", pesan);
+}finally{
+btn.disabled=false;
+loading.style.display="none";
+}
+});
+function tampilPopup(judul,pesan){
+  document.getElementById("popupJudul").innerText=judul;
+  document.getElementById("popupPesan").innerText=pesan;
+  document.getElementById("popup").style.display="flex";
+}
+function tutupPopup(){
+  document.getElementById("popup").style.display="none";
+}
+window.tampilPopup=tampilPopup;
+window.tutupPopup=tutupPopup;
+</script>
+<div id="popup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:9999;">
+  <div style="width:90%;max-width:340px;background:#1b1b1b;padding:25px;border-radius:20px;text-align:center;border:1px solid #FFC107;">
+    <h3 id="popupJudul" style="color:#FFC107;">Fixzy</h3>
+    <p id="popupPesan" style="margin:20px 0;color:#fff;white-space:pre-line;"></p>
+    <button onclick="tutupPopup()" style="padding:12px 30px;border:none;border-radius:10px;background:#FFC107;color:#111;font-weight:bold;cursor:pointer;">OK</button>
+  </div>
+</div>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
+</html>

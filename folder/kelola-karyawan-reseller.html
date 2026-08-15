@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FIXZY | Karyawan & Reseller</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef2f6;color:#111827;font-family:Arial,Helvetica,sans-serif}
+header{background:#111827;color:#fff;padding:10px 14px;position:sticky;top:0;z-index:50}.head{max-width:1180px;margin:auto;display:flex;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}.logo{width:48px;height:48px;object-fit:contain;background:#000;border-radius:10px;padding:3px}.brand h1{font-size:18px;margin:0;white-space:nowrap}.brand small{display:block;color:#cbd5e1;font-size:11px;margin-top:3px}
+.head-actions{margin-left:auto;display:flex;gap:7px}.head button{border:0;border-radius:8px;padding:9px 12px;font-weight:900;cursor:pointer}.refresh{background:#fff;color:#111827}.close{background:#374151;color:#fff}
+main{max-width:1180px;margin:auto;padding:13px}.card{background:#fff;border-radius:13px;padding:15px;margin-bottom:12px;box-shadow:0 2px 10px #0001}.title{font-size:16px;font-weight:900;margin-bottom:12px}
+.toolbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}label{display:block;font-size:11px;font-weight:900;color:#4b5563;margin-bottom:5px}
+input,select{width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font:inherit}.actions{display:flex;align-items:end;gap:7px}.action{border:0;border-radius:8px;padding:11px 13px;font-weight:900;cursor:pointer}.primary{background:#111827;color:#fff}.secondary{background:#e5e7eb;color:#111827}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.sum{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px}.sum small{display:block;font-size:10px;color:#667085;font-weight:900}.sum b{display:block;font-size:20px;margin-top:4px}.green{background:#ecfdf5;border-color:#a7f3d0}.green b{color:#047857}.blue{background:#eff6ff;border-color:#bfdbfe}.blue b{color:#1d4ed8}
+.table-wrap{overflow:auto;border:1px solid #e5e7eb;border-radius:10px}.table-wrap .badge{white-space:nowrap}table{width:100%;border-collapse:collapse;min-width:850px;font-size:12px}th,td{padding:9px;border-bottom:1px solid #eee;text-align:left;vertical-align:middle}th{background:#f8fafc;font-size:11px}
+.badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:10px;font-weight:900}.active{background:#dcfce7;color:#15803d;border:1px solid #86efac}.off{background:#f3f4f6;color:#6b7280;border:1px solid #d1d5db}.employee{background:#ede9fe;color:#7c3aed}.reseller{background:#dbeafe;color:#1d4ed8}
+.empty{text-align:center;color:#667085;padding:25px}.info{font-size:12px;color:#667085;line-height:1.5;margin-top:8px}.ok{color:#15803d;font-weight:800}.err{color:#b91c1c;font-weight:800}
+.popup{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;z-index:100}.popup.show{display:flex}.popup-box{width:min(600px,calc(100% - 24px));max-height:90vh;overflow:auto;background:#fff;border-radius:14px;padding:17px}.popup-box h3{margin:0 0 12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.full{grid-column:1/-1}.checks{display:grid;grid-template-columns:1fr 1fr;gap:7px}.check{border:1px solid #e5e7eb;border-radius:8px;padding:8px;font-size:12px}.popup-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:13px}
+@media(max-width:760px){.toolbar{grid-template-columns:1fr 1fr}.toolbar .field:first-child{grid-column:1/-1}.summary{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.full{grid-column:auto}}
+@media(max-width:520px){.brand h1{font-size:15px}.logo{width:40px;height:40px}.brand small{font-size:9px}.head button{font-size:12px;padding:8px 9px}.toolbar{grid-template-columns:1fr}.toolbar .field:first-child{grid-column:auto}.summary{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header><div class="head">
+<div class="brand"><img src="logo.png" class="logo" alt="FIXZY"><div><h1>Karyawan & Reseller</h1><small>FIXZY • Kelola Akun Usaha</small></div></div>
+<div class="head-actions"><button class="refresh" onclick="location.reload()">↻ Refresh</button><button class="close" onclick="tutupHalaman()">✕ Tutup</button></div>
+</div></header>
+<main>
+<section class="card">
+<div class="title">Kelola Karyawan & Reseller</div>
+<div class="toolbar">
+<div class="field"><label>FILTER ROLE</label><select id="roleFilter"><option value="">Semua</option><option value="employee">Karyawan</option><option value="reseller">Reseller</option></select></div>
+<div class="field"><label>PENCARIAN</label><input id="cari" placeholder="Cari nama atau email..."></div>
+<div class="actions"><button class="action primary" onclick="bukaTambah()">＋ Tambah Akun</button><button class="action secondary" onclick="resetFilter()">Reset</button></div>
+</div>
+<div id="status" class="info">Memuat Firebase...</div>
+</section>
+<section class="summary">
+<div class="sum"><small>TOTAL AKUN</small><b id="total">0</b></div>
+<div class="sum green"><small>AKTIF</small><b id="aktif">0</b></div>
+<div class="sum blue"><small>KARYAWAN</small><b id="jmlKaryawan">0</b></div>
+<div class="sum"><small>RESELLER</small><b id="jmlReseller">0</b></div>
+</section>
+<section class="card"><div class="table-wrap"><table>
+<thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Jabatan</th><th>Upah/Hari</th><th>Status</th><th>Hak Akses</th><th>Aksi</th></tr></thead>
+<tbody id="tbody"><tr><td colspan="8" class="empty">Memuat data...</td></tr></tbody>
+</table></div></section>
+</main>
+
+<div class="popup" id="popup"><div class="popup-box">
+<h3 id="popupTitle">Tambah Akun</h3>
+<div class="grid">
+<div><label>NAMA</label><input id="fNama"></div>
+<div><label>ROLE</label><select id="fRole"><option value="employee">Karyawan</option><option value="reseller">Reseller</option></select></div>
+<div><label>EMAIL LOGIN</label><input id="fEmail" type="email"></div>
+<div id="passWrap"><label>PASSWORD AWAL</label><input id="fPassword" type="password" placeholder="Minimal 6 karakter"></div>
+<div><label>JABATAN / POSISI</label><input id="fJabatan" placeholder="Teknisi / Kasir / Reseller"></div>
+<div><label>UPAH HARIAN</label><input id="fUpah" type="number" min="0" step="1000"></div>
+<div class="full"><label>STATUS</label><select id="fStatus"><option value="aktif">Aktif</option><option value="nonaktif">Nonaktif</option></select></div>
+<div class="full"><label>IZIN HTML / MENU (DITENTUKAN OWNER)</label><div class="checks">
+<label class="check"><input type="checkbox" value="penjualan" class="izin"> 🛒 Input Penjualan</label>
+<label class="check"><input type="checkbox" value="servis" class="izin"> 🧾 Input Servisan</label>
+<label class="check"><input type="checkbox" value="dashboardPendapatan" class="izin"> 📊 Dashboard Pendapatan</label>
+<label class="check"><input type="checkbox" value="dataServis" class="izin"> 🔧 Data Servis</label>
+<label class="check"><input type="checkbox" value="dataPenjualan" class="izin"> 🛒 Data Penjualan</label>
+<label class="check"><input type="checkbox" value="rekapTeknisi" class="izin"> 🧰 Rekap Teknisi</label>
+<label class="check"><input type="checkbox" value="laporanPendapatan" class="izin"> 💻 Laporan Pendapatan</label>
+<label class="check"><input type="checkbox" value="garansi" class="izin"> 🛡️ Monitoring Garansi</label>
+<label class="check"><input type="checkbox" value="stock" class="izin"> 📦 Stock</label>
+</div>
+<div style="margin-top:8px;padding:8px;background:#f3f4f6;border-radius:6px;font-size:10px;color:#6b7280">
+🔒 Menu Owner Only (tidak bisa dicentang): Upah Karyawan, Pengeluaran, Dashboard Admin, Kelola Karyawan, Hak Akses, Data Karyawan, Cek Aktivasi, Pengaturan<br>
+💡 Kalau tambah menu baru, tinggal tambah checkbox dengan value yang sama dengan data-permission di index.html
+</div></div>
+</div>
+<div id="editInfo" class="info"></div>
+<div class="popup-actions"><button class="action secondary" onclick="tutupPopup()">Batal</button><button class="action primary" onclick="simpanAkun()">Simpan</button></div>
+</div></div>
+
+<div class="popup" id="notice"><div class="popup-box"><h3 id="noticeTitle">FIXZY</h3><div id="noticeText" class="info"></div><div class="popup-actions"><button class="action primary" onclick="tutupNotice()">OK</button></div></div></div>
+
+<script>
+function tutupHalaman(){if(window.history.length>1)history.back();else location.href="index.html"}
+</script>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import{getAuth,onAuthStateChanged,createUserWithEmailAndPassword,updateProfile}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import{getFirestore,collection,query,where,getDocs,doc,getDoc,setDoc,updateDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+const cfg={apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",authDomain:"fixzy-update.firebaseapp.com",projectId:"fixzy-update",storageBucket:"fixzy-update.firebasestorage.app",messagingSenderId:"995892519622",appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"};
+const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
+const rupiah=n=>"Rp "+(Number(n)||0).toLocaleString("id-ID"),esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+let uid="",ownerUid="",profile={},accounts=[],editId=null;
+
+function norm(v){return String(v??"").trim().toLowerCase()}
+function nama(a){return a.nama||a.namaKaryawan||a.namaPemilik||a.name||"-"}
+function roleLabel(r){return r==="employee"?"Karyawan":r==="reseller"?"Reseller":r}
+function izinLabel(v){ const map={penjualan:"Input Penjualan",servis:"Input Servisan",dashboardPendapatan:"Dashboard Pendapatan",dataServis:"Data Servis",dataPenjualan:"Data Penjualan",rekapTeknisi:"Rekap Teknisi",laporanPendapatan:"Laporan Pendapatan",garansi:"Monitoring Garansi",stock:"Stock"}; if(map[v]) return map[v];
+  return ({
+    penjualan:"Input Penjualan",
+    servis:"Input Servis",
+    stock:"Stock",
+    dataPenjualan:"Data Penjualan",
+    dataServis:"Data Servis",
+    garansi:"Cek Garansi"
+  })[v]||v;
+}
+function renderIzin(a){
+  const izin=Array.isArray(a.izin)?a.izin:(Array.isArray(a.permissions)?a.permissions:[]);
+  if(!izin.length) return '<span style="color:#9ca3af">Tidak ada akses</span>';
+  return izin.map(v=>`<span class="badge" style="background:#eef2ff;color:#3730a3;margin:2px">${esc(izinLabel(v))}</span>`).join(" ");
+}
+
+function izinValues(){return [...document.querySelectorAll(".izin:checked")].map(x=>x.value)}
+function setIzin(v){const a=Array.isArray(v)?v:[];document.querySelectorAll(".izin").forEach(x=>x.checked=a.includes(x.value))}
+function tampilNotice(t,x){$("noticeTitle").textContent=t;$("noticeText").innerHTML=x;$("notice").classList.add("show")}
+window.tutupNotice=()=>$("notice").classList.remove("show");
+
+async function load(){
+ try{
+  const s=await getDocs(query(collection(db,"users"),where("ownerUid","==",ownerUid)));
+  accounts=s.docs.map(d=>({id:d.id,...d.data()})).filter(x=>["employee","reseller"].includes(x.role));
+  render();$("status").innerHTML=`<span class="ok">✓ ${accounts.length} akun karyawan/reseller ditemukan.</span>`;
+ }catch(e){$("status").innerHTML=`<span class="err">Gagal memuat akun: ${esc(e.message)}</span>`}
+}
+function render(){
+ const role=$("roleFilter").value,q=norm($("cari").value);
+ const arr=accounts.filter(a=>(!role||a.role===role)&&(!q||norm(nama(a)).includes(q)||norm(a.email).includes(q)));
+ $("total").textContent=arr.length;$("aktif").textContent=arr.filter(a=>a.status==="aktif").length;$("jmlKaryawan").textContent=arr.filter(a=>a.role==="employee").length;$("jmlReseller").textContent=arr.filter(a=>a.role==="reseller").length;
+ $("tbody").innerHTML=arr.length?arr.map(a=>`<tr>
+<td><b>${esc(nama(a))}</b></td><td>${esc(a.email||"-")}</td><td><span class="badge ${a.role}">${roleLabel(a.role)}</span></td>
+<td>${esc(a.jabatan||a.posisi||"-")}</td><td>${a.role==="employee"?rupiah(a.upahHarian??a.upah??a.gajiHarian??0):"-"}</td>
+<td><span class="badge ${a.status==="aktif"?"active":"off"}">${esc(a.status||"-")}</span></td>
+<td>${renderIzin(a)}</td>
+<td><button class="action secondary" style="padding:7px 9px;font-size:11px" onclick="editAkun('${a.id}')">Edit</button></td>
+</tr>`).join(""):'<tr><td colspan="8" class="empty">Belum ada akun karyawan/reseller.</td></tr>';
+}
+function aturHakAksesRole(){
+  // Hak akses TIDAK ditentukan otomatis berdasarkan role.
+  // Owner sendiri yang memilih HTML/menu yang boleh diakses.
+  setIzin([]);
+}
+
+window.bukaTambah=()=>{
+  editId=null;
+  $("popupTitle").textContent="＋ Tambah Akun";
+  $("fNama").value="";
+  $("fRole").value="employee";$("fRole").disabled=false;
+  $("fEmail").value="";
+  $("fPassword").value="";
+  $("fJabatan").value="";
+  $("fUpah").value="";
+  $("fStatus").value="aktif";
+  aturHakAksesRole();
+  $("passWrap").style.display="block";
+  $("editInfo").textContent="Akun login dibuat di Firebase Authentication dan terhubung ke Owner ini. Hak akses HTML/menu dipilih sendiri oleh Owner.";
+  $("popup").classList.add("show");
+}
+window.tutupPopup=()=>{$("popup").classList.remove("show");$("fRole").disabled=false;};
+window.editAkun=id=>{
+ const a=accounts.find(x=>x.id===id);if(!a)return;editId=id;$("popupTitle").textContent="✏️ Edit Akun";$("fNama").value=nama(a);$("fRole").value=a.role;$("fEmail").value=a.email||"";$("fPassword").value="";$("fJabatan").value=a.jabatan||a.posisi||"";$("fUpah").value=a.upahHarian??a.upah??a.gajiHarian??0;$("fStatus").value=a.status||"aktif";setIzin(a.izin||a.permissions||[]);$("fRole").disabled=true;$("passWrap").style.display="none";$("editInfo").textContent="Role dan email/password tidak diubah saat edit. Owner dapat mengubah data dan hak akses HTML.";$("popup").classList.add("show")
+}
+window.simpanAkun=async()=>{
+ const n=$("fNama").value.trim(),r=editId?(accounts.find(x=>x.id===editId)?.role||""):$("fRole").value,email=$("fEmail").value.trim(),pass=$("fPassword").value,j=$("fJabatan").value.trim(),upah=Number($("fUpah").value)||0,status=$("fStatus").value,izin=izinValues();
+ if(!n||!email){tampilNotice("⚠️ Data Belum Lengkap","Nama dan email wajib diisi.");return}
+  if(!["employee","reseller"].includes(r)){tampilNotice("⚠️ Role","Role akun tidak valid.");return}
+ try{
+  if(editId){
+   await updateDoc(doc(db,"users",editId),{nama:n,namaKaryawan:n,role:r,jabatan:j,upahHarian:upah,status,izin,permissions:izin,ownerUid,updatedAt:serverTimestamp()});
+   $("popup").classList.remove("show");tampilNotice("✅ Berhasil","Data akun berhasil diperbarui.");await load();return;
+  }
+  if(pass.length<6){tampilNotice("⚠️ Password","Password awal minimal 6 karakter.");return}
+  // Secondary Firebase app: membuat akun baru tanpa mengeluarkan Owner dari sesi aktif.
+  const secondary=initializeApp(cfg,"createUser-"+Date.now());
+  const secondaryAuth=getAuth(secondary);
+  const cred=await createUserWithEmailAndPassword(secondaryAuth,email,pass);
+  try{await updateProfile(cred.user,{displayName:n})}catch{}
+  await setDoc(doc(db,"users",cred.user.uid),{
+   uid:cred.user.uid,ownerUid,role:r,status,nama:n,namaKaryawan:n,email,
+   jabatan:j,upahHarian:upah,izin,permissions:izin,
+   tanggalDaftar:new Date().toISOString(),createdAt:serverTimestamp(),updatedAt:serverTimestamp()
+  });
+  await secondaryAuth.signOut();
+  $("popup").classList.remove("show");tampilNotice("✅ Akun Berhasil Dibuat",`Akun <b>${esc(n)}</b> sudah dibuat sebagai <b>${roleLabel(r)}</b> dan terhubung ke Owner ini.`);
+  await load();
+ }catch(e){console.error(e);tampilNotice("❌ Gagal",esc(e.message||e))}
+}
+$("roleFilter").addEventListener("change",render);
+$("cari").addEventListener("input",render);
+
+// Role hanya menentukan jenis akun.
+ // Hak akses selalu ditentukan manual oleh Owner.
+ $("fRole").addEventListener("change",()=>{
+   if(!editId) setIzin([]);
+ });
+
+window.resetFilter=()=>{
+  $("roleFilter").value="";
+  $("cari").value="";
+  render();
+};
+
+onAuthStateChanged(auth,async u=>{
+ if(!u){location.replace("login.html");return}uid=u.uid;
+ try{
+  const s=await getDoc(doc(db,"users",uid));if(!s.exists())throw new Error("Profil akun tidak ditemukan.");
+  profile=s.data()||{};
+  if(profile.role!=="owner")throw new Error("Halaman ini khusus Owner.");
+  ownerUid=uid;await load();
+ }catch(e){$("status").innerHTML=`<span class="err">${esc(e.message)}</span>`}
+});
+</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script><script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
+</html>
