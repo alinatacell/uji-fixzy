@@ -116,14 +116,14 @@ body{background:#0d0d0d;background-image:radial-gradient(circle at top, rgba(255
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, serverTimestamp, collection, getDocs, query, where, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, serverTimestamp, collection, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 const firebaseConfig = {
-apiKey: "AIzaSyCwMbJsuORhIq4QCmp4c1r6OsjAUlfxU5Y",
-authDomain: "fixzy-f056f.firebaseapp.com",
-projectId: "fixzy-f056f",
-storageBucket: "fixzy-f056f.firebasestorage.app",
-messagingSenderId: "838081521031",
-appId: "1:838081521031:web:50fdee909b56460b055f22"
+apiKey: "AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",
+authDomain: "fixzy-update.firebaseapp.com",
+projectId: "fixzy-update",
+storageBucket: "fixzy-update.firebasestorage.app",
+messagingSenderId: "995892519622",
+appId: "1:995892519622:web:fa41047944d8e5b35d6dc7"
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -157,14 +157,19 @@ form.addEventListener("submit", async (e)=>{
  if(!tokenAktivasi){tampilPopup("Fixzy","Token aktivasi wajib diisi.");return selesaiForm();}
 
  try{
-   const tokenSnap=await getDocs(query(collection(db,"tokens"),where("token","==",tokenAktivasi)));
-   if(tokenSnap.empty){tampilPopup("Fixzy","Token tidak ditemukan atau tidak valid.");return selesaiForm();}
-
+   const tokenSnap=await getDocs(collection(db,"registrationTokens"));
    let tokenDoc=null, tokenData=null;
-   tokenSnap.forEach(d=>{if(!tokenDoc){tokenDoc=d;tokenData=d.data()||{};}});
+   tokenSnap.forEach(d=>{
+     const x=d.data()||{};
+     if(!tokenDoc && String(x.token||"").trim().toUpperCase()===tokenAktivasi){
+       tokenDoc=d;
+       tokenData=x;
+     }
+   });
+   if(!tokenDoc){tampilPopup("Fixzy","Token tidak ditemukan atau tidak valid.");return selesaiForm();}
 
-   if(!tokenData || (tokenData.tipe!=="aktivasi_baru" && tokenData.jenis!=="aktivasi_baru")){
-     tampilPopup("Fixzy","Token ini bukan token aktivasi pengguna baru.\nToken perpanjangan tidak dapat digunakan untuk registrasi.");
+   if(tokenData.tipe!=="registrasi_baru" || tokenData.hanyaRegistrasiBaru!==true){
+     tampilPopup("Fixzy","Token ini bukan token registrasi pengguna baru.\nToken perpanjangan tidak dapat digunakan untuk registrasi.");
      return selesaiForm();
    }
    if(tokenData.used===true || String(tokenData.status||"").toLowerCase()==="terpakai"){
@@ -192,7 +197,7 @@ form.addEventListener("submit", async (e)=>{
      tanggalBerakhir:tanggalBerakhir.toISOString(),device:navigator.userAgent,versi:"Fixzy V1",lastLogin:null
    });
 
-   await updateDoc(doc(db,"tokens",tokenDoc.id),{
+   await updateDoc(doc(db,"registrationTokens",tokenDoc.id),{
      used:true,status:"terpakai",usedBy:uid,usedByEmail:email,usedAt:serverTimestamp()
    });
 
@@ -241,34 +246,95 @@ window.tutupPopup=tutupPopup;
   <div id="tokenListReg" class="token-list"><div class="token-empty">Memuat token...</div></div>
  </div>
 </div>
-<script>
-async function bukaTokenPopup(){document.getElementById("tokenPopup").style.display="flex";document.getElementById("cariTokenReg").value="";await muatTokenPopup()}
-function tutupTokenPopup(){document.getElementById("tokenPopup").style.display="none"}
-async function muatTokenPopup(){
- const box=document.getElementById("tokenListReg");box.innerHTML='<div class="token-empty">Memuat token...</div>';
+<script type="module">
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+const popupCfg={
+ apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",
+ authDomain:"fixzy-update.firebaseapp.com",
+ projectId:"fixzy-update",
+ storageBucket:"fixzy-update.firebasestorage.app",
+ messagingSenderId:"995892519622",
+ appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"
+};
+const popupApp=getApps().length?getApp():initializeApp(popupCfg);
+const popupDb=getFirestore(popupApp);
+
+window.bukaTokenPopup=async function(){
+ document.getElementById("tokenPopup").style.display="flex";
+ document.getElementById("cariTokenReg").value="";
+ await muatTokenPopup();
+};
+window.tutupTokenPopup=function(){document.getElementById("tokenPopup").style.display="none"};
+
+window.muatTokenPopup=async function(){
+ const box=document.getElementById("tokenListReg");
+ box.innerHTML='<div class="token-empty">Memuat token...</div>';
  try{
-  const snap=await getDocs(collection(db,"tokens"));window.fixzyRegisterTokens=[];
-  snap.forEach(d=>{const x=d.data()||{};if((x.tipe==="aktivasi_baru"||x.jenis==="aktivasi_baru")&&Number(x.paketHari||90)===90)window.fixzyRegisterTokens.push({id:d.id,...x})});
-  window.fixzyRegisterTokens.sort((a,b)=>{const da=a.createdAt?.toDate?a.createdAt.toDate():new Date(a.createdAt||0),dbb=b.createdAt?.toDate?b.createdAt.toDate():new Date(b.createdAt||0);return dbb-da});
-  window.fixzyRegisterTokens=window.fixzyRegisterTokens.slice(0,100);renderTokenPopup();
- }catch(e){box.innerHTML='<div class="token-empty">Gagal memuat token: '+escapeTokenReg(e.message||e)+'</div>'}
-}
-function renderTokenPopup(){
- const box=document.getElementById("tokenListReg"),q=(document.getElementById("cariTokenReg").value||"").toLowerCase().trim();
+  const snap=await getDocs(collection(popupDb,"registrationTokens"));
+  window.fixzyRegisterTokens=[];
+  snap.forEach(d=>{
+   const x=d.data()||{};
+   if(x.tipe==="registrasi_baru" && x.hanyaRegistrasiBaru===true && Number(x.paketHari||0)===90){
+    window.fixzyRegisterTokens.push({id:d.id,...x});
+   }
+  });
+  window.fixzyRegisterTokens.sort((a,b)=>{
+   const da=a.createdAt?.toDate?a.createdAt.toDate():(a.createdAt?.seconds?new Date(a.createdAt.seconds*1000):new Date(a.createdAt||0));
+   const dbb=b.createdAt?.toDate?b.createdAt.toDate():(b.createdAt?.seconds?new Date(b.createdAt.seconds*1000):new Date(b.createdAt||0));
+   return dbb-da;
+  });
+  window.fixzyRegisterTokens=window.fixzyRegisterTokens.slice(0,100);
+  renderTokenPopup();
+ }catch(e){
+  box.innerHTML='<div class="token-empty">Gagal memuat token: '+escapeTokenReg(e.message||e)+'</div>';
+ }
+};
+
+window.renderTokenPopup=function(){
+ const box=document.getElementById("tokenListReg");
+ const q=(document.getElementById("cariTokenReg").value||"").toLowerCase().trim();
  const data=(window.fixzyRegisterTokens||[]).filter(t=>!q||((t.token||"")+" "+(t.usedByEmail||"")+" "+(t.usedBy||"")).toLowerCase().includes(q));
- if(!data.length){box.innerHTML='<div class="token-empty">Tidak ada token registrasi.</div>';return}
+ if(!data.length){box.innerHTML='<div class="token-empty">Tidak ada token registrasi yang tersedia.</div>';return}
  box.innerHTML=data.map(t=>{
   const used=!!t.used;
-  const copy='<button class="token-copy" type="button" onclick="copyTokenReg(\\''+String(t.token||"").replace(/\\/g,"\\\\").replace(/'/g,"\\'")+'\\')">COPY</button>';
-  const del=used?'<button class="token-delete" type="button" onclick="hapusTokenTerpakai(\\''+String(t.id).replace(/\\/g,"\\\\").replace(/'/g,"\\'")+'\\')">HAPUS</button>':"";
-  return '<div class="token-row"><div><div class="token-code">'+escapeTokenReg(t.token||"-")+'</div><div class="token-meta">3 Bulan / 90 Hari · '+(used?'<span class="token-status used">TERPAKAI</span>':'<span class="token-status available">TERSEDIA</span>')+(used&&t.usedByEmail?' · '+escapeTokenReg(t.usedByEmail):"")+'</div></div><div class="token-actions">'+copy+del+'</div></div>';
+  const safeToken=String(t.token||"").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+  const safeId=String(t.id).replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+  const copy='<button class="token-copy" type="button" onclick="copyTokenReg(\''+safeToken+'\')">COPY</button>';
+  const del=used?'<button class="token-delete" type="button" onclick="hapusTokenTerpakai(\''+safeId+'\')">HAPUS</button>':"";
+  return '<div class="token-row"><div><div class="token-code">'+escapeTokenReg(t.token||"-")+'</div><div class="token-meta">3 Bulan / 90 Hari · '+(used?'<span style="color:#ef4444;font-weight:bold">TERPAKAI</span>':'<span style="color:#22c55e;font-weight:bold">TERSEDIA</span>')+(used&&t.usedByEmail?' · '+escapeTokenReg(t.usedByEmail):'')+'</div></div><div style="display:flex;gap:5px">'+copy+del+'</div></div>';
  }).join("");
+};
+
+window.copyTokenReg=async function(token){
+ try{
+  await navigator.clipboard.writeText(token);
+  tampilPopup("Token","Token berhasil disalin:\n"+token);
+ }catch(e){
+  tampilPopup("Token","Salin token berikut:\n"+token);
+ }
+};
+
+window.hapusTokenTerpakai=function(id){
+ if(!window.fixzyRegisterTokens?.some(t=>t.id===id&&t.used))return;
+ const ok=()=>deleteDoc(doc(popupDb,"registrationTokens",id)).then(()=>muatTokenPopup());
+ // Gunakan popup aplikasi, bukan confirm browser.
+ tampilPopupKonfirmasiToken("Hapus Token","Token yang sudah terpakai akan dihapus. Lanjutkan?",ok);
+};
+
+function tampilPopupKonfirmasiToken(judul,teks,lanjut){
+ const existing=document.getElementById("tokenConfirmBox");
+ if(existing)existing.remove();
+ const wrap=document.createElement("div");
+ wrap.id="tokenConfirmBox";
+ wrap.style.cssText="position:fixed;inset:0;background:#0009;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px";
+ wrap.innerHTML='<div style="width:min(380px,100%);background:#222;border:1px solid #555;border-radius:18px;padding:22px;color:#fff;box-shadow:0 20px 60px #0008"><h3 style="margin:0 0 10px">'+escapeTokenReg(judul)+'</h3><div style="color:#ddd;line-height:1.5">'+escapeTokenReg(teks)+'</div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px"><button id="tcNo" style="padding:10px 16px;border-radius:9px;border:1px solid #777;background:#333;color:#fff">Batal</button><button id="tcYes" style="padding:10px 16px;border-radius:9px;border:0;background:#FFC107;color:#111;font-weight:bold">Hapus</button></div></div>';
+ document.body.appendChild(wrap);
+ document.getElementById("tcNo").onclick=()=>wrap.remove();
+ document.getElementById("tcYes").onclick=async()=>{const b=document.getElementById("tcYes");b.disabled=true;b.textContent="Menghapus...";try{await lanjut();wrap.remove()}catch(e){b.disabled=false;b.textContent="Hapus";tampilPopup("Token","Gagal menghapus: "+(e.message||e))}};
 }
-async function copyTokenReg(token){try{await navigator.clipboard.writeText(token);tampilPopup("Token","Token berhasil disalin:\n"+token)}catch(e){prompt("Salin token ini:",token)}}
-async function hapusTokenTerpakai(id){
- if(!window.confirm("Hapus token yang sudah terpakai ini?"))return;
- try{await deleteDoc(doc(db,"tokens",id));await muatTokenPopup()}catch(e){tampilPopup("Token","Token tidak bisa dihapus: "+(e.message||e))}
-}
+
 function escapeTokenReg(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 </script>
 
