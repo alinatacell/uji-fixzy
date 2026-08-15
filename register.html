@@ -89,7 +89,7 @@ body{background:#0d0d0d;background-image:radial-gradient(circle at top,rgba(255,
 </div>
 
 <div id="tokenSelected" class="token-selected"></div>
-<div class="token-help">Klik kolom token untuk menampilkan token dari <b>registrationTokens</b> yang belum terpakai. Daftar dapat di-scroll dan dicari.</div>
+<div class="token-help">Klik kolom token untuk memuat langsung semua token 3 bulan dari <b>registrationTokens</b>. Token yang sudah terpakai disembunyikan. Daftar dapat di-scroll dan dicari.</div>
 </div>
 
 <div class="input-box"><label>Password</label><div class="password"><input type="password" id="password" placeholder="Minimal 8 karakter" required><button type="button" id="lihatPassword">👁</button></div></div>
@@ -202,65 +202,158 @@ async function loadTokens(){
 
   try{
     /*
-      PENTING:
-      REGISTER HANYA MEMBACA registrationTokens.
-      Collection tokens TIDAK dipakai di halaman ini karena itu
-      khusus token perpanjangan.
+      POLA LOAD DIBUAT SEPERTI loadProduk() DI HALAMAN PENJUALAN:
+
+      - Tidak memakai collection "tokens".
+      - Tidak memakai query ownerUid.
+      - Ambil SELURUH collection registrationTokens.
+      - Setelah data didapat, baru disaring di JavaScript.
+      - Token perpanjangan tetap berada di collection "tokens".
     */
     const snap=await getDocs(collection(db,"registrationTokens"));
 
-    tokenData=[];
+    console.log("[REGISTER] Total registrationTokens:",snap.size);
+
+    const docs=[];
 
     snap.forEach(d=>{
-      const x=d.data()||{};
-      const token=String(x.token||"").trim();
-      const used=x.used===true ||
-                 String(x.status||"").toLowerCase()==="terpakai";
+      const data=d.data()||{};
 
-      const hari=Number(x.paketHari||0);
-      const tipe=String(x.tipe||"").toLowerCase();
-      const hanya=x.hanyaRegistrasiBaru===true;
+      const token=String(
+        data.token ??
+        data.kodeToken ??
+        data.kode ??
+        ""
+      ).trim();
 
-      // Token registrasi baru: 90 hari + belum terpakai.
-      // Field tipe/hanyaRegistrasiBaru dipakai jika memang ada.
-      const tipeValid=
-        (tipe==="registrasi_baru" && hanya) ||
-        (tipe==="aktivasi_baru" && hanya) ||
-        (!tipe && hanya);
+      if(!token)return;
 
-      if(token && hari===90 && !used && tipeValid){
-        tokenData.push({
-          id:d.id,
-          ...x,
-          token,
-          paketHari:hari
-        });
-      }
+      /*
+        STATUS TERPAKAI
+        Menangani beberapa bentuk data yang mungkin sudah ada
+        di Firebase.
+      */
+      const status=String(data.status||"").toLowerCase().trim();
+
+      const used =
+        data.used===true ||
+        String(data.used||"").toLowerCase()==="true" ||
+        status==="terpakai" ||
+        status==="used";
+
+      if(used)return;
+
+      /*
+        CEK PAKET 3 BULAN.
+        Dibuat fleksibel seperti pembacaan stok di loadProduk(),
+        supaya tidak gagal hanya karena nama field berbeda.
+      */
+      const paketHari=Number(
+        data.paketHari ??
+        data.durasiHari ??
+        data.masaAktifHari ??
+        0
+      );
+
+      const paket=String(
+        data.paket ??
+        data.durasi ??
+        data.masaAktif ??
+        ""
+      ).toLowerCase().trim();
+
+      const tipe=String(data.tipe||"").toLowerCase().trim();
+
+      const is90Hari =
+        paketHari===90 ||
+        paketHari===3 ||
+        paket.includes("3 bulan") ||
+        paket.includes("3bulan") ||
+        paket.includes("90 hari") ||
+        paket.includes("90hari");
+
+      if(!is90Hari)return;
+
+      docs.push({
+        id:d.id,
+        _raw:data,
+        token,
+        paketHari:paketHari || 90,
+        paket:data.paket||data.durasi||"3 Bulan",
+        tipe,
+        harga:Number(data.harga||0),
+        used:false,
+        status:data.status||"tersedia",
+        ...data
+      });
     });
+
+    /*
+      Hilangkan duplikat token.
+      Kalau token sama tersimpan lebih dari sekali,
+      tampilkan satu saja.
+    */
+    const mapToken=new Map();
+
+    for(const p of docs){
+      const key=p.token.toLowerCase().trim();
+
+      if(!mapToken.has(key)){
+        mapToken.set(key,p);
+      }else{
+        /*
+          Kalau duplikat, prioritaskan dokumen yang statusnya
+          lebih jelas tersedia.
+        */
+        const old=mapToken.get(key);
+        const oldStatus=String(old.status||"").toLowerCase();
+        const newStatus=String(p.status||"").toLowerCase();
+
+        if(oldStatus==="terpakai" && newStatus!=="terpakai"){
+          mapToken.set(key,p);
+        }
+      }
+    }
+
+    tokenData=Array.from(mapToken.values());
 
     tokenData.sort((a,b)=>{
       const getDate=x=>{
         if(x?.createdAt?.toDate)return x.createdAt.toDate();
         if(x?.createdAt?.seconds)return new Date(x.createdAt.seconds*1000);
-        return new Date(x?.createdAt||0);
+        const t=new Date(x?.createdAt||0);
+        return isNaN(t.getTime()) ? new Date(0) : t;
       };
       return getDate(b)-getDate(a);
     });
 
     tokenLoaded=true;
+
+    console.log("[REGISTER] Token 3 bulan tersedia:",tokenData.length);
+
     renderTokens();
 
   }catch(err){
     console.error("LOAD REGISTRATION TOKENS:",err);
+
+    let pesan="Gagal memuat token.";
+
+    if(err?.code==="permission-denied"){
+      pesan="Akses registrationTokens ditolak oleh Firebase Rules.";
+    }else if(err?.message){
+      pesan=err.message;
+    }
+
     tokenList.innerHTML=
       '<div class="token-picker-empty">'+
-      'Gagal memuat token.<br><small>'+esc(err.code||"")+" | "+esc(err.message||"")+
-      '</small></div>';
+      esc(pesan)+
+      '<br><small>Collection: registrationTokens</small>'+
+      '</div>';
+
   }finally{
     tokenLoading=false;
   }
 }
-
 function renderTokens(){
   const cari=String(tokenInput.value||"").trim().toLowerCase();
 
