@@ -752,19 +752,48 @@ async function validasiDanTampilkan(user){
       return;
     }
 
-    const exp=data.tanggalBerakhir;
-    let expDate=null;
-    if(exp && typeof exp.toDate==="function") expDate=exp.toDate();
-    else if(exp) expDate=new Date(exp);
+    /*
+  SUMBER TANGGAL AKTIVASI FIXZY
+  Samakan dengan halaman Cek Aktivasi:
+  1. exp
+  2. expAt
+  3. expiredAt
+  4. tanggalBerakhir
+*/
+const exp =
+  data.exp ||
+  data.expAt ||
+  data.expiredAt ||
+  data.tanggalBerakhir ||
+  null;
 
-    if(expDate && !Number.isNaN(expDate.getTime()) && new Date()>expDate){
-      await signOut(auth);
-      window.location.replace("login.html");
-      return;
-    }
+let expDate=null;
 
-    document.getElementById("accountName").textContent=data.namaKonter||data.namaPemilik||data.nama||user.email||"Akun";
-    document.getElementById("accountExp").textContent=formatExpFIXZY(exp);
+if(exp && typeof exp.toDate==="function"){
+  expDate=exp.toDate();
+}
+else if(exp && typeof exp==="object" && exp.seconds!==undefined){
+  expDate=new Date(Number(exp.seconds)*1000);
+}
+else if(exp){
+  expDate=new Date(exp);
+}
+
+if(expDate && !Number.isNaN(expDate.getTime()) && new Date()>expDate){
+  await signOut(auth);
+  window.location.replace("login.html");
+  return;
+}
+
+document.getElementById("accountName").textContent=
+  data.namaKonter||
+  data.namaPemilik||
+  data.nama||
+  user.email||
+  "Akun";
+
+document.getElementById("accountExp").textContent=
+  formatExpFIXZY(exp);
 
     // Tampilkan hanya menu yang sesuai role akun.
     document.querySelectorAll(".menu-link[data-roles]").forEach(btn=>{
