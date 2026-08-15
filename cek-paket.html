@@ -1,28 +1,12 @@
 <!DOCTYPE html>
-<html lang="id"><head><style>
-@font-face {
-  font-family: "Optimistic";
-  font-style: normal;
-  font-weight: 400 600;
-  font-display: swap;
-  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
-}
-@font-face {
-  font-family: "Optimistic Mono";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
-}
-:where(html) {
-  font-family: "Optimistic", system-ui, sans-serif;
-}
-:where(code, pre, kbd, samp) {
-  font-family: "Optimistic Mono", ui-monospace, monospace;
-}
-</style><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FIXZY | Cek Aktivasi Token</title>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FIXZY | Cek Aktivasi</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#eef2f7;color:#111827}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f7;color:#111827}
 .top{position:sticky;top:0;z-index:10;background:#111827;color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px}
 .btn{border:0;border-radius:12px;padding:10px 14px;font-weight:900;cursor:pointer}
 .btn-y{background:#ffc107;color:#111827}.btn-r{background:#dc2626;color:#fff}
@@ -34,144 +18,561 @@
 .input{width:100%;padding:14px;border:1px solid #cbd5e1;border-radius:12px;font-size:16px;text-transform:uppercase;letter-spacing:2px;font-weight:900}
 .badge{display:inline-block;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:900}
 .badge.green{background:#dcfce7;color:#166534}.badge.red{background:#fee2e2;color:#991b1b}.badge.yellow{background:#fef3c7;color:#92400e}
-</style></head><body>
-<div class="top"><div style="flex:1"><h1>FIXZY - Cek Aktivasi</h1><p>Kelola masa aktif akun</p></div>
-<button class="btn btn-y" onclick="loadData()">&#8635;</button><button class="btn btn-r" onclick="tutupHalaman()">X</button></div>
+.small-info{font-size:11px;color:#64748b;margin-top:7px}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div style="flex:1">
+    <h1 style="margin:0;font-size:22px">FIXZY - Cek Aktivasi</h1>
+    <p style="margin:4px 0 0;font-size:12px;opacity:.8">Cek dan perpanjang masa aktif akun</p>
+  </div>
+  <button class="btn btn-y" onclick="loadData()">&#8635;</button>
+  <button class="btn btn-r" onclick="tutupHalaman()">X</button>
+</div>
+
 <div class="wrap">
+
   <div class="card">
     <div style="font-size:22px;font-weight:900;margin-bottom:10px">🔐 Aktivasi Akun</div>
+
     <div style="display:grid;gap:10px">
-      <div style="background:#fff;color:#111827;border-radius:14px;padding:12px"><div class="label">Nama Konter</div><div class="val" id="namaKonter">-</div></div>
-      <div style="background:#fff;color:#111827;border-radius:14px;padding:12px"><div class="label">Aktif Sampai</div><div class="val" id="aktifSampai">-</div><div id="sisaHari" style="margin-top:6px"></div></div>
+      <div style="background:#fff;color:#111827;border-radius:14px;padding:12px">
+        <div class="label">Nama Konter</div>
+        <div class="val" id="namaKonter">-</div>
+      </div>
+
+      <div style="background:#fff;color:#111827;border-radius:14px;padding:12px">
+        <div class="label">Aktif Sampai</div>
+        <div class="val" id="aktifSampai">-</div>
+        <div id="sisaHari" style="margin-top:6px"></div>
+        <div id="sumberAktivasi" class="small-info"></div>
+      </div>
     </div>
   </div>
+
   <div class="card white">
     <h3 style="margin:0 0 8px">Perpanjang Aktivasi Pakai Token</h3>
-    <p style="font-size:12px;color:#64748b;margin:0 0 10px">Masukkan token yang kamu beli dari Owner. Masa aktif akan <b>bertambah</b>.</p>
-    <input id="tokenInput" class="input" placeholder="AB12-9F3K-Q7WZ" maxlength="20">
-    <button class="btn btn-y" style="width:100%;margin-top:10px;padding:14px;font-size:16px" onclick="pakaiToken()">Aktifkan Token</button>
-    <div id="tokenMsg" style="margin-top:10px;font-size:12px;font-weight:800"></div>
+    <p style="font-size:12px;color:#64748b;margin:0 0 10px">
+      Masukkan token perpanjangan yang dibeli dari Owner.
+      Masa aktif akan <b>ditambahkan</b> dari tanggal aktif yang sekarang.
+    </p>
+
+    <input id="tokenInput" class="input" placeholder="AB12-9F3K-Q7WZ" maxlength="50" autocomplete="off">
+
+    <button id="btnPakaiToken" class="btn btn-y"
+      style="width:100%;margin-top:10px;padding:14px;font-size:16px"
+      onclick="pakaiToken()">Aktifkan Token</button>
+
+    <div id="tokenMsg" style="margin-top:10px;font-size:12px;font-weight:800;white-space:pre-line"></div>
   </div>
+
 </div>
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-const cfg={apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",authDomain:"fixzy-update.firebaseapp.com",projectId:"fixzy-update",storageBucket:"fixzy-update.firebasestorage.app",messagingSenderId:"995892519622",appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"};
-const app=initializeApp(cfg); const auth=getAuth(app); const db=getFirestore(app);
-window.db=db;
-function tutupHalaman(){ try{ if(parent!==window){ parent.postMessage({type:"FIXZY_CLOSE_PAGE"}, "*"); return; } }catch(e){} location.href="index.html"; } window.tutupHalaman=tutupHalaman;
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+const cfg={
+  apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",
+  authDomain:"fixzy-update.firebaseapp.com",
+  projectId:"fixzy-update",
+  storageBucket:"fixzy-update.firebasestorage.app",
+  messagingSenderId:"995892519622",
+  appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"
+};
+
+const app=getApps().length ? getApp() : initializeApp(cfg);
+const auth=getAuth(app);
+const db=getFirestore(app);
+
 let currentUid=null;
-function readLocalExp(){
+let currentUserData=null;
+let authReady=false;
+
+window.tutupHalaman=function(){
   try{
-    // coba semua key
-    for(let i=0;i<localStorage.length;i++){
-      const k=localStorage.key(i); const v=localStorage.getItem(k);
-      if(!v) continue;
+    if(parent!==window){
+      parent.postMessage({type:"FIXZY_CLOSE_PAGE"},"*");
+      return;
+    }
+  }catch(e){}
+  location.href="index.html";
+};
+
+/* =========================================================
+   NORMALISASI TANGGAL FIXZY
+
+   PENTING:
+   Satu akun bisa mempunyai beberapa field tanggal dari
+   sistem lama dan sistem baru:
+     - tanggalBerakhir
+     - exp
+     - expAt
+     - expiredAt
+
+   Untuk mencegah akun yang sudah diperpanjang kembali terbaca
+   memakai tanggal lama, semua field valid dibandingkan dan
+   tanggal TERAKHIR dipakai sebagai masa aktif sebenarnya.
+
+   Contoh:
+     tanggalBerakhir = 13 November 2026
+     exp             = 11 Maret 2027
+   hasil:
+     11 Maret 2027
+   ========================================================= */
+function parseDateValue(v){
+  if(v===undefined || v===null || v==="") return null;
+
+  try{
+    if(typeof v==="object" && typeof v.toDate==="function"){
+      const d=v.toDate();
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    if(typeof v==="object" && v.seconds!==undefined){
+      const d=new Date(Number(v.seconds)*1000);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    if(v instanceof Date){
+      return isNaN(v.getTime()) ? null : v;
+    }
+
+    /*
+      Dukungan khusus tanggal YYYY-MM-DD agar tidak terkena
+      pergeseran timezone browser.
+    */
+    const str=String(v).trim();
+    const m=str.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s].*)?$/);
+
+    if(m){
+      const d=new Date(
+        Number(m[1]),
+        Number(m[2])-1,
+        Number(m[3])
+      );
+
+      /*
+        Kalau ada jam/timezone setelah tanggal, gunakan nilai
+        aslinya agar timestamp Firebase tetap akurat.
+      */
+      if(str.length>10){
+        const parsed=new Date(str);
+        if(!isNaN(parsed.getTime())) return parsed;
+      }
+
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    const d=new Date(str);
+    return isNaN(d.getTime()) ? null : d;
+
+  }catch(e){
+    return null;
+  }
+}
+
+function getExpirationFromUser(data){
+  if(!data) return null;
+
+  const candidates=[
+    ["tanggalBerakhir",data.tanggalBerakhir],
+    ["exp",data.exp],
+    ["expAt",data.expAt],
+    ["expiredAt",data.expiredAt]
+  ];
+
+  const valid=[];
+
+  for(const [field,value] of candidates){
+    const d=parseDateValue(value);
+
+    if(d){
+      valid.push({
+        field,
+        date:d
+      });
+    }
+  }
+
+  if(!valid.length) return null;
+
+  /*
+    JANGAN mengambil field pertama.
+    Ambil tanggal paling akhir dari seluruh field.
+
+    Ini memperbaiki kasus:
+      tanggalBerakhir = tanggal lama
+      exp             = tanggal hasil perpanjangan
+
+    sehingga sistem selalu memakai masa aktif yang paling baru.
+  */
+  valid.sort((a,b)=>b.date.getTime()-a.date.getTime());
+
+  return valid[0];
+}
+
+function formatTanggal(d){
+  return d.toLocaleDateString("id-ID",{
+    day:"2-digit",
+    month:"long",
+    year:"numeric"
+  });
+}
+
+function tampilkanAktivasi(data){
+  const namaEl=document.getElementById("namaKonter");
+  const sampaiEl=document.getElementById("aktifSampai");
+  const sisaEl=document.getElementById("sisaHari");
+  const sumberEl=document.getElementById("sumberAktivasi");
+
+  const nama=
+    data?.namaKonter ||
+    data?.namaToko ||
+    data?.tokoName ||
+    data?.nama ||
+    data?.name ||
+    "Akun Fixzy";
+
+  namaEl.textContent=nama;
+
+  const hasil=getExpirationFromUser(data);
+
+  if(!hasil){
+    sampaiEl.textContent="-";
+    sisaEl.innerHTML='<span class="badge red">Masa aktif belum ditemukan</span>';
+    sumberEl.textContent="Data tanggal aktivasi belum tersedia di users akun ini.";
+    return;
+  }
+
+  const exp=hasil.date;
+  sampaiEl.textContent=formatTanggal(exp);
+
+  const now=new Date();
+  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const expDay=new Date(exp.getFullYear(),exp.getMonth(),exp.getDate());
+  const sisa=Math.ceil((expDay-today)/86400000);
+
+  if(sisa>7){
+    sisaEl.innerHTML='<span class="badge green">'+sisa+' hari lagi</span>';
+  }else if(sisa>0){
+    sisaEl.innerHTML='<span class="badge yellow">'+sisa+' hari lagi</span>';
+  }else{
+    sisaEl.innerHTML='<span class="badge red">Kadaluarsa</span>';
+  }
+
+  /*
+    Tampilkan field yang dipakai.
+    Kalau beberapa field berbeda, beri keterangan bahwa FIXZY
+    memilih tanggal terbaru agar mudah dicek oleh Owner.
+  */
+  const semuaTanggal=[
+    ["tanggalBerakhir",data.tanggalBerakhir],
+    ["exp",data.exp],
+    ["expAt",data.expAt],
+    ["expiredAt",data.expiredAt]
+  ]
+  .map(([field,value])=>{
+    const d=parseDateValue(value);
+    return d ? {field,date:d} : null;
+  })
+  .filter(Boolean);
+
+  const adaBerbeda=semuaTanggal.some(x=>x.date.getTime()!==exp.getTime());
+
+  if(adaBerbeda){
+    sumberEl.textContent=
+      "Sumber utama: "+hasil.field+
+      ". FIXZY memakai tanggal aktivasi paling akhir dari data Firebase.";
+  }else{
+    sumberEl.textContent="Sumber: "+hasil.field+" akun Firebase.";
+  }
+}
+
+async function ambilUserAktif(){
+  if(!currentUid) return null;
+
+  const ref=doc(db,"users",currentUid);
+  const snap=await getDoc(ref);
+
+  if(!snap.exists()) return null;
+
+  const data=snap.data()||{};
+  currentUserData=data;
+  return data;
+}
+
+window.loadData=async function(){
+  const namaEl=document.getElementById("namaKonter");
+  const sampaiEl=document.getElementById("aktifSampai");
+  const sisaEl=document.getElementById("sisaHari");
+  const sumberEl=document.getElementById("sumberAktivasi");
+
+  if(!authReady){
+    namaEl.textContent="Memuat...";
+    sampaiEl.textContent="-";
+    return;
+  }
+
+  if(!currentUid){
+    namaEl.textContent="-";
+    sampaiEl.textContent="-";
+    sisaEl.innerHTML='<span class="badge red">Belum login</span>';
+    sumberEl.textContent="Silakan login ke akun Fixzy terlebih dahulu.";
+    return;
+  }
+
+  try{
+    const data=await ambilUserAktif();
+
+    if(!data){
+      namaEl.textContent="-";
+      sampaiEl.textContent="-";
+      sisaEl.innerHTML='<span class="badge red">Data akun tidak ditemukan</span>';
+      sumberEl.textContent="UID login tidak memiliki dokumen users/{uid}.";
+      return;
+    }
+
+    tampilkanAktivasi(data);
+  }catch(err){
+    console.error("CEK AKTIVASI:",err);
+    namaEl.textContent="-";
+    sampaiEl.textContent="-";
+    sisaEl.innerHTML='<span class="badge red">Gagal membaca data</span>';
+    sumberEl.textContent=err.message||"Firebase error";
+  }
+};
+
+/* =========================================================
+   AUTH
+   ========================================================= */
+onAuthStateChanged(auth,async user=>{
+  authReady=true;
+  currentUid=user?.uid||null;
+
+  if(user){
+    console.log("[FIXZY AKTIVASI] Login UID:",user.uid);
+  }else{
+    console.log("[FIXZY AKTIVASI] Tidak ada akun login.");
+  }
+
+  await loadData();
+});
+
+/* =========================================================
+   TOKEN PERPANJANGAN
+   ========================================================= */
+window.pakaiToken=async function(){
+  const input=document.getElementById("tokenInput");
+  const msg=document.getElementById("tokenMsg");
+  const btn=document.getElementById("btnPakaiToken");
+
+  const tokenStr=(input.value||"").trim().toUpperCase();
+
+  if(!tokenStr){
+    msg.textContent="Masukkan token perpanjangan.";
+    msg.style.color="#dc2626";
+    return;
+  }
+
+  if(!currentUid){
+    msg.textContent="Akun belum terdeteksi. Silakan login ulang.";
+    msg.style.color="#dc2626";
+    return;
+  }
+
+  btn.disabled=true;
+  msg.textContent="Memeriksa token perpanjangan...";
+  msg.style.color="#2563eb";
+
+  try{
+    const q=query(
+      collection(db,"tokens"),
+      where("token","==",tokenStr)
+    );
+
+    const snap=await getDocs(q);
+
+    if(snap.empty){
+      throw new Error("Token perpanjangan tidak ditemukan.");
+    }
+
+    let tokenDoc=null;
+    let tokenInfo=null;
+
+    for(const d of snap.docs){
+      const data=d.data()||{};
+
+      const used=
+        data.used===true ||
+        String(data.status||"").toLowerCase()==="terpakai" ||
+        String(data.status||"").toLowerCase()==="used";
+
+      if(!used){
+        tokenDoc=d;
+        tokenInfo=data;
+        break;
+      }
+    }
+
+    if(!tokenDoc){
+      throw new Error("Token perpanjangan sudah terpakai.");
+    }
+
+    const tipe=String(tokenInfo.tipe||tokenInfo.tokenType||"").toLowerCase();
+
+    if(
+      tipe==="registrasi_baru" ||
+      tipe==="aktivasi_baru" ||
+      tokenInfo.hanyaRegistrasiBaru===true
+    ){
+      throw new Error("Token ini khusus registrasi akun baru, bukan token perpanjangan.");
+    }
+
+    const userRef=doc(db,"users",currentUid);
+    const userSnap=await getDoc(userRef);
+
+    if(!userSnap.exists()){
+      throw new Error("Data akun tidak ditemukan di users.");
+    }
+
+    const userData=userSnap.data()||{};
+    currentUserData=userData;
+
+    /*
+      PENTING:
+      getExpirationFromUser() sekarang mengambil tanggal PALING AKHIR
+      dari tanggalBerakhir / exp / expAt / expiredAt.
+
+      Jadi kalau:
+        tanggalBerakhir = 13 November 2026
+        exp             = 11 Maret 2027
+
+      baseDate akan menjadi 11 Maret 2027.
+    */
+    const oldExpInfo=getExpirationFromUser(userData);
+    const now=new Date();
+
+    let baseDate=now;
+
+    if(oldExpInfo && oldExpInfo.date>now){
+      baseDate=oldExpInfo.date;
+    }
+
+    let hari=Number(
+      tokenInfo.paketHari ??
+      tokenInfo.durasiHari ??
+      tokenInfo.masaAktifHari ??
+      0
+    );
+
+    if(!hari){
+      const paketText=String(
+        tokenInfo.paket ??
+        tokenInfo.durasi ??
+        tokenInfo.masaAktif ??
+        ""
+      ).toLowerCase();
+
+      const angka=paketText.match(/\d+/);
+      if(angka) hari=Number(angka[0]);
+
+      if(paketText.includes("bulan") && hari>0){
+        hari*=30;
+      }
+    }
+
+    if(!hari || hari<=0){
+      hari=30;
+    }
+
+    const newExp=new Date(baseDate);
+    newExp.setDate(newExp.getDate()+hari);
+
+    /*
+      Sinkronkan semua field tanggal.
+      Setelah token berhasil, keempat field akan mempunyai
+      tanggal yang sama sehingga halaman FIXZY tidak berbeda-beda.
+    */
+    const newExpISO=newExp.toISOString();
+
+    await updateDoc(userRef,{
+      tanggalBerakhir:newExpISO,
+      exp:newExpISO,
+      expAt:newExpISO,
+      expiredAt:newExpISO,
+
+      status:"aktif",
+      active:true,
+      masaAktif:"aktif",
+
+      updatedAt:serverTimestamp(),
+      lastActivationUpdateAt:serverTimestamp(),
+
+      lastActivationToken:tokenStr,
+      lastActivationTokenId:tokenDoc.id,
+      lastActivationDays:hari
+    });
+
+    await updateDoc(doc(db,"tokens",tokenDoc.id),{
+      used:true,
+      status:"terpakai",
+      usedBy:currentUid,
+      usedAt:serverTimestamp()
+    });
+
+    input.value="";
+
+    msg.textContent=
+      "Berhasil! Masa aktif bertambah "+hari+
+      " hari.\nAktif sampai "+formatTanggal(newExp);
+
+    msg.style.color="#16a34a";
+
+    await loadData();
+
+    setTimeout(()=>{
       try{
-        const j=JSON.parse(v);
-        if(j && (j.exp||j.expAt)){
-          let e=j.exp||j.expAt; if(e && e.toDate) e=e.toDate(); else e=new Date(e);
-          if(e && !isNaN(e)) return {exp:e, nama:j.namaKonter||j.nama};
+        if(parent!==window){
+          parent.location.reload();
         }
       }catch(e){}
-    }
-    const direct=localStorage.getItem('fixzy_exp')||localStorage.getItem('exp');
-    if(direct){ let e=new Date(direct); if(!isNaN(e)) return {exp:e}; }
-  }catch(e){}
-  return null;
-}
-window.loadData=async function(){
-  const namaEl=document.getElementById('namaKonter');
-  const sampaiEl=document.getElementById('aktifSampai');
-  const sisaEl=document.getElementById('sisaHari');
-  // 1. Baca dari URL ?uid=
-  const params=new URLSearchParams(location.search);
-  let uid=params.get('uid')||localStorage.getItem('fixzy_uid')||sessionStorage.getItem('fixzy_uid');
-  if(!uid && auth.currentUser) uid=auth.currentUser.uid;
-  currentUid=uid;
-  // 2. Coba firestore
-  let exp=null, nama=null;
-  if(uid){
-    try{
-      const snap=await getDoc(doc(db,"users",uid));
-      if(snap.exists()){
-        const d=snap.data();
-        nama=d.namaKonter||d.nama;
-        let e=d.exp||d.expAt||d.expiredAt;
-        if(e && e.toDate) e=e.toDate(); else if(e) e=new Date(e);
-        if(e && !isNaN(e)) exp=e;
-      }
-    }catch(e){ console.log(e); }
-  }
-  // 3. Fallback localStorage (ini yang bikin header atas muncul 13 Nov 2026)
-  const local=readLocalExp();
-  if(!exp && local && local.exp) exp=local.exp;
-  if(!nama && local && local.nama) nama=local.nama;
-  // 4. Fallback baca Exp dari parent DOM (header atas)
-  if(!exp){
-    try{
-      // header di parent window
-      const pdoc=parent.document;
-      const txt=pdoc.body.innerText;
-      const m=txt.match(/Exp:\s*([0-9]{1,2}\s+\w+\s+[0-9]{4})/i);
-      if(m){ let d=new Date(m[1]); if(!isNaN(d)) exp=d; }
-    }catch(e){}
-  }
-  // Tampilkan
-  namaEl.textContent=nama||"A Yudi Thea";
-  if(!exp || isNaN(exp)){
-    sampaiEl.textContent='-';
-    sisaEl.innerHTML='<span class="badge red">Belum aktif, masukkan token</span>';
-  }else{
-    sampaiEl.textContent=exp.toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
-    const sisa=Math.ceil((exp-new Date())/86400000);
-    if(sisa>7) sisaEl.innerHTML='<span class="badge green">'+sisa+' hari lagi</span>';
-    else if(sisa>0) sisaEl.innerHTML='<span class="badge yellow">'+sisa+' hari lagi</span>';
-    else sisaEl.innerHTML='<span class="badge red">Kadaluarsa</span>';
-  }
-}
-onAuthStateChanged(auth, async (u)=>{
-  if(!u){ try{ await signInAnonymously(auth); }catch(e){} }
-  loadData();
-});
-setTimeout(loadData, 500);
+    },800);
 
-window.pakaiToken=async function(){
-  const input=document.getElementById('tokenInput'); const msg=document.getElementById('tokenMsg');
-  let tokenStr=(input.value||"").trim().toUpperCase();
-  if(!tokenStr){ msg.textContent='Masukkan token'; msg.style.color='#dc2626'; return; }
-  msg.textContent='Memeriksa token...'; msg.style.color='#2563eb';
-  try{
-    let uid=currentUid||auth.currentUser?.uid||localStorage.getItem('fixzy_uid');
-    if(!uid){ msg.textContent='Gagal deteksi akun, login ulang'; msg.style.color='#dc2626'; return; }
-    const q=query(collection(db,"tokens"), where("token","==",tokenStr));
-    const snap=await getDocs(q);
-    if(snap.empty){ msg.textContent='Token tidak ditemukan'; msg.style.color='#dc2626'; return; }
-    const docSnap=snap.docs[0]; const t=docSnap.data();
-    if(t.used){ msg.textContent='Token sudah terpakai'; msg.style.color='#dc2626'; return; }
-    const userRef=doc(db,"users",uid); const userDoc=await getDoc(userRef);
-    let baseDate=new Date();
-    if(userDoc.exists()){
-      let cur=userDoc.data().exp||userDoc.data().expAt;
-      if(cur && cur.toDate) cur=cur.toDate(); else if(cur) cur=new Date(cur);
-      if(cur && cur>new Date()) baseDate=cur;
-    }else{
-      // jika belum ada doc, coba pakai exp sekarang dari layar
-      const local=readLocalExp();
-      if(local && local.exp && local.exp>new Date()) baseDate=local.exp;
+  }catch(err){
+    console.error("PERPANJANGAN TOKEN:",err);
+
+    let pesan=err?.message||"Gagal memperpanjang masa aktif.";
+
+    if(err?.code==="permission-denied"){
+      pesan="Firebase menolak akses. Periksa Firestore Rules untuk users dan tokens.";
     }
-    const hari=t.paketHari||parseInt(t.paket)||30;
-    const newExp=new Date(baseDate); newExp.setDate(newExp.getDate()+hari);
-    await updateDoc(userRef, {exp:newExp, expAt:newExp, active:true});
-    // update local juga biar header langsung ganti
-    try{ localStorage.setItem('fixzy_exp', newExp.toISOString()); }catch(e){}
-    await updateDoc(doc(db,"tokens",docSnap.id), {used:true, usedBy:uid, usedAt:new Date(), status:"terpakai"});
-    msg.textContent='Berhasil! +'+hari+' hari. Aktif sampai '+newExp.toLocaleDateString('id-ID');
-    msg.style.color='#16a34a';
-    input.value='';
-    loadData();
-    try{ parent.location.reload(); }catch(e){}
-  }catch(e){ msg.textContent='Error: '+e.message; msg.style.color='#dc2626'; }
-}
-</script><script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body></html>
+
+    msg.textContent=pesan;
+    msg.style.color="#dc2626";
+
+  }finally{
+    btn.disabled=false;
+  }
+};
+
+document.getElementById("tokenInput").addEventListener("input",function(){
+  this.value=this.value.toUpperCase();
+});
+</script>
+
+</body>
+</html>
