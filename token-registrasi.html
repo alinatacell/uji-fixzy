@@ -33,6 +33,11 @@ td{padding:8px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
 .badge{padding:3px 7px;border-radius:999px;font-size:10px;font-weight:800}
 .badge.ok{background:#dcfce7;color:#15803d}
 .badge.off{background:#fee2e2;color:#991b1b}
+tr.token-used{background:#fff1f2}
+tr.token-used td{border-bottom-color:#fecdd3}
+tr.token-used td:nth-child(2) b{color:#b91c1c}
+.used-action{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
+.used-action:hover{background:#fecdd3}
 #loginBox{max-width:380px;margin:60px auto;background:#fff;padding:20px;border-radius:16px;box-shadow:0 10px 30px #0002}
 #loginBox input{margin-bottom:8px}
 .msg{font-size:11px;margin-top:8px;font-weight:800}
@@ -126,7 +131,7 @@ td{padding:8px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
         <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
           <button class="btn btn-dark" onclick="copySelected()">📋 Salin (<span id="countSel">0</span>)</button>
           <button class="btn btn-red" onclick="deleteSelected()">🗑️ Hapus</button>
-          <button class="btn btn-white" onclick="deleteUsed()">🧹 Hapus yang Terpakai</button>
+          <button class="btn used-action" onclick="deleteUsed()">🗑️ Hapus Token Terpakai</button>
         </div>
       </div>
 
@@ -438,7 +443,7 @@ window.renderTokens=function(){
     const checked=selected.has(t.id)?"checked":"";
 
     html+=`
-      <tr>
+      <tr class="${used ? "token-used" : ""}">
         <td>
           <input type="checkbox" value="${esc(t.id)}" ${checked}
             onchange="toggleOne('${esc(t.id)}',this)" style="width:auto">
@@ -446,7 +451,7 @@ window.renderTokens=function(){
         <td><b style="letter-spacing:.5px">${esc(t.token||"-")}</b></td>
         <td><b>90 Hari</b></td>
         <td>${used
-          ? '<span class="badge off">Terpakai</span>'
+          ? '<span class="badge off">🔴 Terpakai</span>'
           : '<span class="badge ok">Tersedia</span>'}</td>
         <td>${used
           ? '<b>'+esc(t.usedByEmail||t.usedBy||"-")+'</b>'
@@ -555,7 +560,8 @@ window.deleteSelected=function(){
 };
 
 window.deleteUsed=function(){
-  const used=allTokens.filter(t=>t.used);
+  // HANYA token yang benar-benar mempunyai used=true yang boleh dihapus.
+  const used=allTokens.filter(t=>t.used===true);
 
   if(used.length===0){
     document.getElementById("msg").style.color="#15803d";
@@ -564,17 +570,30 @@ window.deleteUsed=function(){
   }
 
   showModal(
-    "🧹 Hapus Token Terpakai",
-    "Akan menghapus "+used.length+" token registrasi yang sudah dipakai. Token yang masih tersedia tidak ikut dihapus.",
-    "Hapus yang Terpakai",
+    "🗑️ Hapus Token Terpakai",
+    "Akan menghapus "+used.length+" token registrasi yang sudah dipakai dari Firebase. Token Tersedia tidak ikut dihapus.",
+    "Hapus Token Terpakai",
     async()=>{
+      let berhasil=0;
+
       for(const t of used){
-        try{ await deleteDoc(doc(db,TOKEN_COLLECTION,t.id)); }catch(e){}
+        try{
+          await deleteDoc(doc(db,TOKEN_COLLECTION,t.id));
+          berhasil++;
+        }catch(e){
+          console.error("Gagal menghapus token:",t.id,e);
+        }
       }
+
       selected.clear();
+      document.getElementById("checkAll").checked=false;
+      document.getElementById("checkHead").checked=false;
+
       await loadAll();
+
       document.getElementById("msg").style.color="#15803d";
-      document.getElementById("msg").textContent=used.length+" token terpakai berhasil dihapus.";
+      document.getElementById("msg").textContent=
+        berhasil+" token terpakai berhasil dihapus dari Firebase.";
     }
   );
 };
