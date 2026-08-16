@@ -61,7 +61,7 @@ table{width:100%;border-collapse:collapse;min-width:750px;font-size:11px}
 th{background:#0f172a;color:#fff;padding:9px 8px;text-align:left;font-size:10px;text-transform:uppercase;white-space:nowrap}
 td{padding:8px;border-bottom:1px solid #f1f5f9;vertical-align:top}
 .badge{padding:3px 7px;border-radius:999px;font-size:10px;font-weight:800}
-.badge.ok{background:#dcfce7;color:#15803d} .badge.off{background:#fee2e2;color:#991b1b}
+.badge.ok{background:#dcfce7;color:#15803d} .badge.off{background:#fee2e2;color:#991b1b} tr.token-used{background:#fff7f7} tr.token-used td{background:#fff7f7} tr.token-used td:first-child{border-left:3px solid #ef4444} tr.token-available{background:#fff} .btn-danger-soft{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca} .btn-danger-soft:hover{background:#fecaca}
 #loginBox{max-width:380px;margin:60px auto;background:#fff;padding:20px;border-radius:16px;box-shadow:0 10px 30px #0002}
 </style></head><body>
 <div id="loginBox"><h2 style="margin:0 0 8px">🔒 Login Owner</h2><input id="email" value="servicehpmaja@gmail.com" style="width:100%;margin-bottom:8px"><input id="pass" type="password" placeholder="Password" style="width:100%;margin-bottom:8px"><button class="btn btn-dark" style="width:100%" onclick="loginOwner()">Masuk</button><div id="loginErr" style="color:#dc2626;font-size:11px;margin-top:8px;display:none"></div></div>
@@ -89,7 +89,7 @@ td{padding:8px;border-bottom:1px solid #f1f5f9;vertical-align:top}
 <div style="display:flex;gap:6px;align-items:center;margin-top:10px;flex-wrap:wrap">
 <label style="font-size:11px;font-weight:800"><input type="checkbox" id="checkAll" onchange="toggleAll(this)"> Ceklis Semua</label>
 <span id="filterInfo" style="font-size:10px;color:#64748b"></span>
-<div style="margin-left:auto;display:flex;gap:6px"><button class="btn btn-dark" onclick="copySelected()">📋 Salin (<span id="countSel">0</span>)</button><button class="btn btn-red" onclick="hapusSelected()">🗑️ Hapus</button></div>
+<div style="margin-left:auto;display:flex;gap:6px"><button class="btn btn-dark" onclick="copySelected()">📋 Salin (<span id="countSel">0</span>)</button><button class="btn btn-danger-soft" onclick="hapusTerpakai()">🗑️ Hapus yang Terpakai</button><button class="btn btn-red" onclick="hapusSelected()">🗑️ Hapus</button></div>
 </div>
 </div>
 <div class="table-wrap"><table><thead><tr><th><input type="checkbox" id="checkAllHead" onchange="document.getElementById('checkAll').checked=this.checked;toggleAll(this)"></th><th>TOKEN</th><th>PAKET</th><th>HARGA</th><th>STATUS</th><th>PEMAKAI</th><th>AKSI</th></tr></thead><tbody id="tokenBody"><tr><td colspan=7 style="text-align:center;padding:20px">Memuat...</td></tr></tbody></table></div>
@@ -170,12 +170,12 @@ window.renderTokens=function(){
     const tglPakai=usedAt? usedAt.toLocaleDateString('id-ID')+' '+usedAt.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}):'-';
     const checked=selected.has(t.id)?'checked':'';
     const paketLabel=t.paketHari? (t.paketHari+' Hari') : (t.paket||'-');
-    html+=`<tr>
+    html+=`<tr class="${isUsed?'token-used':'token-available'}">
 <td><input type="checkbox" value="${t.id}" ${checked} onchange="toggleOne('${t.id}',this)"></td>
 <td><b style="letter-spacing:.5px">${t.token||'-'}</b></td>
 <td><b>${paketLabel}</b></td>
 <td>Rp ${Number(t.harga||0).toLocaleString()}</td>
-<td>${isUsed?'<span class=badge off>Terpakai</span>':'<span class=badge ok>Tersedia</span>'}</td>
+<td>${isUsed?'<span class="badge off">🔴 Terpakai</span>':'<span class="badge ok">🟢 Tersedia</span>'}</td>
 <td>${isUsed?`<div><b>${t.usedByEmail||t.usedBy||'-'}</b></div><small style="color:#64748b">${tglPakai}</small>`:'<small style="color:#94a3b8">Belum dipakai</small>'}</td>
 <td><button class="btn btn-white" onclick="copyText('${t.token}')">Copy</button></td>
 </tr>`;
@@ -188,6 +188,26 @@ window.toggleOne=function(id,el){ if(el.checked) selected.add(id); else selected
 function updateBulk(){ const n=selected.size; document.getElementById('countSel').textContent=n; }
 window.copyText=function(txt){ navigator.clipboard.writeText(txt); alert('Disalin: '+txt); }
 window.copySelected=function(){ if(selected.size===0){ alert('Pilih token dulu'); return; } let teks=[]; allTokens.forEach(t=>{ if(selected.has(t.id)) teks.push(t.token); }); navigator.clipboard.writeText(teks.join('\n')); alert(teks.length+' token disalin!'); }
+window.hapusTerpakai=async function(){
+  const usedTokens=allTokens.filter(t=>!!t.used);
+  if(usedTokens.length===0){ alert('Tidak ada token terpakai yang bisa dihapus.'); return; }
+  if(!confirm('Hapus semua '+usedTokens.length+' token yang sudah terpakai? Token yang tersedia tidak akan dihapus.')) return;
+  const btns=document.querySelectorAll('button');
+  let target=null;
+  btns.forEach(b=>{ if((b.textContent||'').includes('Hapus yang Terpakai')) target=b; });
+  if(target){ target.disabled=true; target.textContent='⏳ Menghapus...'; }
+  let berhasil=0;
+  for(const t of usedTokens){
+    try{
+      await deleteDoc(doc(db,'tokens',t.id));
+      berhasil++;
+    }catch(e){}
+  }
+  selected.clear();
+  await loadAll();
+  if(target){ target.disabled=false; target.textContent='🗑️ Hapus yang Terpakai'; }
+  alert(berhasil+' token terpakai berhasil dihapus.');
+}
 window.hapusSelected=async function(){ if(selected.size===0){ alert('Pilih token dulu'); return; } if(!confirm('Hapus '+selected.size+' token terpilih?')) return; for(let id of Array.from(selected)){ try{ await deleteDoc(doc(db,'tokens',id)); }catch(e){} } selected.clear(); await loadAll(); }
 function genToken(){ const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let t=""; for(let i=0;i<12;i++) t+=chars[Math.floor(Math.random()*chars.length)]; return t.match(/.{1,4}/g).join("-"); }
 window.buatToken=async function(){
