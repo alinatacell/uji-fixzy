@@ -89,8 +89,12 @@ td{padding:8px;border-bottom:1px solid #f1f5f9;vertical-align:top}
 <div style="display:flex;gap:6px;align-items:center;margin-top:10px;flex-wrap:wrap">
 <label style="font-size:11px;font-weight:800"><input type="checkbox" id="checkAll" onchange="toggleAll(this)"> Ceklis Semua</label>
 <span id="filterInfo" style="font-size:10px;color:#64748b"></span>
-<div style="margin-left:auto;display:flex;gap:6px"><button class="btn btn-dark" onclick="copySelected()">📋 Salin (<span id="countSel">0</span>)</button><button class="btn btn-danger-soft" onclick="hapusTerpakai()">🗑️ Hapus yang Terpakai</button><button class="btn btn-red" onclick="hapusSelected()">🗑️ Hapus</button></div>
+<div style="margin-left:auto;display:flex;gap:6px"><button class="btn btn-dark" onclick="copySelected()">📋 Salin (<span id="countSel">0</span>)</button><button id="btnHapusTerpakai" class="btn btn-red" style="background:#dc2626!important;color:#fff!important" onclick="hapusTerpakai()">🗑️ Hapus Token Terpakai</button><button class="btn btn-red" onclick="hapusSelected()">🗑️ Hapus</button></div>
 </div>
+</div>
+<div id="quickDeleteUsed" style="margin-top:8px;display:flex;justify-content:flex-end">
+<button class="btn btn-red" style="width:100%;height:40px;background:#dc2626!important;color:#fff!important"
+onclick="hapusTerpakai()">🗑️ HAPUS SEMUA TOKEN YANG SUDAH TERPAKAI</button>
 </div>
 <div class="table-wrap"><table><thead><tr><th><input type="checkbox" id="checkAllHead" onchange="document.getElementById('checkAll').checked=this.checked;toggleAll(this)"></th><th>TOKEN</th><th>PAKET</th><th>HARGA</th><th>STATUS</th><th>PEMAKAI</th><th>AKSI</th></tr></thead><tbody id="tokenBody"><tr><td colspan=7 style="text-align:center;padding:20px">Memuat...</td></tr></tbody></table></div>
 </div>
@@ -138,7 +142,7 @@ window.loadAll=async function(){
     // sort manual by createdAt terbaru
     allTokens.sort((a,b)=>{ const da=a.createdAt?.toDate?a.createdAt.toDate(): (a.createdAt?.seconds?new Date(a.createdAt.seconds*1000): new Date(a.createdAt||0)); const db2=b.createdAt?.toDate?b.createdAt.toDate(): (b.createdAt?.seconds?new Date(b.createdAt.seconds*1000): new Date(b.createdAt||0)); return db2-da; });
     renderTokens();
-  }catch(e){ document.getElementById('tokenBody').innerHTML='<tr><td colspan=7 style="color:red">Error tokens: '+e.message+'<br>Pastikan Rules: allow read,write if request.auth!=null</td></tr>'; }
+  }catch(e){ document.getElementById('tokenBody').innerHTML='<tr><td colspan=7 style="color:red">Error tokens: '+e.message+'<br>Pastikan Firebase Rules mengizinkan read/write untuk pengguna yang sudah login.</td></tr>'; }
   if(btn){ btn.textContent='↻ Refresh'; btn.disabled=false; }
 }
 window.renderTokens=function(){
