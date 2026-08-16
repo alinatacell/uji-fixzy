@@ -133,6 +133,32 @@ window.tutupHalaman=function(){
    hasil:
      11 Maret 2027
    ========================================================= */
+
+function getPaketMetadataFIXZY(tokenInfo,hari){
+  const n=Number(hari)||0;
+  const raw=String(
+    tokenInfo?.paketLabel ??
+    tokenInfo?.paketTerakhir ??
+    tokenInfo?.paket ??
+    ""
+  ).trim();
+
+  if(raw){
+    const low=raw.toLowerCase();
+    if(low.includes("tahun")) return {label:"1 Tahun",unit:"tahun",value:1,days:n||360};
+    const m=low.match(/(\d+)\s*bulan/);
+    if(m) return {label:m[1]+" Bulan",unit:"bulan",value:Number(m[1]),days:n||Number(m[1])*30};
+  }
+
+  if(n===30) return {label:"1 Bulan",unit:"bulan",value:1,days:30};
+  if(n===60) return {label:"2 Bulan",unit:"bulan",value:2,days:60};
+  if(n===90) return {label:"3 Bulan",unit:"bulan",value:3,days:90};
+  if(n===180) return {label:"6 Bulan",unit:"bulan",value:6,days:180};
+  if(n===360) return {label:"1 Tahun",unit:"tahun",value:1,days:360};
+
+  return {label:n+" Hari",unit:"hari",value:n,days:n};
+}
+
 function parseDateValue(v){
   if(v===undefined || v===null || v==="") return null;
 
@@ -524,7 +550,11 @@ window.pakaiToken=async function(){
 
       lastActivationToken:tokenStr,
       lastActivationTokenId:tokenDoc.id,
-      lastActivationDays:hari
+      lastActivationDays:hari,
+      paketTerakhir:getPaketMetadataFIXZY(tokenInfo,hari).label,
+      paketLabel:getPaketMetadataFIXZY(tokenInfo,hari).label,
+      durasiUnit:getPaketMetadataFIXZY(tokenInfo,hari).unit,
+      durasiNilai:getPaketMetadataFIXZY(tokenInfo,hari).value
     });
 
     await updateDoc(doc(db,"tokens",tokenDoc.id),{
