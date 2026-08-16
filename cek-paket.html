@@ -143,11 +143,17 @@ function getPaketMetadataFIXZY(tokenInfo,hari){
     ""
   ).trim();
 
-  if(raw){
-    const low=raw.toLowerCase();
-    if(low.includes("tahun")) return {label:"1 Tahun",unit:"tahun",value:1,days:n||360};
-    const m=low.match(/(\d+)\s*bulan/);
-    if(m) return {label:m[1]+" Bulan",unit:"bulan",value:Number(m[1]),days:n||Number(m[1])*30};
+  const low=raw.toLowerCase();
+
+  // Paket token -> jumlah hari yang benar.
+  if(low.includes("tahun")){
+    return {label:"1 Tahun",unit:"tahun",value:1,days:n||360};
+  }
+
+  const m=low.match(/(\d+)\s*bulan/);
+  if(m){
+    const bulan=Number(m[1]);
+    return {label:bulan+" Bulan",unit:"bulan",value:bulan,days:n||bulan*30};
   }
 
   if(n===30) return {label:"1 Bulan",unit:"bulan",value:1,days:30};
@@ -177,10 +183,6 @@ function parseDateValue(v){
       return isNaN(v.getTime()) ? null : v;
     }
 
-    /*
-      Dukungan khusus tanggal YYYY-MM-DD agar tidak terkena
-      pergeseran timezone browser.
-    */
     const str=String(v).trim();
     const m=str.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s].*)?$/);
 
@@ -191,10 +193,6 @@ function parseDateValue(v){
         Number(m[3])
       );
 
-      /*
-        Kalau ada jam/timezone setelah tanggal, gunakan nilai
-        aslinya agar timestamp Firebase tetap akurat.
-      */
       if(str.length>10){
         const parsed=new Date(str);
         if(!isNaN(parsed.getTime())) return parsed;
@@ -205,50 +203,27 @@ function parseDateValue(v){
 
     const d=new Date(str);
     return isNaN(d.getTime()) ? null : d;
-
   }catch(e){
     return null;
   }
 }
 
+/*
+  MASTER DATA AKTIVASI:
+  Hanya tanggalBerakhir dari users/{uid}.
+  Tidak membandingkan exp, expAt, expiredAt, atau field tanggal lain.
+*/
 function getExpirationFromUser(data){
   if(!data) return null;
 
-  const candidates=[
-    ["tanggalBerakhir",data.tanggalBerakhir],
-    ["exp",data.exp],
-    ["expAt",data.expAt],
-    ["expiredAt",data.expiredAt]
-  ];
+  const d=parseDateValue(data.tanggalBerakhir);
 
-  const valid=[];
+  if(!d) return null;
 
-  for(const [field,value] of candidates){
-    const d=parseDateValue(value);
-
-    if(d){
-      valid.push({
-        field,
-        date:d
-      });
-    }
-  }
-
-  if(!valid.length) return null;
-
-  /*
-    JANGAN mengambil field pertama.
-    Ambil tanggal paling akhir dari seluruh field.
-
-    Ini memperbaiki kasus:
-      tanggalBerakhir = tanggal lama
-      exp             = tanggal hasil perpanjangan
-
-    sehingga sistem selalu memakai masa aktif yang paling baru.
-  */
-  valid.sort((a,b)=>b.date.getTime()-a.date.getTime());
-
-  return valid[0];
+  return {
+    field:"tanggalBerakhir",
+    date:d
+  };
 }
 
 function formatTanggal(d){
@@ -305,27 +280,8 @@ function tampilkanAktivasi(data){
     Kalau beberapa field berbeda, beri keterangan bahwa FIXZY
     memilih tanggal terbaru agar mudah dicek oleh Owner.
   */
-  const semuaTanggal=[
-    ["tanggalBerakhir",data.tanggalBerakhir],
-    ["exp",data.exp],
-    ["expAt",data.expAt],
-    ["expiredAt",data.expiredAt]
-  ]
-  .map(([field,value])=>{
-    const d=parseDateValue(value);
-    return d ? {field,date:d} : null;
-  })
-  .filter(Boolean);
+  sumberEl.textContent="Sumber: tanggalBerakhir dari users/{uid} di Firebase.";
 
-  const adaBerbeda=semuaTanggal.some(x=>x.date.getTime()!==exp.getTime());
-
-  if(adaBerbeda){
-    sumberEl.textContent=
-      "Sumber utama: "+hasil.field+
-      ". FIXZY memakai tanggal aktivasi paling akhir dari data Firebase.";
-  }else{
-    sumberEl.textContent="Sumber: "+hasil.field+" akun Firebase.";
-  }
 }
 
 async function ambilUserAktif(){
@@ -479,15 +435,8 @@ window.pakaiToken=async function(){
     currentUserData=userData;
 
     /*
-      PENTING:
-      getExpirationFromUser() sekarang mengambil tanggal PALING AKHIR
-      dari tanggalBerakhir / exp / expAt / expiredAt.
-
-      Jadi kalau:
-        tanggalBerakhir = 13 November 2026
-        exp             = 11 Maret 2027
-
-      baseDate akan menjadi 11 Maret 2027.
+      Masa aktif sebelumnya hanya dibaca dari tanggalBerakhir
+      yang tersimpan di users/{uid} Firebase.
     */
     const oldExpInfo=getExpirationFromUser(userData);
     const now=new Date();
@@ -498,6 +447,12 @@ window.pakaiToken=async function(){
       baseDate=oldExpInfo.date;
     }
 
+    /*
+      Durasi token:
+      - Prioritas paketHari/durasiHari/masaAktifHari dari dokumen token.
+      - Jika token hanya menyimpan label paket, konversi label dilakukan
+        dengan benar: 1 Tahun = 360 hari, bukan 1 hari.
+    */
     let hari=Number(
       tokenInfo.paketHari ??
       tokenInfo.durasiHari ??
@@ -505,24 +460,31 @@ window.pakaiToken=async function(){
       0
     );
 
+    const paketText=String(
+      tokenInfo.paketLabel ??
+      tokenInfo.paketTerakhir ??
+      tokenInfo.paket ??
+      tokenInfo.durasi ??
+      tokenInfo.masaAktif ??
+      ""
+    ).trim().toLowerCase();
+
     if(!hari){
-      const paketText=String(
-        tokenInfo.paket ??
-        tokenInfo.durasi ??
-        tokenInfo.masaAktif ??
-        ""
-      ).toLowerCase();
+      const tahun=paketText.match(/(\d+)\s*tahun/);
+      const bulan=paketText.match(/(\d+)\s*bulan/);
+      const angkaHari=paketText.match(/(\d+)\s*hari/);
 
-      const angka=paketText.match(/\d+/);
-      if(angka) hari=Number(angka[0]);
-
-      if(paketText.includes("bulan") && hari>0){
-        hari*=30;
+      if(tahun){
+        hari=Number(tahun[1])*360;
+      }else if(bulan){
+        hari=Number(bulan[1])*30;
+      }else if(angkaHari){
+        hari=Number(angkaHari[1]);
       }
     }
 
     if(!hari || hari<=0){
-      hari=30;
+      throw new Error("Durasi token tidak valid. Periksa paketHari/durasiHari di Firebase tokens.");
     }
 
     const newExp=new Date(baseDate);
@@ -535,11 +497,19 @@ window.pakaiToken=async function(){
     */
     const newExpISO=newExp.toISOString();
 
+    const paketMeta=getPaketMetadataFIXZY(tokenInfo,hari);
+
+    /*
+      FIREBASE = MASTER.
+      Field aktivasi yang dipakai seluruh halaman FIXZY:
+        tanggalBerakhir
+        masaAktifHari
+        paketTerakhir
+    */
     await updateDoc(userRef,{
       tanggalBerakhir:newExpISO,
-      exp:newExpISO,
-      expAt:newExpISO,
-      expiredAt:newExpISO,
+      masaAktifHari:hari,
+      paketTerakhir:paketMeta.label,
 
       status:"aktif",
       active:true,
@@ -550,11 +520,7 @@ window.pakaiToken=async function(){
 
       lastActivationToken:tokenStr,
       lastActivationTokenId:tokenDoc.id,
-      lastActivationDays:hari,
-      paketTerakhir:getPaketMetadataFIXZY(tokenInfo,hari).label,
-      paketLabel:getPaketMetadataFIXZY(tokenInfo,hari).label,
-      durasiUnit:getPaketMetadataFIXZY(tokenInfo,hari).unit,
-      durasiNilai:getPaketMetadataFIXZY(tokenInfo,hari).value
+      lastActivationDays:hari
     });
 
     await updateDoc(doc(db,"tokens",tokenDoc.id),{
