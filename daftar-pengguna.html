@@ -59,62 +59,61 @@ function parseDateFIXZY(v){
   if(v===undefined || v===null || v==="") return null;
   try{
     if(typeof v==="object" && typeof v.toDate==="function"){
-      const d=v.toDate(); return isNaN(d.getTime())?null:d;
+      const d=v.toDate();
+      return isNaN(d.getTime())?null:d;
     }
     if(typeof v==="object" && v.seconds!==undefined){
-      const d=new Date(Number(v.seconds)*1000); return isNaN(d.getTime())?null:d;
+      const d=new Date(Number(v.seconds)*1000);
+      return isNaN(d.getTime())?null:d;
     }
     if(v instanceof Date) return isNaN(v.getTime())?null:v;
+
     const str=String(v).trim();
     const m=str.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s].*)?$/);
     if(m){
       const d=new Date(Number(m[1]),Number(m[2])-1,Number(m[3]));
       if(str.length>10){
-        const p=new Date(str); if(!isNaN(p.getTime())) return p;
+        const p=new Date(str);
+        if(!isNaN(p.getTime())) return p;
       }
       return isNaN(d.getTime())?null:d;
     }
-    const d=new Date(str); return isNaN(d.getTime())?null:d;
-  }catch(e){return null;}
+
+    const d=new Date(str);
+    return isNaN(d.getTime())?null:d;
+  }catch(e){
+    return null;
+  }
 }
 
-function getLatestExpirationFIXZY(u){
-  const candidates=[
-    ["tanggalBerakhir",u?.tanggalBerakhir],
-    ["exp",u?.exp],
-    ["expAt",u?.expAt],
-    ["expiredAt",u?.expiredAt],
-    ["aktifSampai",u?.aktifSampai]
-  ];
-  const valid=candidates.map(([field,value])=>{
-    const date=parseDateFIXZY(value);
-    return date?{field,date}:null;
-  }).filter(Boolean);
-  if(!valid.length) return null;
-  valid.sort((a,b)=>b.date.getTime()-a.date.getTime());
-  return valid[0];
+/*
+  MASTER DATA:
+  Daftar Pengguna hanya membaca field yang disimpan di Firebase users.
+  Tidak ada fallback ke exp/expAt/expiredAt/aktifSampai.
+*/
+function getExpirationFIXZY(u){
+  return parseDateFIXZY(u?.tanggalBerakhir);
 }
 
 function getPaketTerakhirFIXZY(u){
-  return u?.paketTerakhir ||
-         u?.paketLabel ||
-         u?.lastPaket ||
-         u?.paket ||
-         u?.lastActivationPackage ||
-         "-";
+  return u?.paketTerakhir || "-";
 }
 
-function parseExp(o){ let cands=[o.exp,o.expAt,o.expiredAt,o.aktifSampai,o.tanggalBerakhir,o.activeUntil]; for(let k in o){ let lk=k.toLowerCase(); if(lk.includes('exp')||lk.includes('akhir')||lk.includes('sampai')) cands.push(o[k]); } for(let c of cands){ if(!c) continue; try{ if(c.toDate) return c.toDate(); if(c.seconds) return new Date(c.seconds*1000); let d=new Date(c); if(!isNaN(d)&&d.getFullYear()>2020) return d; }catch(e){} } return null; }
 window.loginOwner=async function(){ const e=document.getElementById('email').value.trim(); const p=document.getElementById('pass').value.trim(); const err=document.getElementById('loginErr'); err.style.display='none'; if(!e||!p){ err.style.display='block'; err.textContent='Isi email & password'; return; } try{ await signInWithEmailAndPassword(auth,e,p); }catch(ex){ err.style.display='block'; err.textContent='Gagal: '+ex.message; } }
 window.logout=async function(){ await signOut(auth); location.reload(); }
 onAuthStateChanged(auth,(u)=>{ if(!u){ document.getElementById('loginBox').style.display='block'; document.getElementById('app').style.display='none'; return; } document.getElementById('loginBox').style.display='none'; document.getElementById('app').style.display='block'; document.getElementById('ownerEmail').textContent=u.email; loadUsers(); });
 window.loadUsers=async function(){
   document.getElementById('userBody').innerHTML='<tr><td colspan=6 style="text-align:center;padding:20px">Memuat ulang...</td></tr>';
   try{
+    // FIREBASE users = satu-satunya sumber data daftar pengguna.
     const snap=await getDocs(collection(db,"users"));
     let users=[]; snap.forEach(d=>users.push({id:d.id,...d.data()}));
     users=users.filter(u=>{ const r=(u.role||'').toLowerCase(); return r!=='employee' && r!=='karyawan'; });
-    allUsers=users.map(u=>{ const e=parseExp(u); const sisa=e?Math.ceil((e-new Date())/86400000):-999; return {...u, _exp:e, _sisa:sisa}; });
+    allUsers=users.map(u=>{
+      const e=getExpirationFIXZY(u);
+      const sisa=e?Math.ceil((e-new Date())/86400000):-999;
+      return {...u,_exp:e,_sisa:sisa};
+    });
     allUsers.sort((a,b)=>{ const da=a._exp? a._exp.getTime():0; const db=b._exp? b._exp.getTime():0; return db-da; });
     render();
   }catch(e){ document.getElementById('userBody').innerHTML='<tr><td colspan=6 style="color:red">Error: '+e.message+'</td></tr>'; }
