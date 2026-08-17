@@ -139,12 +139,12 @@ import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/11.10.
 import{getFirestore,collection,query,where,getDocs,doc,getDoc,updateDoc,serverTimestamp,onSnapshot}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const cfg={
- apiKey:"AIzaSy_C_PcarMTT5Un7qfSLzf92o5OGn5rginsI",
- authDomain:"fixzy-update.firebaseapp.com",
- projectId:"fixzy-update",
- storageBucket:"fixzy-update.firebasestorage.app",
- messagingSenderId:"995892519622",
- appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"
+ apiKey:"AIzaSyCwMbJsuORHqI4QCmp4c1r6OsjAUlfxU5Y",
+ authDomain:"fixzy-f056f.firebaseapp.com",
+ projectId:"fixzy-f056f",
+ storageBucket:"fixzy-f056f.firebasestorage.app",
+ messagingSenderId:"838081521031",
+ appId:"1:838081521031:web:50fddf909b56460b055f22"
 };
 const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
 const $=id=>document.getElementById(id);
@@ -610,6 +610,17 @@ window.rejectRequest=async()=>{
 
 $("search").oninput=render;
 $("filter").onchange=render;
+
+
+window.addEventListener("message",event=>{
+ if(event.origin!==location.origin)return;
+ if(!event.data||event.data.type!=="FIXZY_AUTH_SESSION")return;
+});
+try{
+ if(window.parent!==window){
+  window.parent.postMessage({type:"FIXZY_REQUEST_AUTH_SESSION"},location.origin);
+ }
+}catch(e){}
 
 onAuthStateChanged(auth,async u=>{
  user=u;
