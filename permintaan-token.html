@@ -7,1076 +7,283 @@
 <title>FIXZY | Approval Token Reseller</title>
 <style>
 *{box-sizing:border-box}
-:root{
-  --navy:#081326;--yellow:#facc15;--bg:#eef2f6;--text:#111827;
-  --muted:#64748b;--green:#16a34a;--red:#dc2626;--border:#111827
-}
+:root{--navy:#081326;--yellow:#facc15;--bg:#eef2f6;--text:#111827;--muted:#64748b;--green:#16a34a;--red:#dc2626}
 body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-header{
-  height:72px;background:var(--navy);color:#fff;padding:9px 14px;
-  display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:30;
-  border-bottom:2px solid #000;box-shadow:0 3px 0 #000
-}
-.logo{width:52px;height:52px;flex:0 0 52px;background:#000;border:2px solid var(--yellow);
-  border-radius:13px;padding:4px;overflow:hidden}
-.logo img{width:100%;height:100%;object-fit:contain}
+header{height:72px;background:var(--navy);color:#fff;padding:9px 14px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:30;border-bottom:2px solid #000;box-shadow:0 3px 0 #000}
+.logo{width:52px;height:52px;flex:0 0 52px;background:#000;border:2px solid var(--yellow);border-radius:13px;padding:4px;overflow:hidden}.logo img{width:100%;height:100%;object-fit:contain}
 .brand{flex:1;min-width:0}.brand b{font-size:18px}.brand small{display:block;color:#cbd5e1;font-size:11px;margin-top:2px}
 .wrap{max-width:1000px;margin:auto;padding:14px}
 .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-.stat{background:#fff;border:2px solid #111827;border-radius:12px;padding:12px;box-shadow:3px 3px 0 #111827}
-.stat small{display:block;color:var(--muted);font-size:10px;font-weight:800}
-.stat b{display:block;font-size:22px;margin-top:4px}.stat.pending b{color:#b45309}
+.stat{background:#fff;border:2px solid #111827;border-radius:12px;padding:12px;box-shadow:3px 3px 0 #111827}.stat small{display:block;color:var(--muted);font-size:10px;font-weight:800}.stat b{display:block;font-size:22px;margin-top:4px}.stat.pending b{color:#b45309}
 .card{background:#fff;border:2px solid #111827;border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:4px 4px 0 #111827}
 .toolbar{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-bottom:12px}
-input,select,textarea{width:100%;padding:10px;border:2px solid #111827;border-radius:9px;background:#fff;font:inherit}
-textarea{min-height:70px;resize:vertical}
-.request{border:2px solid #d1d5db;border-radius:12px;padding:13px;margin-bottom:10px;background:#fff}
-.request.pending{border-color:#f59e0b;background:#fffbeb}
-.top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.title{font-weight:900;font-size:14px}.muted{color:var(--muted);font-size:11px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.info{background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:8px}
-.info small{display:block;color:var(--muted);font-size:9px}.info b{font-size:12px;word-break:break-word}
-.badge{padding:5px 8px;border-radius:999px;font-size:10px;font-weight:900;white-space:nowrap}
-.bpend{background:#fef3c7;color:#92400e}.bapp{background:#dcfce7;color:#166534}.brej{background:#fee2e2;color:#991b1b}
+input,select,textarea{width:100%;padding:10px;border:2px solid #111827;border-radius:9px;background:#fff;font:inherit}textarea{min-height:70px;resize:vertical}
+.request{border:2px solid #d1d5db;border-radius:12px;padding:13px;margin-bottom:10px;background:#fff}.request.pending{border-color:#f59e0b;background:#fffbeb}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.title{font-weight:900;font-size:14px}.muted{color:var(--muted);font-size:11px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.info{background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:8px}.info small{display:block;color:var(--muted);font-size:9px}.info b{font-size:12px;word-break:break-word}
+.badge{padding:5px 8px;border-radius:999px;font-size:10px;font-weight:900;white-space:nowrap}.bpend{background:#fef3c7;color:#92400e}.bapp{background:#dcfce7;color:#166534}.brej{background:#fee2e2;color:#991b1b}
 .actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
-button{border:2px solid #111827;border-radius:9px;padding:9px 12px;font-weight:900;cursor:pointer;box-shadow:2px 2px 0 #111827}
-button:active{transform:translate(2px,2px);box-shadow:none}
-button:disabled{opacity:.55;cursor:not-allowed}
-.approve{background:var(--green);color:#fff}.reject{background:#fee2e2;color:#991b1b}
-.secondary{background:#fff;color:#111827}.refresh{background:#1e293b;color:#fff;border-color:#334155}
+button{border:2px solid #111827;border-radius:9px;padding:9px 12px;font-weight:900;cursor:pointer;box-shadow:2px 2px 0 #111827}button:active{transform:translate(2px,2px);box-shadow:none}button:disabled{opacity:.55;cursor:not-allowed}
+.approve{background:var(--green);color:#fff}.reject{background:#fee2e2;color:#991b1b}.secondary{background:#fff;color:#111827}.refresh{background:#1e293b;color:#fff;border-color:#334155}
 .empty{text-align:center;color:#94a3b8;padding:30px;font-size:12px}
-
-/* MODAL */
-.modal{display:none;position:fixed;inset:0;background:#0009;align-items:center;justify-content:center;padding:14px;z-index:100}
-.modal.show{display:flex}
-.modalbox{width:min(520px,100%);max-height:92vh;overflow:auto;background:#fff;border:3px solid #111827;
-  border-radius:15px;box-shadow:7px 7px 0 #111827;padding:16px}
-.modalbox h3{margin:-16px -16px 14px;padding:13px 15px;background:#111827;color:#fff;border-radius:11px 11px 0 0}
-.formrow{margin-bottom:10px}.formrow label{display:block;font-size:11px;font-weight:900;margin-bottom:4px}
-.price{background:#fff7d6;border:1px solid #f2c94c;border-radius:9px;padding:10px;font-weight:900;margin-bottom:10px}
-.modal-actions{display:flex;gap:7px;justify-content:flex-end}
-
-/* TOKEN PICKER */
-.token-input-wrap{position:relative}
-.token-input{padding-right:48px!important;cursor:pointer;background:#f8fafc!important}
-.token-input:focus{outline:2px solid #facc15}
-.token-picker-btn{position:absolute;right:7px;top:7px;width:36px;height:36px;padding:0;background:#111827;color:#fff;border-color:#111827;box-shadow:none}
-.selected-token-list{margin-top:8px;border:1px solid #dbe2ea;border-radius:9px;background:#f8fafc;padding:8px;display:none}
-.selected-token-list.show{display:block}
-.selected-token-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 8px;
-  background:#ecfdf5;border:1px solid #86efac;border-radius:7px;margin-bottom:5px;font-size:11px;font-weight:900}
-.selected-token-item:last-child{margin-bottom:0}
-.selected-token-item button{padding:3px 7px;font-size:10px;background:#fee2e2;color:#991b1b;box-shadow:none}
-.token-count{font-size:11px;color:#475569;margin-top:6px}
-.token-picker-box{width:min(620px,100%);max-height:90vh}
-.token-search-row{display:flex;gap:7px;margin-bottom:10px}.token-search-row input{flex:1}
-.token-stock{font-size:11px;color:#64748b;margin-bottom:8px}
-.token-list{max-height:55vh;overflow:auto;border:2px solid #111827;border-radius:10px;padding:8px;background:#f8fafc}
-.token-option{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;padding:9px;background:#fff;
-  border:1px solid #dbe2ea;border-radius:8px;margin-bottom:6px;cursor:pointer}
-.token-option:last-child{margin-bottom:0}.token-option:hover{background:#fffbeb}
-.token-option input{width:18px;height:18px;margin:0;padding:0}
-.token-code{font-size:12px;font-weight:900;word-break:break-all}
-.token-meta{font-size:9px;color:#64748b;text-align:right}
-.token-option.disabled{opacity:.5;cursor:not-allowed;background:#f1f5f9}
-.token-loading{text-align:center;padding:20px;color:#64748b;font-size:11px}
-.picker-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
-.notice-box{background:#f8fafc;border:1px solid #dbe2ea;border-radius:9px;padding:9px;font-size:11px;color:#475569;line-height:1.5;margin-bottom:10px}
-@media(max-width:650px){
-  .summary{grid-template-columns:1fr}
-  .toolbar{grid-template-columns:1fr 1fr}.toolbar input{grid-column:1/-1}
-  .grid{grid-template-columns:1fr}
-  .token-option{grid-template-columns:28px 1fr}.token-meta{grid-column:2;text-align:left}
-}
+.modal{display:none;position:fixed;inset:0;background:#0009;align-items:center;justify-content:center;padding:14px;z-index:100}.modal.show{display:flex}
+.modalbox{width:min(520px,100%);max-height:92vh;overflow:auto;background:#fff;border:3px solid #111827;border-radius:15px;box-shadow:7px 7px 0 #111827;padding:16px}.modalbox h3{margin:-16px -16px 14px;padding:13px 15px;background:#111827;color:#fff;border-radius:11px 11px 0 0}
+.formrow{margin-bottom:10px}.formrow label{display:block;font-size:11px;font-weight:900;margin-bottom:4px}.price{background:#fff7d6;border:1px solid #f2c94c;border-radius:9px;padding:10px;font-weight:900;margin-bottom:10px}.modal-actions{display:flex;gap:7px;justify-content:flex-end}
+.token-input-wrap{position:relative}.token-input{padding-right:48px!important;cursor:pointer;background:#f8fafc!important}.token-picker-btn{position:absolute;right:7px;top:7px;width:36px;height:36px;padding:0;background:#111827;color:#fff;border-color:#111827;box-shadow:none}
+.selected-token-list{margin-top:8px;border:1px solid #dbe2ea;border-radius:9px;background:#f8fafc;padding:8px;display:none}.selected-token-list.show{display:block}.selected-token-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 8px;background:#ecfdf5;border:1px solid #86efac;border-radius:7px;margin-bottom:5px;font-size:11px;font-weight:900}.selected-token-item:last-child{margin-bottom:0}.selected-token-item button{padding:3px 7px;font-size:10px;background:#fee2e2;color:#991b1b;box-shadow:none}.token-count{font-size:11px;color:#475569;margin-top:6px}
+.token-picker-box{width:min(620px,100%);max-height:90vh}.token-search-row{display:flex;gap:7px;margin-bottom:10px}.token-search-row input{flex:1}.token-stock{font-size:11px;color:#64748b;margin-bottom:8px}.token-list{max-height:55vh;overflow:auto;border:2px solid #111827;border-radius:10px;padding:8px;background:#f8fafc}.token-option{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;padding:9px;background:#fff;border:1px solid #dbe2ea;border-radius:8px;margin-bottom:6px;cursor:pointer}.token-option:last-child{margin-bottom:0}.token-option input{width:18px;height:18px;margin:0;padding:0}.token-code{font-size:12px;font-weight:900;word-break:break-all}.token-meta{font-size:9px;color:#64748b;text-align:right}.token-option.disabled{opacity:.5;cursor:not-allowed;background:#f1f5f9}.token-loading{text-align:center;padding:20px;color:#64748b;font-size:11px}.picker-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}.notice-box{background:#f8fafc;border:1px solid #dbe2ea;border-radius:9px;padding:9px;font-size:11px;color:#475569;line-height:1.5;margin-bottom:10px}
+@media(max-width:650px){.summary{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr 1fr}.toolbar input{grid-column:1/-1}.grid{grid-template-columns:1fr}.token-option{grid-template-columns:28px 1fr}.token-meta{grid-column:2;text-align:left}}
 </style>
 </head>
 <body>
-
 <header>
-  <div class="logo"><img src="logo.png" alt="FIXZY"></div>
-  <div class="brand">
-    <b>Approval Token Reseller</b>
-    <small>Persetujuan request token registrasi & perpanjangan</small>
-  </div>
-  <button class="refresh" id="refreshPageBtn" type="button">↻ Refresh</button>
+<div class="logo"><img src="logo.png" alt="FIXZY"></div>
+<div class="brand"><b>Approval Token Reseller</b><small>Persetujuan request token registrasi & perpanjangan</small></div>
+<button class="refresh" id="refreshPageBtn" type="button">↻ Refresh</button>
 </header>
 
 <main class="wrap">
-  <section class="summary">
-    <div class="stat pending"><small>REQUEST MENUNGGU</small><b id="pendingCount">0</b></div>
-    <div class="stat"><small>DISETUJUI</small><b id="approvedCount">0</b></div>
-    <div class="stat"><small>DITOLAK</small><b id="rejectedCount">0</b></div>
-  </section>
-
-  <section class="card">
-    <div style="font-weight:900;font-size:16px;margin-bottom:10px">Request Token</div>
-    <div class="toolbar">
-      <input id="search" placeholder="Cari reseller / email...">
-      <select id="filter">
-        <option value="semua">Semua</option>
-        <option value="pending">Menunggu</option>
-        <option value="approved">Disetujui</option>
-        <option value="rejected">Ditolak</option>
-      </select>
-      <button class="secondary" id="loadBtn" type="button">↻ Muat</button>
-    </div>
-    <div id="list"><div class="empty">Memuat request...</div></div>
-  </section>
+<section class="summary">
+<div class="stat pending"><small>REQUEST MENUNGGU</small><b id="pendingCount">0</b></div>
+<div class="stat"><small>DISETUJUI</small><b id="approvedCount">0</b></div>
+<div class="stat"><small>DITOLAK</small><b id="rejectedCount">0</b></div>
+</section>
+<section class="card">
+<div style="font-weight:900;font-size:16px;margin-bottom:10px">Request Token</div>
+<div class="toolbar"><input id="search" placeholder="Cari reseller / email..."><select id="filter"><option value="semua">Semua</option><option value="pending">Menunggu</option><option value="approved">Disetujui</option><option value="rejected">Ditolak</option></select><button class="secondary" id="loadBtn" type="button">↻ Muat</button></div>
+<div id="list"><div class="empty">Memuat request...</div></div>
+</section>
 </main>
 
-<!-- APPROVAL -->
-<div class="modal" id="approvalModal">
-  <div class="modalbox">
-    <h3>✅ Setujui Request Token</h3>
-    <div id="approvalInfo" style="font-size:12px;line-height:1.5;margin-bottom:12px"></div>
+<div class="modal" id="approvalModal"><div class="modalbox"><h3>✅ Setujui Request Token</h3><div id="approvalInfo" style="font-size:12px;line-height:1.5;margin-bottom:12px"></div>
+<div class="formrow"><label>TOKEN REGISTRASI</label><div class="token-input-wrap"><input id="tokenInput" class="token-input" readonly placeholder="Klik di sini untuk memilih token"><button type="button" id="openTokenPickerBtn" class="token-picker-btn">☷</button></div><div id="selectedTokenList" class="selected-token-list"></div><div id="tokenCount" class="token-count">0 token dipilih</div></div>
+<div class="formrow"><label>JUMLAH TAGIHAN</label><input id="amountInput" type="number" min="0" inputmode="numeric" placeholder="Contoh: 50000"></div><div class="price">Tagihan yang akan tampil di halaman reseller: <span id="amountPreview">Rp 0</span></div>
+<div class="formrow"><label>CATATAN ADMIN</label><textarea id="adminNote" placeholder="Opsional"></textarea></div>
+<div class="modal-actions"><button class="secondary" id="cancelApprovalBtn" type="button">Batal</button><button class="approve" id="approveBtn" type="button">💾 Setujui & Kirim Token</button></div></div></div>
 
-    <div class="formrow">
-      <label>TOKEN REGISTRASI</label>
-      <div class="token-input-wrap">
-        <input id="tokenInput" class="token-input" readonly placeholder="Klik di sini untuk memilih token">
-        <button type="button" id="openTokenPickerBtn" class="token-picker-btn">☷</button>
-      </div>
-      <div id="selectedTokenList" class="selected-token-list"></div>
-      <div id="tokenCount" class="token-count">0 token dipilih</div>
-    </div>
+<div class="modal" id="tokenPickerModal"><div class="modalbox token-picker-box"><h3>🔑 Pilih Token Registrasi</h3><div id="pickerInfo" class="notice-box">Pilih token yang akan diberikan kepada reseller.</div>
+<div class="token-search-row"><input id="tokenSearch" placeholder="Cari token..."><button class="secondary" type="button" id="reloadTokensBtn">↻</button></div><div id="tokenStock" class="token-stock">Memuat stok token...</div><div id="tokenList" class="token-list"><div class="token-loading">Memuat token dari Firebase...</div></div>
+<div class="picker-actions"><button class="secondary" type="button" id="closePickerBtn">Batal</button><button class="approve" type="button" id="useSelectedTokensBtn">✓ Gunakan Token Terpilih</button></div></div></div>
 
-    <div class="formrow">
-      <label>JUMLAH TAGIHAN</label>
-      <input id="amountInput" type="number" min="0" inputmode="numeric" placeholder="Contoh: 50000">
-    </div>
+<div class="modal" id="rejectModal"><div class="modalbox"><h3>❌ Tolak Request</h3><div id="rejectInfo" style="font-size:12px;line-height:1.5;margin-bottom:12px"></div><div class="formrow"><label>ALASAN</label><textarea id="rejectNote" placeholder="Tulis alasan penolakan..."></textarea></div><div class="modal-actions"><button class="secondary" id="cancelRejectBtn" type="button">Batal</button><button class="reject" id="rejectBtn" type="button">Tolak Request</button></div></div></div>
 
-    <div class="price">Tagihan yang akan tampil di halaman reseller: <span id="amountPreview">Rp 0</span></div>
-
-    <div class="formrow">
-      <label>CATATAN ADMIN</label>
-      <textarea id="adminNote" placeholder="Opsional"></textarea>
-    </div>
-
-    <div class="modal-actions">
-      <button class="secondary" id="cancelApprovalBtn" type="button">Batal</button>
-      <button class="approve" id="approveBtn" type="button">💾 Setujui & Kirim Token</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOKEN PICKER -->
-<div class="modal" id="tokenPickerModal">
-  <div class="modalbox token-picker-box">
-    <h3>🔑 Pilih Token Registrasi</h3>
-
-    <div id="pickerInfo" class="notice-box">
-      Pilih token yang akan diberikan kepada reseller.
-    </div>
-
-    <div class="token-search-row">
-      <input id="tokenSearch" placeholder="Cari token...">
-      <button class="secondary" type="button" id="reloadTokensBtn">↻</button>
-    </div>
-
-    <div id="tokenStock" class="token-stock">Memuat stok token...</div>
-    <div id="tokenList" class="token-list">
-      <div class="token-loading">Memuat token dari Firebase...</div>
-    </div>
-
-    <div class="picker-actions">
-      <button class="secondary" type="button" id="closePickerBtn">Batal</button>
-      <button class="approve" type="button" id="useSelectedTokensBtn">✓ Gunakan Token Terpilih</button>
-    </div>
-  </div>
-</div>
-
-<!-- REJECT -->
-<div class="modal" id="rejectModal">
-  <div class="modalbox">
-    <h3>❌ Tolak Request</h3>
-    <div id="rejectInfo" style="font-size:12px;line-height:1.5;margin-bottom:12px"></div>
-    <div class="formrow">
-      <label>ALASAN</label>
-      <textarea id="rejectNote" placeholder="Tulis alasan penolakan..."></textarea>
-    </div>
-    <div class="modal-actions">
-      <button class="secondary" id="cancelRejectBtn" type="button">Batal</button>
-      <button class="reject" id="rejectBtn" type="button">Tolak Request</button>
-    </div>
-  </div>
-</div>
-
-<!-- NOTICE -->
-<div class="modal" id="noticeModal">
-  <div class="modalbox" style="width:min(430px,100%)">
-    <h3 id="noticeTitle">FIXZY</h3>
-    <div id="noticeText" style="font-size:12px;line-height:1.5;margin-bottom:12px"></div>
-    <div class="modal-actions">
-      <button class="approve" id="noticeOkBtn" type="button">OK</button>
-    </div>
-  </div>
-</div>
+<div class="modal" id="noticeModal"><div class="modalbox" style="width:min(430px,100%)"><h3 id="noticeTitle">FIXZY</h3><div id="noticeText" style="font-size:12px;line-height:1.5;margin-bottom:12px"></div><div class="modal-actions"><button class="approve" id="noticeOkBtn" type="button">OK</button></div></div></div>
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import{
-  getFirestore,collection,query,where,getDocs,doc,getDoc,
-  updateDoc,serverTimestamp,onSnapshot
-}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import{getFirestore,collection,getDocs,doc,getDoc,updateDoc,serverTimestamp,onSnapshot}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-const cfg={
- apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",
- authDomain:"fixzy-update.firebaseapp.com",
- projectId:"fixzy-update",
- storageBucket:"fixzy-update.firebasestorage.app",
- messagingSenderId:"995892519622",
- appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"
-};
+const cfg={apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",authDomain:"fixzy-update.firebaseapp.com",projectId:"fixzy-update",storageBucket:"fixzy-update.firebasestorage.app",messagingSenderId:"995892519622",appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"};
+const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id),rupiah=n=>"Rp "+(Number(n)||0).toLocaleString("id-ID");
+let user=null,profile={},requests=[],selected=null,unsub=null,availableTokens=[],selectedTokens=[],sessionStarted="",sesiIndexDiterima=false;
 
-const app=initializeApp(cfg);
-const auth=getAuth(app);
-const db=getFirestore(app);
-const $=id=>document.getElementById(id);
-const rupiah=n=>"Rp "+(Number(n)||0).toLocaleString("id-ID");
-
-let user=null,profile={},requests=[],selected=null,unsub=null;
-let availableTokens=[],selectedTokens=[];
-let sessionStarted="",sesiIndexDiterima=false;
-
-function esc(v){
- return String(v??"").replace(/[&<>"']/g,m=>({
-  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
- }[m]));
-}
-
-function showModal(id){$(id).classList.add("show")}
-function hideModal(id){$(id).classList.remove("show")}
-
-function showNotice(title,text){
- $("noticeTitle").textContent=title||"FIXZY";
- $("noticeText").innerHTML=text||"";
- showModal("noticeModal");
-}
-
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function showModal(id){$(id).classList.add("show")}function hideModal(id){$(id).classList.remove("show")}
+function showNotice(title,text){$("noticeTitle").textContent=title||"FIXZY";$("noticeText").innerHTML=text||"";showModal("noticeModal")}
 function canonicalStatus(v){
- const s=String(v||"pending").toLowerCase().trim();
- if(["approved","disetujui","setuju"].includes(s))return"approved";
- if(["rejected","ditolak","tolak"].includes(s))return"rejected";
+ const s=String(v??"pending").toLowerCase().trim();
+ if(["approved","disetujui","setuju","approved_by_admin"].includes(s))return"approved";
+ if(["rejected","ditolak","tolak","rejected_by_admin"].includes(s))return"rejected";
  return"pending";
 }
+function dateText(v){try{if(v?.toDate)return v.toDate().toLocaleString("id-ID");if(v?.seconds)return new Date(v.seconds*1000).toLocaleString("id-ID");if(v)return new Date(v).toLocaleString("id-ID")}catch(e){}return"-"}
+function allowed(){const r=String(profile.role||"").toLowerCase();return r==="owner"||r==="superadmin"||r==="admin"}
 
-function dateText(v){
- try{
-  if(v?.toDate)return v.toDate().toLocaleString("id-ID");
-  if(v?.seconds)return new Date(v.seconds*1000).toLocaleString("id-ID");
-  if(v)return new Date(v).toLocaleString("id-ID");
- }catch(e){}
- return"-";
+/*
+ FIX UTAMA:
+ Jangan hanya mencari requestType === "registrasi"/"perpanjangan".
+ Versi lama dapat menyimpan nama tipe dengan beberapa variasi, bahkan
+ beberapa request lama tidak memiliki requestType tetapi memiliki field
+ reseller/request-status. Dokumen request tetap berasal dari
+ registrationTokens, sedangkan dokumen stok token disaring.
+*/
+function normalizeRequestType(x){
+ const raw=String(x.requestType??x.jenisRequest??x.jenis??x.typeRequest??x.requestJenis??"").toLowerCase().trim();
+ if(raw.includes("perpan")||raw.includes("renew")||raw.includes("extend"))return"perpanjangan";
+ return"registrasi";
 }
-
-function allowed(){
- const r=String(profile.role||"").toLowerCase();
- return r==="owner"||r==="superadmin"||r==="admin";
+function isRequestDoc(x){
+ const hasReseller=!!(x.resellerUid||x.resellerId||x.uidReseller||x.resellerEmail||x.emailReseller||x.resellerNama||x.namaReseller);
+ const hasRequest=!!(x.requestStatus||x.statusRequest||x.jumlahRequest||x.jumlahTokenDiminta||x.notificationAdmin||x.createdAt);
+ const hasTokenOnly=!!(x.hanyaRegistrasiBaru===true||x.tokenCode||x.kodeToken||x.registrationToken);
+ return hasReseller && (hasRequest || !hasTokenOnly);
 }
+function getResellerUid(x){return x.resellerUid||x.resellerId||x.uidReseller||""}
+function getName(x){return x.resellerNama||x.namaReseller||x.name||"-"}
+function getEmail(x){return x.resellerEmail||x.emailReseller||x.email||"-"}
+function getCreated(x){return x.createdAt??x.requestAt??x.requestedAt??x.timestamp??x.created_at}
+function getAmount(x){return x.jumlahTagihan??x.totalTagihan??x.hargaToken??x.tagihan??x.amount??0}
+function getQty(x){return Math.max(1,Number(x.jumlahRequest??x.jumlahTokenDiminta??x.jumlahToken??x.qty??1)||1)}
+function getTokens(x){if(Array.isArray(x.tokens))return x.tokens.filter(Boolean);return[x.token,x.kodeToken,x.registrationToken,x.tokenCode].filter(Boolean)}
 
-/* =========================
-   REQUEST
-========================= */
 function render(){
- const q=$("search").value.trim().toLowerCase();
- const f=$("filter").value;
-
+ const q=$("search").value.trim().toLowerCase(),f=$("filter").value;
  const list=requests.filter(x=>{
-  const st=canonicalStatus(x.requestStatus||x.status);
+  const st=canonicalStatus(x.requestStatus??x.statusRequest??x.status);
   if(f!=="semua"&&st!==f)return false;
   if(!q)return true;
-  return[
-   x.resellerNama,x.resellerEmail,x.resellerUid,
-   x.requestType
-  ].join(" ").toLowerCase().includes(q);
+  return[getName(x),getEmail(x),getResellerUid(x),normalizeRequestType(x),x.requestType].join(" ").toLowerCase().includes(q);
  });
-
- $("pendingCount").textContent=requests.filter(x=>canonicalStatus(x.requestStatus||x.status)==="pending").length;
- $("approvedCount").textContent=requests.filter(x=>canonicalStatus(x.requestStatus||x.status)==="approved").length;
- $("rejectedCount").textContent=requests.filter(x=>canonicalStatus(x.requestStatus||x.status)==="rejected").length;
-
- if(!list.length){
-  $("list").innerHTML='<div class="empty">Tidak ada request.</div>';
-  return;
- }
-
+ $("pendingCount").textContent=requests.filter(x=>canonicalStatus(x.requestStatus??x.statusRequest??x.status)==="pending").length;
+ $("approvedCount").textContent=requests.filter(x=>canonicalStatus(x.requestStatus??x.statusRequest??x.status)==="approved").length;
+ $("rejectedCount").textContent=requests.filter(x=>canonicalStatus(x.requestStatus??x.statusRequest??x.status)==="rejected").length;
+ if(!list.length){$("list").innerHTML='<div class="empty">Tidak ada request.</div>';return}
  $("list").innerHTML=list.map(x=>{
-  const st=canonicalStatus(x.requestStatus||x.status);
-  const type=x.requestType==="perpanjangan"?"Perpanjangan":"Registrasi";
-  const badge=st==="approved"?"bapp":st==="rejected"?"brej":"bpend";
-  const label=st==="approved"?"DISETUJUI":st==="rejected"?"DITOLAK":"MENUNGGU";
-  const amount=x.jumlahTagihan??x.totalTagihan??x.hargaToken??0;
-  const qty=Number(x.jumlahRequest??x.jumlahTokenDiminta??1)||1;
-  const tokenArr=Array.isArray(x.tokens)
-    ?x.tokens.filter(Boolean)
-    :[x.token||x.kodeToken||x.registrationToken].filter(Boolean);
-  const tokenText=tokenArr.length?tokenArr.join(", "):"Belum diberikan";
-
+  const st=canonicalStatus(x.requestStatus??x.statusRequest??x.status),type=normalizeRequestType(x),badge=st==="approved"?"bapp":st==="rejected"?"brej":"bpend",label=st==="approved"?"DISETUJUI":st==="rejected"?"DITOLAK":"MENUNGGU",tokens=getTokens(x);
   return `<article class="request ${st==="pending"?"pending":""}">
-   <div class="top">
-    <div>
-      <div class="title">🔑 ${esc(type)}</div>
-      <div class="muted">${esc(x.resellerNama||"-")} • ${esc(x.resellerEmail||"-")}</div>
-    </div>
-    <span class="badge ${badge}">${label}</span>
-   </div>
-
+   <div class="top"><div><div class="title">🔑 ${type==="perpanjangan"?"Perpanjangan":"Registrasi"}</div><div class="muted">${esc(getName(x))} • ${esc(getEmail(x))}</div></div><span class="badge ${badge}">${label}</span></div>
    <div class="grid">
-    <div class="info"><small>WAKTU REQUEST</small><b>${esc(dateText(x.createdAt))}</b></div>
-    <div class="info"><small>RESELLER UID</small><b>${esc(x.resellerUid||"-")}</b></div>
-    <div class="info"><small>JUMLAH REQUEST</small><b>${qty} Token</b></div>
-    <div class="info"><small>TAGIHAN</small><b>${rupiah(amount)}</b></div>
-    <div class="info" style="grid-column:1/-1"><small>TOKEN</small><b>${esc(tokenText)}</b></div>
+    <div class="info"><small>WAKTU REQUEST</small><b>${esc(dateText(getCreated(x)))}</b></div>
+    <div class="info"><small>RESELLER UID</small><b>${esc(getResellerUid(x)||"-")}</b></div>
+    <div class="info"><small>JUMLAH REQUEST</small><b>${getQty(x)} Token</b></div>
+    <div class="info"><small>TAGIHAN</small><b>${rupiah(getAmount(x))}</b></div>
+    <div class="info" style="grid-column:1/-1"><small>TOKEN</small><b>${esc(tokens.length?tokens.join(", "):"Belum diberikan")}</b></div>
    </div>
-
-   ${x.catatan?`<div class="muted" style="margin-top:9px">Catatan reseller: ${esc(x.catatan)}</div>`:""}
+   ${x.catatan||x.note||x.resellerNote?`<div class="muted" style="margin-top:9px">Catatan reseller: ${esc(x.catatan||x.note||x.resellerNote)}</div>`:""}
    ${x.adminNote?`<div class="muted" style="margin-top:5px">Catatan admin: ${esc(x.adminNote)}</div>`:""}
-
-   ${st==="pending"
-    ?`<div class="actions">
-       <button class="approve" type="button" onclick="openApproval('${esc(x.id)}')">✅ Setujui</button>
-       <button class="reject" type="button" onclick="openReject('${esc(x.id)}')">❌ Tolak</button>
-      </div>`
-    :""}
+   ${st==="pending"?`<div class="actions"><button class="approve" type="button" onclick="openApproval('${esc(x.id)}')">✅ Setujui</button><button class="reject" type="button" onclick="openReject('${esc(x.id)}')">❌ Tolak</button></div>`:""}
   </article>`;
  }).join("");
 }
 
 async function loadRequests(){
  try{
+  /*
+   * Tetap memakai collection lama: registrationTokens.
+   * Tidak memakai where(requestType) agar request lama yang field-nya
+   * berbeda tetap terbaca.
+   */
   const s=await getDocs(collection(db,"registrationTokens"));
-  requests=s.docs.map(d=>({id:d.id,...d.data()}))
-   .filter(x=>x.requestType==="registrasi"||x.requestType==="perpanjangan");
-
+  requests=s.docs.map(d=>({id:d.id,...d.data()})).filter(isRequestDoc);
   requests.sort((a,b)=>{
-   const ta=a.createdAt?.seconds||0;
-   const tb=b.createdAt?.seconds||0;
-   return tb-ta;
+   const av=getCreated(a),bv=getCreated(b);
+   const ta=av?.seconds?av.seconds*1000:new Date(av||0).getTime();
+   const tb=bv?.seconds?bv.seconds*1000:new Date(bv||0).getTime();
+   return (tb||0)-(ta||0);
   });
-
   render();
- }catch(e){
-  $("list").innerHTML=`<div class="empty">Gagal memuat request: ${esc(e.message)}</div>`;
- }
+ }catch(e){$("list").innerHTML=`<div class="empty">Gagal memuat request: ${esc(e.message)}</div>`}
 }
 
-/* =========================
-   STOK TOKEN
-   REGISTRASI:
-   registrationTokens, 90 hari,
-   registrasi_baru / aktivasi_baru,
-   hanyaRegistrasiBaru=true,
-   belum dipakai.
-
-   PERPANJANGAN:
-   tokens, bukan token registrasi baru.
-========================= */
-function tokenUsed(d){
- const s=String(d.status??d.tokenStatus??d.state??"").toLowerCase().trim();
- return d.used===true ||
-   d.digunakan===true ||
-   d.isUsed===true ||
-   ["used","terpakai","dipakai","usedup"].includes(s) ||
-   !!d.usedBy ||
-   !!d.usedAt;
-}
-
-function tokenDate(d){
- try{
-  if(d.createdAt?.toDate)return d.createdAt.toDate().getTime();
-  if(d.createdAt?.seconds)return d.createdAt.seconds*1000;
-  return new Date(d.createdAt||0).getTime();
- }catch(e){return 0}
-}
-
-function tokenValue(d,id){
- return String(
-  d.token??d.kodeToken??d.registrationToken??
-  d.tokenCode??d.code??d.kode??d.value??id??""
- ).trim();
-}
-
-function tokenType(d){
- return String(
-  d.tipe??d.tokenType??d.jenis??d.jenisToken??
-  d.type??d.kategori??d.requestType??""
- ).toLowerCase().trim();
-}
-
-function isRequestDocument(d){
- return !!(
-  d.resellerUid ||
-  d.requestStatus ||
-  d.jumlahRequest ||
-  d.jumlahTokenDiminta ||
-  d.notificationAdmin
- );
-}
-
-function tokenPrice(d,type){
- const v=type==="registrasi"
-  ?(d.hargaRegistrasi??d.hargaTokenRegistrasi??d.hargaToken??d.harga??d.price??d.amount)
-  :(d.hargaPerpanjangan??d.hargaTokenPerpanjangan??d.hargaToken??d.harga??d.price??d.amount);
- return Number(v)||0;
-}
-
+/* TOKEN STOK */
+function tokenUsed(d){const s=String(d.status??d.tokenStatus??d.state??"").toLowerCase().trim();return d.used===true||d.digunakan===true||d.isUsed===true||["used","terpakai","dipakai","usedup"].includes(s)||!!d.usedBy||!!d.usedAt}
+function tokenDate(d){try{if(d.createdAt?.toDate)return d.createdAt.toDate().getTime();if(d.createdAt?.seconds)return d.createdAt.seconds*1000;return new Date(d.createdAt||0).getTime()}catch(e){return 0}}
+function tokenValue(d,id){return String(d.token??d.kodeToken??d.registrationToken??d.tokenCode??d.code??d.kode??d.value??id??"").trim()}
+function tokenType(d){return String(d.tipe??d.tokenType??d.jenis??d.jenisToken??d.type??d.kategori??d.requestType??"").toLowerCase().trim()}
+function tokenPrice(d,type){const v=type==="registrasi"?(d.hargaRegistrasi??d.hargaTokenRegistrasi??d.hargaToken??d.harga??d.price??d.amount):(d.hargaPerpanjangan??d.hargaTokenPerpanjangan??d.hargaToken??d.harga??d.price??d.amount);return Number(v)||0}
 function tokenIsValidForRequest(d,type){
  if(tokenUsed(d))return false;
-
  if(type==="registrasi"){
-  if(isRequestDocument(d))return false;
-
-  const hari=Number(d.paketHari??d.durasiHari??d.masaAktifHari??0);
-  const tipe=tokenType(d);
-  const hanya=d.hanyaRegistrasiBaru;
-
-  if(hari!==90)return false;
-
-  if(tipe && tipe!=="registrasi_baru" && tipe!=="aktivasi_baru")return false;
-
-  if(hanya!==true)return false;
-
+  if(isRequestDoc(d))return false;
+  const hari=Number(d.paketHari??d.durasiHari??d.masaAktifHari??0),tipe=tokenType(d);
+  if(hari!==90||d.hanyaRegistrasiBaru!==true)return false;
+  if(tipe&&tipe!=="registrasi_baru"&&tipe!=="aktivasi_baru")return false;
   return true;
  }
-
- /* Perpanjangan tidak mengambil token registrasi baru. */
- const tipe=tokenType(d);
- if(tipe==="registrasi_baru"||tipe==="aktivasi_baru")return false;
- if(d.hanyaRegistrasiBaru===true)return false;
-
- const hari=Number(d.paketHari??d.durasiHari??d.masaAktifHari??0);
- const paketText=String(
-  d.paketLabel??d.paketTerakhir??d.paket??d.durasi??d.masaAktif??""
- ).trim();
-
- return hari>0 || !!paketText;
+ const tipe=tokenType(d);if(tipe==="registrasi_baru"||tipe==="aktivasi_baru"||d.hanyaRegistrasiBaru===true)return false;
+ const hari=Number(d.paketHari??d.durasiHari??d.masaAktifHari??0),paket=String(d.paketLabel??d.paketTerakhir??d.paket??d.durasi??d.masaAktif??"").trim();
+ return hari>0||!!paket;
 }
-
 async function loadAvailableTokens(type){
- availableTokens=[];
- const seen=new Set();
-
- /*
-  * Untuk registrasi, sumber UTAMA dan satu-satunya:
-  * registrationTokens.
-  *
-  * Untuk perpanjangan:
-  * tokens.
-  */
- const collections=type==="registrasi"
-   ?["registrationTokens"]
-   :["tokens"];
-
+ availableTokens=[];const seen=new Set();
+ const collections=type==="registrasi"?["registrationTokenInventory","tokenInventory","registrationTokens"]:["tokens"];
  for(const colName of collections){
-  let snap;
-  try{
-   snap=await getDocs(collection(db,colName));
-  }catch(e){
-   continue;
-  }
-
-  snap.forEach(ds=>{
-   const d=ds.data()||{};
-   const token=tokenValue(d,ds.id);
-
-   if(!token||seen.has(token))return;
-   if(!tokenIsValidForRequest(d,type))return;
-
-   availableTokens.push({
-    id:ds.id,
-    collection:colName,
-    token,
-    price:tokenPrice(d,type),
-    data:d
-   });
-
-   seen.add(token);
-  });
+  let snap;try{snap=await getDocs(collection(db,colName))}catch(e){continue}
+  snap.forEach(ds=>{const d=ds.data()||{},token=tokenValue(d,ds.id);if(!token||seen.has(token)||!tokenIsValidForRequest(d,type))return;availableTokens.push({id:ds.id,collection:colName,token,price:tokenPrice(d,type),data:d});seen.add(token)});
  }
-
- availableTokens.sort((a,b)=>{
-  const ta=tokenDate(a.data),tb=tokenDate(b.data);
-  return tb-ta || a.token.localeCompare(b.token);
- });
-
- return availableTokens;
+ availableTokens.sort((a,b)=>tokenDate(b.data)-tokenDate(a.data)||a.token.localeCompare(b.token));return availableTokens;
 }
-
-/* =========================
-   TOKEN PICKER
-========================= */
-function selectedQty(){
- return Math.max(
-  1,
-  Number(selected?.jumlahRequest??selected?.jumlahTokenDiminta??1)||1
- );
-}
-
+function selectedQty(){return getQty(selected)}
 function renderSelectedTokens(){
- const box=$("selectedTokenList");
- const qty=selectedQty();
-
- $("tokenInput").value=selectedTokens.join(", ");
- $("tokenCount").textContent=
-  `${selectedTokens.length} token dipilih • kebutuhan request: ${qty} token`;
-
- if(!selectedTokens.length){
-  box.classList.remove("show");
-  box.innerHTML="";
-  return;
- }
-
- box.classList.add("show");
- box.innerHTML=selectedTokens.map((t,i)=>`
-  <div class="selected-token-item">
-   <span>🔑 ${esc(t)}</span>
-   <button type="button" onclick="removeSelectedToken(${i})">Hapus</button>
-  </div>
- `).join("");
+ $("tokenInput").value=selectedTokens.join(", ");$("tokenCount").textContent=`${selectedTokens.length} token dipilih • kebutuhan request: ${selectedQty()} token`;
+ const box=$("selectedTokenList");if(!selectedTokens.length){box.classList.remove("show");box.innerHTML="";return}
+ box.classList.add("show");box.innerHTML=selectedTokens.map((t,i)=>`<div class="selected-token-item"><span>🔑 ${esc(t)}</span><button type="button" onclick="removeSelectedToken(${i})">Hapus</button></div>`).join("");
 }
-
-window.removeSelectedToken=i=>{
- selectedTokens.splice(i,1);
- renderSelectedTokens();
- renderTokenPicker();
-};
-
+window.removeSelectedToken=i=>{selectedTokens.splice(i,1);renderSelectedTokens();renderTokenPicker()}
 function renderTokenPicker(){
- const search=$("tokenSearch").value.trim().toLowerCase();
- const qty=selectedQty();
-
- const list=availableTokens.filter(t=>
-  !search || t.token.toLowerCase().includes(search)
- );
-
- $("tokenStock").textContent=
-  `${availableTokens.length} token tersedia • pilih maksimal ${qty} token`;
-
- if(!list.length){
-  $("tokenList").innerHTML=
-   '<div class="token-loading">Tidak ada token tersedia yang cocok.</div>';
-  return;
- }
-
- $("tokenList").innerHTML=list.map(t=>{
-  const checked=selectedTokens.includes(t.token);
-  const disabled=!checked && selectedTokens.length>=qty;
-
-  return `<label class="token-option ${disabled?"disabled":""}">
-   <input type="checkbox"
-     data-token="${esc(t.token)}"
-     ${checked?"checked":""}
-     ${disabled?"disabled":""}>
-   <span class="token-code">${esc(t.token)}</span>
-   <span class="token-meta">
-    ${t.price>0?esc(rupiah(t.price)):"Harga belum ada"}
-    <br>${esc(t.collection)}
-   </span>
-  </label>`;
- }).join("");
-
- $("tokenList").querySelectorAll('input[type="checkbox"]').forEach(cb=>{
-  cb.addEventListener("change",()=>{
-   const token=cb.dataset.token;
-
-   if(cb.checked){
-    if(!selectedTokens.includes(token)&&selectedTokens.length<qty){
-     selectedTokens.push(token);
-    }
-   }else{
-    selectedTokens=selectedTokens.filter(x=>x!==token);
-   }
-
-   renderSelectedTokens();
-   renderTokenPicker();
-  });
- });
+ const search=$("tokenSearch").value.trim().toLowerCase(),qty=selectedQty(),list=availableTokens.filter(t=>!search||t.token.toLowerCase().includes(search));
+ $("tokenStock").textContent=`${availableTokens.length} token tersedia • pilih maksimal ${qty} token`;
+ if(!list.length){$("tokenList").innerHTML='<div class="token-loading">Tidak ada token tersedia yang cocok.</div>';return}
+ $("tokenList").innerHTML=list.map(t=>{const checked=selectedTokens.includes(t.token),disabled=!checked&&selectedTokens.length>=qty;return `<label class="token-option ${disabled?"disabled":""}"><input type="checkbox" data-token="${esc(t.token)}" ${checked?"checked":""} ${disabled?"disabled":""}><span class="token-code">${esc(t.token)}</span><span class="token-meta">${t.price>0?esc(rupiah(t.price)):"Harga belum ada"}<br>${esc(t.collection)}</span></label>`}).join("");
+ $("tokenList").querySelectorAll('input[type="checkbox"]').forEach(cb=>cb.addEventListener("change",()=>{const token=cb.dataset.token;if(cb.checked){if(!selectedTokens.includes(token)&&selectedTokens.length<qty)selectedTokens.push(token)}else selectedTokens=selectedTokens.filter(x=>x!==token);renderSelectedTokens();renderTokenPicker()}));
 }
-
 async function openTokenPicker(){
- if(!selected)return;
-
- const type=selected.requestType==="perpanjangan"?"perpanjangan":"registrasi";
- const label=type==="registrasi"?"Registrasi 3 Bulan / 90 Hari":"Perpanjangan";
-
- $("pickerInfo").innerHTML=
-  `<b>${esc(selected.resellerNama||"-")}</b> • ${esc(selected.resellerEmail||"-")}<br>`+
-  `Jenis: <b>${label}</b><br>`+
-  `Kebutuhan: <b>${selectedQty()} token</b>`;
-
- $("tokenSearch").value="";
- $("tokenList").innerHTML=
-  '<div class="token-loading">⏳ Memuat token dari Firebase...</div>';
-
- showModal("tokenPickerModal");
-
- try{
-  await loadAvailableTokens(type);
-  renderTokenPicker();
- }catch(e){
-  $("tokenList").innerHTML=
-   `<div class="token-loading">Gagal membaca token: ${esc(e.message)}</div>`;
- }
+ if(!selected)return;const type=normalizeRequestType(selected),label=type==="registrasi"?"Registrasi 3 Bulan / 90 Hari":"Perpanjangan";
+ $("pickerInfo").innerHTML=`<b>${esc(getName(selected))}</b> • ${esc(getEmail(selected))}<br>Jenis: <b>${label}</b><br>Kebutuhan: <b>${selectedQty()} token</b>`;
+ $("tokenSearch").value="";$("tokenList").innerHTML='<div class="token-loading">⏳ Memuat token dari Firebase...</div>';showModal("tokenPickerModal");
+ try{await loadAvailableTokens(type);renderTokenPicker()}catch(e){$("tokenList").innerHTML=`<div class="token-loading">Gagal membaca token: ${esc(e.message)}</div>`}
 }
 
-/* =========================
-   APPROVAL
-========================= */
+/* APPROVAL */
 window.openApproval=async id=>{
- selected=requests.find(x=>x.id===id);
- if(!selected)return;
-
- const qty=selectedQty();
-
- $("approvalInfo").innerHTML=
-  `<b>${esc(selected.resellerNama||"-")}</b><br>`+
-  `${esc(selected.resellerEmail||"-")}<br>`+
-  `Request: <b>${selected.requestType==="perpanjangan"?"Perpanjangan":"Registrasi"}</b> • `+
-  `Jumlah: <b>${qty} Token</b>`;
-
- selectedTokens=[];
-
- const oldTokens=Array.isArray(selected.tokens)
-  ?selected.tokens.filter(Boolean)
-  :[
-    selected.token||selected.kodeToken||selected.registrationToken
-   ].filter(Boolean);
-
- selectedTokens=[...new Set(oldTokens)].slice(0,qty);
-
- $("amountInput").value=
-  selected.jumlahTagihan??selected.totalTagihan??selected.hargaToken??"";
-
- $("amountPreview").textContent=rupiah($("amountInput").value);
- $("adminNote").value=selected.adminNote||"";
-
- renderSelectedTokens();
- showModal("approvalModal");
-};
-
+ selected=requests.find(x=>x.id===id);if(!selected)return;const qty=selectedQty();
+ $("approvalInfo").innerHTML=`<b>${esc(getName(selected))}</b><br>${esc(getEmail(selected))}<br>Request: <b>${normalizeRequestType(selected)==="perpanjangan"?"Perpanjangan":"Registrasi"}</b> • Jumlah: <b>${qty} Token</b>`;
+ selectedTokens=[...new Set(getTokens(selected))].slice(0,qty);
+ $("amountInput").value=getAmount(selected)||"";$("amountPreview").textContent=rupiah($("amountInput").value);$("adminNote").value=selected.adminNote||"";renderSelectedTokens();showModal("approvalModal");
+}
 async function verifyTokensStillAvailable(chosen){
- for(const t of chosen){
-  const snap=await getDoc(doc(db,t.collection,t.id));
-  if(!snap.exists()){
-   throw new Error(`Token ${t.token} sudah tidak ditemukan.`);
-  }
-
-  const d=snap.data()||{};
-  if(tokenUsed(d)){
-   throw new Error(`Token ${t.token} sudah digunakan oleh proses lain.`);
-  }
- }
+ for(const t of chosen){const snap=await getDoc(doc(db,t.collection,t.id));if(!snap.exists())throw new Error(`Token ${t.token} sudah tidak ditemukan.`);if(tokenUsed(snap.data()||{}))throw new Error(`Token ${t.token} sudah digunakan oleh proses lain.`)}
 }
-
-function buildTokenUpdate(){
- return {
-  used:true,
-  isUsed:true,
-  status:"terpakai",
-  tokenStatus:"terpakai",
-  usedBy:user?.uid||"",
-  usedByEmail:user?.email||"",
-  usedForResellerUid:selected?.resellerUid||"",
-  usedAt:serverTimestamp(),
-  updatedAt:serverTimestamp()
- };
-}
-
-async function markTokenUsed(t){
- await updateDoc(
-  doc(db,t.collection,t.id),
-  buildTokenUpdate()
- );
-}
-
+function buildTokenUpdate(){return{used:true,isUsed:true,status:"terpakai",tokenStatus:"terpakai",usedBy:user?.uid||"",usedByEmail:user?.email||"",usedForResellerUid:getResellerUid(selected),usedAt:serverTimestamp(),updatedAt:serverTimestamp()}}
 async function approveRequest(){
- if(!selected)return;
-
- const qty=selectedQty();
-
- if(selectedTokens.length!==qty){
-  showNotice(
-   "Token Belum Lengkap",
-   `Request ini meminta <b>${qty} token</b>.<br>`+
-   `Klik kolom TOKEN lalu pilih tepat ${qty} token dengan ceklis.`
-  );
-  return;
- }
-
- const amount=Number($("amountInput").value)||0;
-
- if(amount<=0){
-  showNotice(
-   "Jumlah Tagihan",
-   "Jumlah tagihan harus diisi lebih dari Rp 0."
-  );
-  return;
- }
-
- const chosen=selectedTokens
-  .map(v=>availableTokens.find(t=>t.token===v))
-  .filter(Boolean);
-
- if(chosen.length!==selectedTokens.length){
-  showNotice(
-   "Token Tidak Ditemukan",
-   "Salah satu token sudah tidak tersedia. Tekan Muat Ulang token lalu pilih kembali."
-  );
-  return;
- }
-
- const btn=$("approveBtn");
- btn.disabled=true;
- btn.textContent="Menyimpan...";
-
+ if(!selected)return;const qty=selectedQty();if(selectedTokens.length!==qty){showNotice("Token Belum Lengkap",`Request ini meminta <b>${qty} token</b>. Klik kolom TOKEN lalu pilih tepat ${qty} token.`);return}
+ const amount=Number($("amountInput").value)||0;if(amount<=0){showNotice("Jumlah Tagihan","Jumlah tagihan harus diisi lebih dari Rp 0.");return}
+ const chosen=selectedTokens.map(v=>availableTokens.find(t=>t.token===v)).filter(Boolean);if(chosen.length!==selectedTokens.length){showNotice("Token Tidak Ditemukan","Salah satu token sudah tidak tersedia. Muat ulang token lalu pilih kembali.");return}
+ const btn=$("approveBtn");btn.disabled=true;btn.textContent="Menyimpan...";
  try{
-  /*
-   * CEK ULANG stok langsung ke Firebase sebelum menyetujui.
-   */
-  await verifyTokensStillAvailable(chosen);
-
-  const tokens=chosen.map(t=>t.token);
-
-  /*
-   * Simpan token ke dokumen request reseller.
-   */
+  await verifyTokensStillAvailable(chosen);const tokens=chosen.map(t=>t.token);
   await updateDoc(doc(db,"registrationTokens",selected.id),{
-   requestStatus:"approved",
-   status:"approved",
-
-   tokens,
-   token:tokens[0]||"",
-   kodeToken:tokens[0]||"",
-   registrationToken:tokens[0]||"",
-
-   jumlahRequest:qty,
-   jumlahTokenDiminta:qty,
-   jumlahTokenDisetujui:tokens.length,
-
-   jumlahTagihan:amount,
-   totalTagihan:amount,
-
-   adminNote:$("adminNote").value.trim(),
-
-   approvedBy:user?.uid||"",
-   approvedByEmail:user?.email||"",
-   approvedAt:serverTimestamp(),
-   updatedAt:serverTimestamp(),
-
-   notificationReseller:true,
-   notificationText:
-    `Request token disetujui. ${tokens.length} token telah diberikan.`
+   requestStatus:"approved",status:"approved",tokens,token:tokens[0]||"",kodeToken:tokens[0]||"",registrationToken:tokens[0]||"",
+   jumlahRequest:qty,jumlahTokenDiminta:qty,jumlahTokenDisetujui:tokens.length,jumlahTagihan:amount,totalTagihan:amount,
+   adminNote:$("adminNote").value.trim(),approvedBy:user?.uid||"",approvedByEmail:user?.email||"",approvedAt:serverTimestamp(),updatedAt:serverTimestamp(),
+   notificationReseller:true,notificationText:`Request token disetujui. ${tokens.length} token telah diberikan.`
   });
-
-  /*
-   * Token stok TIDAK dihapus.
-   * Hanya ditandai sudah digunakan.
-   */
-  for(const t of chosen){
-   await markTokenUsed(t);
-  }
-
-  const nama=selected.resellerNama||"reseller";
-  const jenis=selected.requestType==="perpanjangan"
-    ?"perpanjangan"
-    :"registrasi";
-
-  closeApproval();
-  await loadRequests();
-
-  showNotice(
-   "✅ Berhasil Disetujui",
-   `Request <b>${esc(nama)}</b> berhasil disetujui.<br>`+
-   `Jenis: <b>${jenis}</b><br>`+
-   `${tokens.length} token dikirim.<br>`+
-   `Tagihan: <b>${rupiah(amount)}</b>`
-  );
-
- }catch(e){
-  showNotice(
-   "❌ Gagal Menyetujui",
-   esc(e.message)
-  );
- }finally{
-  btn.disabled=false;
-  btn.textContent="💾 Setujui & Kirim Token";
- }
+  for(const t of chosen)await updateDoc(doc(db,t.collection,t.id),buildTokenUpdate());
+  const nama=getName(selected),jenis=normalizeRequestType(selected);closeApproval();await loadRequests();
+  showNotice("✅ Berhasil Disetujui",`Request <b>${esc(nama)}</b> berhasil disetujui.<br>Jenis: <b>${jenis}</b><br>${tokens.length} token dikirim.<br>Tagihan: <b>${rupiah(amount)}</b>`);
+ }catch(e){showNotice("❌ Gagal Menyetujui",esc(e.message))}finally{btn.disabled=false;btn.textContent="💾 Setujui & Kirim Token"}
 }
+function closeApproval(){hideModal("approvalModal");selected=null;selectedTokens=[];availableTokens=[];renderSelectedTokens()}window.closeApproval=closeApproval;
 
-function closeApproval(){
- hideModal("approvalModal");
- selected=null;
- selectedTokens=[];
- availableTokens=[];
- renderSelectedTokens();
-}
-window.closeApproval=closeApproval;
-
-/* =========================
-   REJECT
-========================= */
-window.openReject=id=>{
- selected=requests.find(x=>x.id===id);
- if(!selected)return;
-
- $("rejectInfo").innerHTML=
-  `Request <b>${esc(
-   selected.requestType==="perpanjangan"
-    ?"Perpanjangan"
-    :"Registrasi"
-  )}</b> dari <b>${esc(
-   selected.resellerNama||selected.resellerEmail||"-"
-  )}</b> akan ditolak.`;
-
- $("rejectNote").value="";
- showModal("rejectModal");
-};
-
+/* REJECT */
+window.openReject=id=>{selected=requests.find(x=>x.id===id);if(!selected)return;$("rejectInfo").innerHTML=`Request <b>${esc(normalizeRequestType(selected)==="perpanjangan"?"Perpanjangan":"Registrasi")}</b> dari <b>${esc(getName(selected)||getEmail(selected)||"-")}</b> akan ditolak.`;$("rejectNote").value="";showModal("rejectModal")}
 async function rejectRequest(){
- if(!selected)return;
-
- const btn=$("rejectBtn");
- btn.disabled=true;
- btn.textContent="Memproses...";
-
+ if(!selected)return;const btn=$("rejectBtn");btn.disabled=true;btn.textContent="Memproses...";
  try{
-  await updateDoc(doc(db,"registrationTokens",selected.id),{
-   requestStatus:"rejected",
-   status:"rejected",
-
-   token:"",
-   kodeToken:"",
-   registrationToken:"",
-   tokens:[],
-
-   jumlahTagihan:0,
-   totalTagihan:0,
-
-   adminNote:$("rejectNote").value.trim(),
-
-   rejectedBy:user?.uid||"",
-   rejectedByEmail:user?.email||"",
-   rejectedAt:serverTimestamp(),
-   updatedAt:serverTimestamp(),
-
-   notificationReseller:true,
-   notificationText:"Request token ditolak oleh admin."
-  });
-
-  hideModal("rejectModal");
-  selected=null;
-
-  await loadRequests();
-
-  showNotice(
-   "Request Ditolak",
-   "Request token berhasil ditolak dan reseller akan menerima status penolakan."
-  );
- }catch(e){
-  showNotice("❌ Gagal Menolak",esc(e.message));
- }finally{
-  btn.disabled=false;
-  btn.textContent="Tolak Request";
- }
+  await updateDoc(doc(db,"registrationTokens",selected.id),{requestStatus:"rejected",status:"rejected",token:"",kodeToken:"",registrationToken:"",tokens:[],jumlahTagihan:0,totalTagihan:0,adminNote:$("rejectNote").value.trim(),rejectedBy:user?.uid||"",rejectedByEmail:user?.email||"",rejectedAt:serverTimestamp(),updatedAt:serverTimestamp(),notificationReseller:true,notificationText:"Request token ditolak oleh admin."});
+  hideModal("rejectModal");selected=null;await loadRequests();showNotice("Request Ditolak","Request token berhasil ditolak dan reseller akan menerima status penolakan.");
+ }catch(e){showNotice("❌ Gagal Menolak",esc(e.message))}finally{btn.disabled=false;btn.textContent="Tolak Request"}
 }
 
-/* =========================
-   EVENT
-========================= */
-$("search").oninput=render;
-$("filter").onchange=render;
+/* EVENT */
+$("search").oninput=render;$("filter").onchange=render;$("amountInput").oninput=()=>{$("amountPreview").textContent=rupiah($("amountInput").value)};
+$("openTokenPickerBtn").onclick=openTokenPicker;$("tokenInput").onclick=openTokenPicker;$("tokenSearch").oninput=renderTokenPicker;
+$("reloadTokensBtn").onclick=async()=>{if(!selected)return;const type=normalizeRequestType(selected);$("tokenList").innerHTML='<div class="token-loading">⏳ Memuat ulang token...</div>';try{await loadAvailableTokens(type);renderTokenPicker()}catch(e){$("tokenList").innerHTML=`<div class="token-loading">Gagal: ${esc(e.message)}</div>`}};
+$("useSelectedTokensBtn").onclick=()=>{if(selectedTokens.length!==selectedQty()){showNotice("Pilihan Belum Lengkap",`Pilih tepat <b>${selectedQty()} token</b> sebelum digunakan.`);return}hideModal("tokenPickerModal");renderSelectedTokens()};
+$("closePickerBtn").onclick=()=>hideModal("tokenPickerModal");$("cancelApprovalBtn").onclick=closeApproval;$("approveBtn").onclick=approveRequest;$("cancelRejectBtn").onclick=()=>{hideModal("rejectModal");selected=null};$("rejectBtn").onclick=rejectRequest;$("noticeOkBtn").onclick=()=>hideModal("noticeModal");
+$("loadBtn").onclick=loadRequests;$("refreshPageBtn").onclick=async()=>{const b=$("refreshPageBtn");b.disabled=true;b.textContent="↻...";try{await loadRequests()}finally{b.disabled=false;b.textContent="↻ Refresh"}};
 
-$("amountInput").oninput=()=>{
- $("amountPreview").textContent=rupiah($("amountInput").value);
-};
-
-$("openTokenPickerBtn").onclick=openTokenPicker;
-$("tokenInput").onclick=openTokenPicker;
-
-$("tokenSearch").oninput=renderTokenPicker;
-
-$("reloadTokensBtn").onclick=async()=>{
- if(!selected)return;
-
- const type=selected.requestType==="perpanjangan"
-  ?"perpanjangan"
-  :"registrasi";
-
- $("tokenList").innerHTML=
-  '<div class="token-loading">⏳ Memuat ulang token...</div>';
-
- try{
-  await loadAvailableTokens(type);
-  renderTokenPicker();
- }catch(e){
-  $("tokenList").innerHTML=
-   `<div class="token-loading">Gagal: ${esc(e.message)}</div>`;
- }
-};
-
-$("useSelectedTokensBtn").onclick=()=>{
- const qty=selectedQty();
-
- if(selectedTokens.length!==qty){
-  showNotice(
-   "Pilihan Belum Lengkap",
-   `Pilih tepat <b>${qty} token</b> sebelum digunakan.`
-  );
-  return;
- }
-
- hideModal("tokenPickerModal");
- renderSelectedTokens();
-};
-
-$("closePickerBtn").onclick=()=>hideModal("tokenPickerModal");
-$("cancelApprovalBtn").onclick=closeApproval;
-$("approveBtn").onclick=approveRequest;
-
-$("cancelRejectBtn").onclick=()=>{
- hideModal("rejectModal");
- selected=null;
-};
-
-$("rejectBtn").onclick=rejectRequest;
-$("noticeOkBtn").onclick=()=>hideModal("noticeModal");
-
-$("loadBtn").onclick=loadRequests;
-
-$("refreshPageBtn").onclick=async()=>{
- const btn=$("refreshPageBtn");
- btn.disabled=true;
- btn.textContent="↻...";
-
- try{
-  await loadRequests();
- }finally{
-  btn.disabled=false;
-  btn.textContent="↻ Refresh";
- }
-};
-
-/* =========================
-   AUTH / SESI INDEX
-   Tidak meminta login kedua.
-========================= */
-function ambilSesiIndex(){
- try{
-  if(window.fixzySession?.uid)return window.fixzySession;
-  if(window.parent&&window.parent!==window&&window.parent.fixzySession?.uid)
-   return window.parent.fixzySession;
-  if(window.top&&window.top!==window&&window.top.fixzySession?.uid)
-   return window.top.fixzySession;
- }catch(e){}
- return null;
-}
-
+/* AUTH: mengikuti sesi Index / Firebase Auth, tanpa login kedua */
+function ambilSesiIndex(){try{if(window.fixzySession?.uid)return window.fixzySession;if(window.parent&&window.parent!==window&&window.parent.fixzySession?.uid)return window.parent.fixzySession;if(window.top&&window.top!==window&&window.top.fixzySession?.uid)return window.top.fixzySession}catch(e){}return null}
 async function mulaiDariSesi(uid,email,seedProfile={}){
- if(!uid)return;
-
- const key=String(uid);
- if(sessionStarted===key&&user?.uid===key)return;
- sessionStarted=key;
-
- user={uid:key,email:email||seedProfile?.email||""};
- profile={...(seedProfile||{})};
-
- try{
-  const s=await getDoc(doc(db,"users",key));
-  if(s.exists())profile={...profile,...(s.data()||{})};
- }catch(e){
-  console.warn("Profil users:",e);
- }
-
- profile.uid=profile.uid||key;
- profile.email=profile.email||user.email||"";
-
- if(!allowed()){
-  document.querySelector("main").innerHTML=
-   '<section class="card"><div class="empty">🔒 Akses ditolak. Halaman ini hanya untuk Owner/Admin/Superadmin.</div></section>';
-  return;
- }
-
+ if(!uid)return;const key=String(uid);if(sessionStarted===key&&user?.uid===key)return;sessionStarted=key;user={uid:key,email:email||seedProfile?.email||""};profile={...(seedProfile||{})};
+ try{const s=await getDoc(doc(db,"users",key));if(s.exists())profile={...profile,...(s.data()||{})}}catch(e){console.warn("Profil users:",e)}
+ profile.uid=profile.uid||key;profile.email=profile.email||user.email||"";
+ if(!allowed()){$("list").innerHTML='<div class="empty">🔒 Akses ditolak. Halaman ini hanya untuk Owner/Admin/Superadmin.</div>';return}
  await loadRequests();
-
  try{
   if(unsub)unsub();
-
-  const q=query(
-   collection(db,"registrationTokens"),
-   where("requestStatus","==","pending")
-  );
-
-  unsub=onSnapshot(
-   q,
-   ()=>loadRequests(),
-   ()=>{}
-  );
+  unsub=onSnapshot(collection(db,"registrationTokens"),()=>loadRequests(),()=>{});
  }catch(e){}
 }
-
-window.addEventListener("message",async event=>{
- if(event.origin!==location.origin)return;
-
- const d=event.data||{};
-
- if(d.type==="FIXZY_AUTH_SESSION"&&d.uid){
-  sesiIndexDiterima=true;
-  await mulaiDariSesi(
-   d.uid,
-   d.email||"",
-   d.profile||{}
-  );
- }
-});
-
-try{
- if(window.parent!==window){
-  window.parent.postMessage(
-   {type:"FIXZY_REQUEST_AUTH_SESSION"},
-   location.origin
-  );
- }
-}catch(e){}
-
+window.addEventListener("message",async event=>{if(event.origin!==location.origin)return;const d=event.data||{};if(d.type==="FIXZY_AUTH_SESSION"&&d.uid){sesiIndexDiterima=true;await mulaiDariSesi(d.uid,d.email||"",d.profile||{})}});
+try{if(window.parent!==window)window.parent.postMessage({type:"FIXZY_REQUEST_AUTH_SESSION"},location.origin)}catch(e){}
 onAuthStateChanged(auth,async u=>{
- if(u){
-  await mulaiDariSesi(u.uid,u.email||{},{}); 
-  return;
- }
-
- if(!sesiIndexDiterima){
-  const s=ambilSesiIndex();
-
-  if(s?.uid){
-   sesiIndexDiterima=true;
-   await mulaiDariSesi(
-    s.uid,
-    s.email||"",
-    s.profile||{}
-   );
-   return;
-  }
-
-  $("list").innerHTML=
-   '<div class="empty">Menunggu sesi akun dari Index...</div>';
- }
+ if(u){await mulaiDariSesi(u.uid,u.email||"",{});return}
+ if(!sesiIndexDiterima){const s=ambilSesiIndex();if(s?.uid){sesiIndexDiterima=true;await mulaiDariSesi(s.uid,s.email||"",s.profile||{});return}$("list").innerHTML='<div class="empty">Menunggu sesi akun dari Index...</div>'}
 });
-
-(async()=>{
- const s=ambilSesiIndex();
-
- if(s?.uid){
-  sesiIndexDiterima=true;
-  await mulaiDariSesi(
-   s.uid,
-   s.email||"",
-   s.profile||{}
-  );
- }
-})();
+(async()=>{const s=ambilSesiIndex();if(s?.uid){sesiIndexDiterima=true;await mulaiDariSesi(s.uid,s.email||"",s.profile||{})}})();
 </script>
 </body>
 </html>
