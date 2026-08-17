@@ -78,7 +78,7 @@ body.dark .token-row code{color:#f3f4f6}
 <main class="wrap">
 <section class="card">
 <h2>Akun Reseller</h2>
-<div class="sub">Request akan masuk ke Firebase untuk diperiksa dan disetujui admin. Tidak ada form login yang ditampilkan.</div>
+<div class="sub">Request akan masuk ke Firebase untuk diperiksa dan disetujui admin. Login dikelola oleh halaman Index.</div>
 <div class="identity">
 <div class="info"><span>Email</span><b id="email">-</b></div>
 <div class="info"><span>Nama / Toko</span><b id="nama">-</b></div>
@@ -148,7 +148,7 @@ Tagihan perkiraan:
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getAuth,signInAnonymously}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import{getFirestore,collection,query,where,getDocs,addDoc,doc,getDoc,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig={
@@ -171,28 +171,10 @@ let hargaAktif=0;
 let unsub=null;
 
 /*
- * HALAMAN TANPA LOGIN
- * Tidak ada login manual. Identitas reseller dapat dikirim melalui URL:
- * ?uid=UID_RESELLER&email=email@contoh.com&nama=Nama%20Toko
- * Jika parameter tidak ada, halaman membuat ID sesi sementara.
+ * LOGIN DIKELOLA OLEH INDEX.
+ * Halaman ini tidak menampilkan form login dan tidak melakukan redirect.
+ * Jika reseller sudah login dari Index, Firebase Auth membawa sesi yang sama.
  */
-function getResellerIdentity(){
- const p=new URLSearchParams(location.search);
- const uid=(p.get("uid")||"").trim();
- const email=(p.get("email")||"").trim();
- const nama=(p.get("nama")||p.get("namaToko")||"").trim()||"Reseller";
- return {uid,email,nama};
-}
-currentUser=getResellerIdentity();
-profile={
- namaToko:currentUser.nama,
- nama:currentUser.nama,
- role:"reseller",
- status:"aktif"
-};
-
-const $=id=>document.getElementById(id);
-
 function rupiah(v){
  const n=Number(v||0);
  return n>0?"Rp "+n.toLocaleString("id-ID"):"Belum ditetapkan";
@@ -214,7 +196,13 @@ function setProfile(){
  $("statusAkun").textContent=profile.status||"aktif";
 }
 
-async function loadProfile(){
+async function loadProfile(u){
+ try{
+  const snap=await getDoc(doc(db,"users",u.uid));
+  profile=snap.exists()?snap.data():{};
+ }catch(e){
+  profile={};
+ }
  setProfile();
 }
 
@@ -451,39 +439,20 @@ async function listenRequests(){
  }
 }
 
-(async()=>{
- try{
-   /*
-    * Tidak ada halaman/login form untuk reseller.
-    * Firebase hanya membuat sesi anonim di belakang layar agar
-    * Firestore dapat menerima request sesuai security rules.
-    */
-   const cred=await signInAnonymously(auth);
-   const identity=getResellerIdentity();
-
-   currentUser={
-     uid:cred.user.uid,
-     email:identity.email,
-     nama:identity.nama
-   };
-
-   profile={
-     namaToko:identity.nama,
-     nama:identity.nama,
-     role:"reseller",
-     status:"aktif"
-   };
-
-   setProfile();
-   await listenRequests();
- }catch(e){
-   console.error("Firebase anonymous auth gagal:",e);
-   showInfo(
-     "❌ Gagal Terhubung",
-     "Sistem tidak dapat membuat sesi Firebase. Pastikan Anonymous Authentication diaktifkan pada Firebase Authentication."
-   );
+onAuthStateChanged(auth,async u=>{
+ if(!u){
+  $("email").textContent="-";
+  $("nama").textContent="Login melalui Index";
+  $("role").textContent="RESELLER";
+  $("statusAkun").textContent="Belum terhubung";
+  $("requestList").innerHTML='<div class="empty">Silakan buka halaman ini dari Index setelah login reseller.</div>';
+  return;
  }
-})();
+
+ currentUser=u;
+ await loadProfile(u);
+ await listenRequests();
+});
 
 $("darkBtn").onclick=()=>{
  document.body.classList.toggle("dark");
