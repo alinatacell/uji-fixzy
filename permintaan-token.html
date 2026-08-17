@@ -613,7 +613,15 @@ $("filter").onchange=render;
 
 onAuthStateChanged(auth,async u=>{
  user=u;
- if(!u){location.replace("login.html");return}
+
+ // Login hanya dilakukan di halaman Index.
+ // Halaman Approval tidak menampilkan form login dan tidak redirect ke login.html.
+ if(!u){
+  document.querySelector("main").innerHTML=
+   '<section class="card"><div class="empty">🔒 Belum login. Silakan login melalui halaman Index terlebih dahulu, lalu buka halaman Approval Token.</div></section>';
+  return;
+ }
+
  try{
   const s=await getDoc(doc(db,"users",u.uid));
   if(!s.exists())throw new Error("Profil akun tidak ditemukan.");
