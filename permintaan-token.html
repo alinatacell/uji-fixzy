@@ -614,22 +614,20 @@ $("filter").onchange=render;
 onAuthStateChanged(auth,async u=>{
  user=u;
 
- // Login hanya dilakukan di halaman Index.
- // Halaman Approval tidak menampilkan form login dan tidak redirect ke login.html.
+ // Login dan izin akses dilakukan di Index.
+ // Tidak ada login ulang, login.html, atau persetujuan akses kedua.
  if(!u){
   document.querySelector("main").innerHTML=
-   '<section class="card"><div class="empty">🔒 Belum login. Silakan login melalui halaman Index terlebih dahulu, lalu buka halaman Approval Token.</div></section>';
+   '<section class="card"><div class="empty">Buka halaman ini melalui Index setelah login dan izin akses diberikan.</div></section>';
   return;
  }
 
  try{
   const s=await getDoc(doc(db,"users",u.uid));
-  if(!s.exists())throw new Error("Profil akun tidak ditemukan.");
-  profile=s.data()||{};
-  if(!allowed()){
-   document.querySelector("main").innerHTML='<section class="card"><div class="empty">🔒 Akses ditolak. Halaman ini hanya untuk Owner/Admin/Superadmin.</div></section>';
-   return;
-  }
+  profile=s.exists()?s.data():{};
+
+  // Jangan lakukan pemeriksaan izin kedua di halaman ini.
+  // Index sudah menentukan apakah menu/halaman ini boleh dibuka.
   await loadRequests();
 
   try{
