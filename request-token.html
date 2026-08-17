@@ -78,7 +78,7 @@ body.dark .token-row code{color:#f3f4f6}
 <main class="wrap">
 <section class="card">
 <h2>Akun Reseller</h2>
-<div class="sub">Request akan masuk ke Firebase untuk diperiksa dan disetujui admin.</div>
+<div class="sub">Request akan masuk ke Firebase untuk diperiksa dan disetujui admin. Halaman ini tidak meminta login.</div>
 <div class="identity">
 <div class="info"><span>Email</span><b id="email">-</b></div>
 <div class="info"><span>Nama / Toko</span><b id="nama">-</b></div>
@@ -148,7 +148,6 @@ Tagihan perkiraan:
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import{getFirestore,collection,query,where,getDocs,addDoc,doc,getDoc,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig={
@@ -161,7 +160,6 @@ const firebaseConfig={
 };
 
 const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
 const db=getFirestore(app);
 
 let currentUser=null;
@@ -169,6 +167,40 @@ let profile={};
 let selectedJenis="";
 let hargaAktif=0;
 let unsub=null;
+
+/*
+ * HALAMAN TANPA LOGIN
+ * Identitas reseller dapat dikirim melalui URL:
+ * ?uid=UID_RESELLER&email=email@contoh.com&nama=Nama%20Toko
+ * Jika parameter tidak ada, halaman membuat ID sesi sementara.
+ */
+function getResellerIdentity(){
+ const p=new URLSearchParams(location.search);
+ let uid=(p.get("uid")||"").trim();
+ let email=(p.get("email")||"").trim();
+ let nama=(p.get("nama")||p.get("namaToko")||"").trim();
+
+ try{
+   if(!uid) uid=sessionStorage.getItem("fixzy-reseller-uid")||"";
+   if(!uid){
+     uid="guest-"+(crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random().toString(36).slice(2));
+     sessionStorage.setItem("fixzy-reseller-uid",uid);
+   }
+ }catch(e){
+   uid="guest-"+Date.now()+"-"+Math.random().toString(36).slice(2);
+ }
+
+ if(!nama)nama="Reseller";
+ return {uid,email,nama};
+}
+
+currentUser=getResellerIdentity();
+profile={
+ namaToko:currentUser.nama,
+ nama:currentUser.nama,
+ role:"reseller",
+ status:"aktif"
+};
 
 const $=id=>document.getElementById(id);
 
@@ -193,11 +225,7 @@ function setProfile(){
  $("statusAkun").textContent=profile.status||"aktif";
 }
 
-async function loadProfile(u){
- try{
-  const snap=await getDoc(doc(db,"users",u.uid));
-  profile=snap.exists()?snap.data():{};
- }catch(e){profile={};}
+async function loadProfile(){
  setProfile();
 }
 
@@ -264,7 +292,7 @@ window.closeRequest=()=>{
 };
 
 window.kirimRequest=async()=>{
- if(!currentUser||!selectedJenis)return;
+ if(!selectedJenis)return;
 
  const status=String(profile.status||"aktif").toLowerCase();
  if(status==="nonaktif"){
@@ -434,15 +462,17 @@ async function listenRequests(){
  }
 }
 
-onAuthStateChanged(auth,async u=>{
- if(!u){
-  location.href="login.html";
-  return;
- }
- currentUser=u;
- await loadProfile(u);
+(async()=>{
+ currentUser=getResellerIdentity();
+ profile={
+   namaToko:currentUser.nama,
+   nama:currentUser.nama,
+   role:"reseller",
+   status:"aktif"
+ };
+ setProfile();
  await listenRequests();
-});
+})();
 
 $("darkBtn").onclick=()=>{
  document.body.classList.toggle("dark");
