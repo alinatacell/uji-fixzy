@@ -102,7 +102,7 @@ textarea{min-height:110px;resize:vertical}
 .modal-box h3{margin:0 0 8px}.modal-box p{font-size:13px;line-height:1.5}.ok{width:100%;background:#111827;color:#fff;border:0;border-radius:10px;padding:13px;font-weight:900}
 .hidden{display:none!important}
 .error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;border-radius:9px;padding:10px;font-size:12px;margin-bottom:10px}
-.saldo-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.saldo-stat{background:#f8fafc;border:1px solid #dbe2ea;border-radius:10px;padding:10px}.saldo-stat small{display:block;font-size:9px;color:#64748b;font-weight:900}.saldo-stat b{display:block;font-size:20px;margin-top:3px}.saldo-stat.pending b{color:#b45309}.saldo-stat.approved b{color:#166534}.saldo-stat.rejected b{color:#991b1b}.saldo-request{border:2px solid #f0b000;border-radius:14px;padding:14px;margin-top:12px;background:#fffdf2;box-shadow:3px 3px 0 #111827}.saldo-request.approved{border-color:#86efac;background:#f0fdf4}.saldo-request.rejected{border-color:#fecaca;background:#fff7f7}.saldo-balance{background:#fff7d6;border:2px solid #f2c94c;border-radius:10px;padding:10px;margin-top:10px;font-size:12px}.saldo-balance b{font-size:16px}.saldo-actions{display:flex;gap:8px;margin-top:12px}.saldo-actions button{flex:1}.saldo-note{font-size:11px;color:#64748b;margin-top:7px;line-height:1.5}@media(max-width:600px){.saldo-summary{grid-template-columns:1fr}.saldo-actions{flex-direction:column}}
+.token-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.token-stat{background:#f8fafc;border:1px solid #dbe2ea;border-radius:10px;padding:10px}.token-stat small{display:block;font-size:9px;color:#64748b;font-weight:900}.token-stat b{display:block;font-size:20px;margin-top:3px}.token-stat.pending b{color:#b45309}.token-stat.approved b{color:#166534}.token-stat.rejected b{color:#991b1b}@media(max-width:600px){.token-summary{grid-template-columns:1fr}}.saldo-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.saldo-stat{background:#f8fafc;border:1px solid #dbe2ea;border-radius:10px;padding:10px}.saldo-stat small{display:block;font-size:9px;color:#64748b;font-weight:900}.saldo-stat b{display:block;font-size:20px;margin-top:3px}.saldo-stat.pending b{color:#b45309}.saldo-stat.approved b{color:#166534}.saldo-stat.rejected b{color:#991b1b}.saldo-request{border:2px solid #f0b000;border-radius:14px;padding:14px;margin-top:12px;background:#fffdf2;box-shadow:3px 3px 0 #111827}.saldo-request.approved{border-color:#86efac;background:#f0fdf4}.saldo-request.rejected{border-color:#fecaca;background:#fff7f7}.saldo-balance{background:#fff7d6;border:2px solid #f2c94c;border-radius:10px;padding:10px;margin-top:10px;font-size:12px}.saldo-balance b{font-size:16px}.saldo-actions{display:flex;gap:8px;margin-top:12px}.saldo-actions button{flex:1}.saldo-note{font-size:11px;color:#64748b;margin-top:7px;line-height:1.5}@media(max-width:600px){.saldo-summary{grid-template-columns:1fr}.saldo-actions{flex-direction:column}}
 @media(max-width:600px){
  .head-actions .logout{display:none}
  .head-title b{font-size:17px}
@@ -175,6 +175,21 @@ body.dark .modal-box{background:#151b23;color:#f3f4f6}
     Semua request dibaca dari collection <b>registrationTokens</b>.
     <b>Token registrasi = GRATIS</b>. Token perpanjangan memakai harga paket/token.
     <b>Keuntungan reseller = Rp 20.000 per token</b>.
+  </div>
+
+  <div class="token-summary">
+    <div class="token-stat pending">
+      <small>MENUNGGU</small>
+      <b id="tokenPendingCount">0</b>
+    </div>
+    <div class="token-stat approved">
+      <small>DISETUJUI</small>
+      <b id="tokenApprovedCount">0</b>
+    </div>
+    <div class="token-stat rejected">
+      <small>DITOLAK</small>
+      <b id="tokenRejectedCount">0</b>
+    </div>
   </div>
 
   <div class="filters">
@@ -954,6 +969,16 @@ window.rejectSaldoRequest=async id=>{
 };
 
 function render(){
+  // Statistik selalu dihitung dari seluruh data request token.
+  // Filter dan pencarian hanya memengaruhi daftar di bawahnya.
+  const tokenPending=allRequests.filter(x=>requestStatus(x)==="pending").length;
+  const tokenApproved=allRequests.filter(x=>requestStatus(x)==="approved").length;
+  const tokenRejected=allRequests.filter(x=>requestStatus(x)==="rejected").length;
+
+  if($("tokenPendingCount"))$("tokenPendingCount").textContent=tokenPending;
+  if($("tokenApprovedCount"))$("tokenApprovedCount").textContent=tokenApproved;
+  if($("tokenRejectedCount"))$("tokenRejectedCount").textContent=tokenRejected;
+
   const status=$("statusFilter").value;
   const search=$("searchInput").value.trim().toLowerCase();
 
