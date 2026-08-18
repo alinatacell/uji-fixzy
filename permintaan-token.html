@@ -102,7 +102,6 @@ textarea{min-height:110px;resize:vertical}
 .modal-box h3{margin:0 0 8px}.modal-box p{font-size:13px;line-height:1.5}.ok{width:100%;background:#111827;color:#fff;border:0;border-radius:10px;padding:13px;font-weight:900}
 .hidden{display:none!important}
 .error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;border-radius:9px;padding:10px;font-size:12px;margin-bottom:10px}
-.token-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.token-stat{background:#f8fafc;border:1px solid #dbe2ea;border-radius:10px;padding:10px}.token-stat small{display:block;font-size:9px;color:#64748b;font-weight:900}.token-stat b{display:block;font-size:20px;margin-top:3px}.token-stat.pending b{color:#b45309}.token-stat.approved b{color:#166534}.token-stat.rejected b{color:#991b1b}@media(max-width:600px){.token-summary{grid-template-columns:1fr}}.saldo-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.saldo-stat{background:#f8fafc;border:1px solid #dbe2ea;border-radius:10px;padding:10px}.saldo-stat small{display:block;font-size:9px;color:#64748b;font-weight:900}.saldo-stat b{display:block;font-size:20px;margin-top:3px}.saldo-stat.pending b{color:#b45309}.saldo-stat.approved b{color:#166534}.saldo-stat.rejected b{color:#991b1b}.saldo-request{border:2px solid #f0b000;border-radius:14px;padding:14px;margin-top:12px;background:#fffdf2;box-shadow:3px 3px 0 #111827}.saldo-request.approved{border-color:#86efac;background:#f0fdf4}.saldo-request.rejected{border-color:#fecaca;background:#fff7f7}.saldo-balance{background:#fff7d6;border:2px solid #f2c94c;border-radius:10px;padding:10px;margin-top:10px;font-size:12px}.saldo-balance b{font-size:16px}.saldo-actions{display:flex;gap:8px;margin-top:12px}.saldo-actions button{flex:1}.saldo-note{font-size:11px;color:#64748b;margin-top:7px;line-height:1.5}@media(max-width:600px){.saldo-summary{grid-template-columns:1fr}.saldo-actions{flex-direction:column}}
 @media(max-width:600px){
  .head-actions .logout{display:none}
  .head-title b{font-size:17px}
@@ -177,21 +176,6 @@ body.dark .modal-box{background:#151b23;color:#f3f4f6}
     <b>Keuntungan reseller = Rp 20.000 per token</b>.
   </div>
 
-  <div class="token-summary">
-    <div class="token-stat pending">
-      <small>MENUNGGU</small>
-      <b id="tokenPendingCount">0</b>
-    </div>
-    <div class="token-stat approved">
-      <small>DISETUJUI</small>
-      <b id="tokenApprovedCount">0</b>
-    </div>
-    <div class="token-stat rejected">
-      <small>DITOLAK</small>
-      <b id="tokenRejectedCount">0</b>
-    </div>
-  </div>
-
   <div class="filters">
     <select id="statusFilter">
       <option value="all">Semua Status</option>
@@ -204,31 +188,6 @@ body.dark .modal-box{background:#151b23;color:#f3f4f6}
 
   <div id="requestList" class="list">
     <div class="loading">Memuat request...</div>
-  </div>
-</section>
-
-<section class="card">
-  <h2>💰 Request Saldo Reseller</h2>
-  <div class="sub">Daftar request penambahan saldo dari reseller. <b>Saldo hanya ditambahkan setelah admin memeriksa transfer dan menekan Setujui.</b></div>
-
-  <div class="saldo-summary">
-    <div class="saldo-stat pending"><small>MENUNGGU</small><b id="saldoPendingCount">0</b></div>
-    <div class="saldo-stat approved"><small>DISETUJUI</small><b id="saldoApprovedCount">0</b></div>
-    <div class="saldo-stat rejected"><small>DITOLAK</small><b id="saldoRejectedCount">0</b></div>
-  </div>
-
-  <div class="filters">
-    <select id="saldoStatusFilter">
-      <option value="all">Semua Status</option>
-      <option value="pending">Menunggu Admin</option>
-      <option value="approved">Disetujui</option>
-      <option value="rejected">Ditolak</option>
-    </select>
-    <input id="saldoSearchInput" type="search" placeholder="Cari nama, email, UID, ID request...">
-  </div>
-
-  <div id="saldoRequestList" class="list">
-    <div class="loading">Memuat request saldo...</div>
   </div>
 </section>
 </section>
@@ -268,7 +227,6 @@ const db=getFirestore(app);
 let adminUser=null;
 let adminProfile={};
 let allRequests=[];
-let allSaldoRequests=[];
 let availableTokens=[];
 const selectedTokensByRequest={};
 
@@ -314,7 +272,6 @@ async function loadAdminProfile(user){
   $("adminArea").classList.remove("hidden");
   $("logoutBtn").classList.remove("hidden");
   await loadRequests();
-  await loadSaldoRequests();
 }
 
 function requestStatus(x){
@@ -428,7 +385,11 @@ function isRequestDocument(colName,d){
 
 function requestedDurationMonths(request){
   const x=request||{};
+
+  // Field khusus request perpanjangan diprioritaskan agar paket tidak salah terbaca.
   const fields=[
+    x.masaPerpanjangan,x.perpanjanganLabel,x.perpanjanganHari,
+    x.packageMonths,x.packageDays,x.packageLabel,
     x.durasiBulan,x.masaAktifBulan,x.jumlahBulan,x.bulan,
     x.paketBulan,x.lamaBulan,x.durasi,x.masaAktif,
     x.paket,x.paketLabel,x.paketTerakhir,
@@ -437,11 +398,11 @@ function requestedDurationMonths(request){
 
   for(const raw of fields){
     if(raw===undefined||raw===null||raw==="")continue;
-    const s=String(raw).toLowerCase().trim();
+    const s=String(raw).toLowerCase().trim().replace(/_/g," " );
 
     const m=s.match(/(\d+(?:[.,]\d+)?)\s*(?:bulan|bln|month|months)/i);
     if(m){
-      const n=Number(m[1].replace(",",".")); 
+      const n=Number(m[1].replace(",","."));
       if(Number.isFinite(n)&&n>0)return Math.round(n);
     }
 
@@ -461,6 +422,8 @@ function requestedDurationMonths(request){
 function tokenDurationMonths(d){
   const x=d.data?d.data():(d||{});
   return requestedDurationMonths({
+    // Struktur token stok FIXZY dan token pembelian reseller.
+    packageMonths:x.packageMonths,packageDays:x.packageDays,packageLabel:x.packageLabel,
     durasiBulan:x.durasiBulan,masaAktifBulan:x.masaAktifBulan,
     jumlahBulan:x.jumlahBulan,bulan:x.bulan,paketBulan:x.paketBulan,
     lamaBulan:x.lamaBulan,durasi:x.durasi,masaAktif:x.masaAktif,
@@ -478,6 +441,12 @@ function tokenMatchesRequestedDuration(tokenDoc,request){
 function tokenValidForRequest(d,type,colName,request=null){
   if(tokenUsed(d))return false;
   if(isRequestDocument(colName,d))return false;
+
+  // Token yang sudah dibeli/dimiliki reseller tidak boleh muncul lagi
+  // di daftar token milik admin untuk request reseller lain.
+  const ownerStatus=String(d.status??d.tokenStatus??d.state??"").toLowerCase().trim();
+  if(d.resellerOwned===true||d.dibeliReseller===true||ownerStatus==="dibeli_reseller")return false;
+
   if(request&&!tokenMatchesRequestedDuration(d,request))return false;
 
   const tipe=tokenType(d);
@@ -521,7 +490,14 @@ async function loadAvailableTokens(requestType,requestPrice=0,request=null){
     });
   }
 
-  availableTokens.sort((a,b)=>String(a.token).localeCompare(String(b.token)));
+  // Urutkan berdasarkan masa aktif terlebih dahulu, lalu token.
+  // Ini membuat paket request tetap konsisten dan tidak tercampur.
+  const requested=requestedDurationMonths(request||{});
+  availableTokens.sort((a,b)=>{
+    const da=tokenDurationMonths(a.data), db=tokenDurationMonths(b.data);
+    if(requested && da!==db)return da-db;
+    return String(a.token).localeCompare(String(b.token));
+  });
   return availableTokens;
 }
 
@@ -731,254 +707,7 @@ window.selectToken=(requestId,tokenId,checked)=>{
   updateSelectedUI(requestId);
 };
 
-function saldoRequestStatus(x){
-  const s=String(x.requestStatus||x.status||"pending").toLowerCase();
-  if(s.includes("approve")||s==="disetujui"||s==="setuju")return "approved";
-  if(s.includes("tolak")||s==="rejected"||s==="ditolak")return "rejected";
-  return "pending";
-}
-
-function saldoRequestDate(x){
-  try{
-    if(x.createdAt?.toDate)return x.createdAt.toDate().toLocaleString("id-ID");
-  }catch(e){}
-  return x.createdAtText||"-";
-}
-
-function saldoAmount(x){
-  return Number(x.amount??x.jumlahSaldo??x.nominal??0)||0;
-}
-
-function saldoAdminName(){
-  return adminProfile.namaToko||adminProfile.nama||adminProfile.displayName||adminProfile.name||adminUser?.email||"Admin";
-}
-
-function renderSaldoRequests(){
-  const status=$("saldoStatusFilter").value;
-  const search=$("saldoSearchInput").value.trim().toLowerCase();
-
-  const pending=allSaldoRequests.filter(x=>saldoRequestStatus(x)==="pending").length;
-  const approved=allSaldoRequests.filter(x=>saldoRequestStatus(x)==="approved").length;
-  const rejected=allSaldoRequests.filter(x=>saldoRequestStatus(x)==="rejected").length;
-  $("saldoPendingCount").textContent=pending;
-  $("saldoApprovedCount").textContent=approved;
-  $("saldoRejectedCount").textContent=rejected;
-
-  const list=allSaldoRequests.filter(x=>{
-    const st=saldoRequestStatus(x);
-    if(status!=="all"&&st!==status)return false;
-    if(!search)return true;
-    const hay=[x.id,x.resellerNama,x.resellerEmail,x.resellerUid,x.metode,x.catatan].join(" ").toLowerCase();
-    return hay.includes(search);
-  });
-
-  if(!list.length){
-    $("saldoRequestList").innerHTML='<div class="empty">Tidak ada request saldo sesuai filter.</div>';
-    return;
-  }
-
-  $("saldoRequestList").innerHTML=list.map(x=>{
-    const st=saldoRequestStatus(x);
-    const label=st==="approved"?"DISETUJUI":st==="rejected"?"DITOLAK":"MENUNGGU ADMIN";
-    const amount=saldoAmount(x);
-    const canProcess=st==="pending";
-    const balanceAfter=x.balanceAfter??x.saldoSetelah??null;
-    return `<article class="saldo-request ${st}">
-      <div class="req-head">
-        <div>
-          <div class="req-title">💰 Request Tambah Saldo</div>
-          <div class="req-meta">${esc(x.resellerNama||"-")} • ${esc(x.resellerEmail||"-")}</div>
-        </div>
-        <span class="badge ${st}">${label}</span>
-      </div>
-
-      <div class="grid">
-        <div class="info"><span>WAKTU REQUEST</span><b>${esc(saldoRequestDate(x))}</b></div>
-        <div class="info"><span>ID REQUEST</span><b>${esc(x.id)}</b></div>
-        <div class="info"><span>RESELLER UID</span><b>${esc(x.resellerUid||"-")}</b></div>
-        <div class="info"><span>NOMINAL SALDO</span><b style="font-size:17px;color:#166534">${rupiah(amount)}</b></div>
-        <div class="info"><span>METODE</span><b>${esc(x.metode||"QRIS")}</b></div>
-        <div class="info"><span>NOTIFIKASI ADMIN</span><b>${x.notificationAdmin===false?"Sudah diproses":"Perlu diperiksa"}</b></div>
-      </div>
-
-      <div class="saldo-note"><b>Keterangan transfer:</b> ${esc(x.catatan||"-")}</div>
-
-      ${x.adminNote?`<div class="saldo-note"><b>Catatan admin:</b> ${esc(x.adminNote)}</div>`:""}
-      ${x.adminEmail?`<div class="saldo-note"><b>Diproses oleh:</b> ${esc(x.adminNama||x.adminEmail)}</div>`:""}
-      ${balanceAfter!==null?`<div class="saldo-balance">Saldo setelah transaksi: <b>${rupiah(balanceAfter)}</b></div>`:""}
-
-      ${canProcess?`<div class="admin-box">
-        <div class="form-row">
-          <label>CATATAN ADMIN</label>
-          <textarea id="saldo-note-${esc(x.id)}" style="min-height:65px" placeholder="Contoh: Transfer sudah masuk, saldo ditambahkan."></textarea>
-        </div>
-        <div class="saldo-actions">
-          <button class="green" type="button" onclick="approveSaldoRequest('${esc(x.id)}')">✅ Setujui & Tambah Saldo</button>
-          <button class="danger" type="button" onclick="rejectSaldoRequest('${esc(x.id)}')">❌ Tolak</button>
-        </div>
-      </div>`:""}
-    </article>`;
-  }).join("");
-}
-
-async function loadSaldoRequests(){
-  if(!adminUser)return;
-  $("saldoRequestList").innerHTML='<div class="loading">Memuat request saldo...</div>';
-  try{
-    const snap=await getDocs(collection(db,"saldoRequests"));
-    allSaldoRequests=[];
-    snap.forEach(d=>allSaldoRequests.push({id:d.id,...d.data()}));
-    allSaldoRequests.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-    renderSaldoRequests();
-  }catch(e){
-    console.error("loadSaldoRequests:",e);
-    $("saldoRequestList").innerHTML=`<div class="error">Gagal membaca request saldo: ${esc(e.message||String(e))}</div>`;
-  }
-}
-
-window.approveSaldoRequest=async id=>{
-  if(!adminUser){showModal("Belum Login","Silakan login Firebase sebagai admin.");return;}
-  const item=allSaldoRequests.find(x=>x.id===id);
-  if(!item)return;
-
-  const note=$("saldo-note-"+id)?.value.trim()||"";
-  const btn=document.querySelector(`button[onclick="approveSaldoRequest('${CSS.escape(id)}')"]`);
-  if(btn){btn.disabled=true;btn.textContent="Memproses...";}
-
-  try{
-    const result=await runTransaction(db,async transaction=>{
-      const reqRef=doc(db,"saldoRequests",id);
-      const reqSnap=await transaction.get(reqRef);
-      if(!reqSnap.exists())throw new Error("Request saldo tidak ditemukan.");
-      const req=reqSnap.data()||{};
-      const currentStatus=saldoRequestStatus(req);
-      if(currentStatus!=="pending")throw new Error("Request saldo ini sudah diproses sebelumnya.");
-
-      const resellerUid=String(req.resellerUid||"").trim();
-      if(!resellerUid)throw new Error("resellerUid pada request saldo kosong.");
-
-      const amount=saldoAmount(req);
-      if(amount<10000)throw new Error("Nominal request saldo tidak valid atau kurang dari Rp10.000.");
-
-      const balRef=doc(db,"resellerBalances",resellerUid);
-      const balSnap=await transaction.get(balRef);
-      const before=balSnap.exists()?Number(balSnap.data()?.balance||0):0;
-      const after=before+amount;
-
-      const ledgerRef=doc(collection(db,"balanceTransactions"));
-
-      transaction.set(balRef,{
-        resellerUid,
-        balance:after,
-        updatedAt:serverTimestamp()
-      },{merge:true});
-
-      transaction.set(ledgerRef,{
-        resellerUid,
-        type:"deposit",
-        amount,
-        balanceBefore:before,
-        balanceAfter:after,
-        description:`Penambahan saldo dari request ${id}`,
-        requestId:id,
-        paymentMethod:req.metode||"QRIS",
-        adminUid:adminUser.uid,
-        adminEmail:adminUser.email||"",
-        adminNama:saldoAdminName(),
-        createdAt:serverTimestamp()
-      });
-
-      transaction.update(reqRef,{
-        requestStatus:"approved",
-        status:"approved",
-        jumlahSaldoDisetujui:amount,
-        saldoDitambahkan:amount,
-        balanceBefore:before,
-        balanceAfter:after,
-        adminUid:adminUser.uid,
-        adminEmail:adminUser.email||"",
-        adminNama:saldoAdminName(),
-        adminNote:note||"Transfer terverifikasi. Saldo ditambahkan.",
-        notificationReseller:true,
-        notificationAdmin:false,
-        approvedAt:serverTimestamp(),
-        updatedAt:serverTimestamp()
-      });
-
-      return {before,after,amount};
-    });
-
-    await loadSaldoRequests();
-    showModal("Saldo Berhasil Ditambahkan",
-      `Request ${id} disetujui. Saldo ${rupiah(result.amount)} sudah ditambahkan ke reseller. Saldo sebelumnya ${rupiah(result.before)}, sekarang menjadi ${rupiah(result.after)}.`);
-  }catch(e){
-    console.error("approveSaldoRequest:",e);
-    showModal("Gagal Menyetujui Request Saldo",
-      e?.code==="permission-denied"
-        ?"Firebase menolak perubahan saldo/request. Pastikan Rules mengizinkan admin update saldo, saldoRequests, dan balanceTransactions."
-        :(e?.message||String(e)));
-  }finally{
-    if(btn){btn.disabled=false;btn.textContent="✅ Setujui & Tambah Saldo";}
-  }
-};
-
-window.rejectSaldoRequest=async id=>{
-  if(!adminUser){showModal("Belum Login","Silakan login Firebase sebagai admin.");return;}
-  const item=allSaldoRequests.find(x=>x.id===id);
-  if(!item)return;
-
-  const note=$("saldo-note-"+id)?.value.trim()||"";
-  if(!note){showModal("Alasan Diperlukan","Isi Catatan Admin terlebih dahulu sebelum request saldo ditolak.");return;}
-
-  const btn=document.querySelector(`button[onclick="rejectSaldoRequest('${CSS.escape(id)}')"]`);
-  if(btn){btn.disabled=true;btn.textContent="Menolak...";}
-
-  try{
-    const reqRef=doc(db,"saldoRequests",id);
-    const reqSnap=await getDoc(reqRef);
-    if(!reqSnap.exists())throw new Error("Request saldo tidak ditemukan.");
-    const req=reqSnap.data()||{};
-    if(saldoRequestStatus(req)!=="pending")throw new Error("Request saldo ini sudah diproses sebelumnya.");
-
-    await updateDoc(reqRef,{
-      requestStatus:"rejected",
-      status:"rejected",
-      jumlahSaldoDisetujui:0,
-      saldoDitambahkan:0,
-      adminUid:adminUser.uid,
-      adminEmail:adminUser.email||"",
-      adminNama:saldoAdminName(),
-      adminNote:note,
-      notificationReseller:true,
-      notificationAdmin:false,
-      rejectedAt:serverTimestamp(),
-      updatedAt:serverTimestamp()
-    });
-
-    await loadSaldoRequests();
-    showModal("Request Saldo Ditolak","Request saldo ditolak. Saldo reseller tidak berubah.");
-  }catch(e){
-    console.error("rejectSaldoRequest:",e);
-    showModal("Gagal Menolak Request Saldo",
-      e?.code==="permission-denied"
-        ?"Firebase menolak update request saldo. Pastikan akun admin mempunyai izin update collection saldoRequests."
-        :(e?.message||String(e)));
-  }finally{
-    if(btn){btn.disabled=false;btn.textContent="❌ Tolak";}
-  }
-};
-
 function render(){
-  // Statistik selalu dihitung dari seluruh data request token.
-  // Filter dan pencarian hanya memengaruhi daftar di bawahnya.
-  const tokenPending=allRequests.filter(x=>requestStatus(x)==="pending").length;
-  const tokenApproved=allRequests.filter(x=>requestStatus(x)==="approved").length;
-  const tokenRejected=allRequests.filter(x=>requestStatus(x)==="rejected").length;
-
-  if($("tokenPendingCount"))$("tokenPendingCount").textContent=tokenPending;
-  if($("tokenApprovedCount"))$("tokenApprovedCount").textContent=tokenApproved;
-  if($("tokenRejectedCount"))$("tokenRejectedCount").textContent=tokenRejected;
-
   const status=$("statusFilter").value;
   const search=$("searchInput").value.trim().toLowerCase();
 
@@ -1572,7 +1301,6 @@ $("refreshBtn").onclick=async()=>{
 
   try{
     await loadRequests();
-    await loadSaldoRequests();
   }finally{
     $("refreshBtn").disabled=false;
     $("refreshBtn").textContent="↻ Refresh";
@@ -1581,8 +1309,6 @@ $("refreshBtn").onclick=async()=>{
 
 $("statusFilter").onchange=render;
 $("searchInput").oninput=render;
-$("saldoStatusFilter").onchange=renderSaldoRequests;
-$("saldoSearchInput").oninput=renderSaldoRequests;
 
 $("loginPassword").addEventListener("keydown",e=>{
   if(e.key==="Enter")$("loginBtn").click();
