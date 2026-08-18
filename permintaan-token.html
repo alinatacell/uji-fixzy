@@ -299,7 +299,6 @@ async function loadAdminProfile(user){
   $("adminArea").classList.remove("hidden");
   $("logoutBtn").classList.remove("hidden");
 
-  await loadAvailableTokens().catch(e=>console.warn("Daftar token:",e));
   await loadRequests();
 }
 
@@ -337,126 +336,86 @@ function getTokens(x){
 }
 
 
-function tokenData(d){
+function tokenUsed(d){
+  const s=String(d.status??d.tokenStatus??d.state??'').toLowerCase().trim();
+  return d.used===true||d.digunakan===true||d.terpakai===true||d.isUsed===true||
+    d.assigned===true||d.sold===true||!!d.usedBy||!!d.usedAt||
+    ['used','terpakai','dipakai','usedup','assigned','sold','inactive','nonaktif','disabled','expired'].includes(s);
+}
+
+function tokenValueFromDoc(d,id=''){
   const x=d.data?d.data():(d||{});
+  return String(x.token??x.kodeToken??x.registrationToken??x.tokenCode??x.code??x.kode??x.value??id??'').trim();
+}
 
-  const token=String(
-    x.token ?? x.kodeToken ?? x.registrationToken ??
-    x.code ?? x.kode ?? x.value ?? ""
-  ).trim();
+function tokenType(d){
+  const x=d.data?d.data():(d||{});
+  return String(x.tipe??x.tokenType??x.jenis??x.jenisToken??x.type??x.kategori??x.requestType??'').toLowerCase().trim();
+}
 
-  const rawJenis=String(
-    x.jenisToken ?? x.tokenType ?? x.token_type ??
-    x.jenis ?? x.tipe ?? x.type ?? x.kategori ??
-    x.category ?? x.productType ?? x.requestType ?? ""
-  ).toLowerCase().trim();
+function tokenPrice(d,type,requestPrice=0){
+  const x=d.data?d.data():(d||{});
+  const v=type==='registrasi'
+    ?(x.hargaRegistrasi??x.hargaTokenRegistrasi??x.hargaToken??x.harga??x.price??x.amount)
+    :(x.hargaPerpanjangan??x.hargaTokenPerpanjangan??x.hargaToken??x.harga??x.price??x.amount);
+  const n=Number(v);
+  return Number.isFinite(n)&&n>0?n:Number(requestPrice)||0;
+}
 
-  let jenis="";
-  if(
-    rawJenis.includes("perpanjang") ||
-    rawJenis.includes("renew") ||
-    rawJenis.includes("extend")
-  ){
-    jenis="perpanjangan";
-  }else if(
-    rawJenis.includes("registr") ||
-    rawJenis.includes("baru") ||
-    rawJenis.includes("new")
-  ){
-    jenis="registrasi";
+function isRequestDocument(colName,d){
+  if(colName!=='registrationTokens')return false;
+  return !!(d.resellerUid||d.requestStatus||d.jumlahRequest||d.jumlahTokenDiminta||d.notificationAdmin||d.requestType==='registrasi'||d.requestType==='perpanjangan');
+}
+
+function tokenValidForRequest(d,type,colName){
+  if(tokenUsed(d))return false;
+  if(isRequestDocument(colName,d))return false;
+
+  const tipe=tokenType(d);
+  const hari=Number(d.paketHari??d.durasiHari??d.masaAktifHari??0);
+  const paket=String(d.paketLabel??d.paketTerakhir??d.paket??d.durasi??d.masaAktif??'').trim();
+
+  if(type==='registrasi'){
+    // Token registrasi baru: 90 hari + penanda registrasi baru.
+    if(colName!=='registrationTokens')return false;
+    if(hari && hari!==90)return false;
+    if(tipe && !['registrasi_baru','aktivasi_baru','registrasi','registration'].includes(tipe))return false;
+    if(d.hanyaRegistrasiBaru!==undefined && d.hanyaRegistrasiBaru!==true)return false;
+    return true;
   }
 
-  // Harga bisa tersimpan dengan beberapa nama field.
-  const harga=Number(
-    x.harga ?? x.price ?? x.hargaToken ??
-    x.pricePerToken ?? x.nominal ?? x.amount ?? 0
-  ) || 0;
-
-  return {token,jenis,harga,data:x};
+  // Perpanjangan hanya dari collection tokens dan bukan token registrasi baru.
+  if(colName!=='tokens')return false;
+  if(tipe==='registrasi_baru'||tipe==='aktivasi_baru'||d.hanyaRegistrasiBaru===true)return false;
+  return hari>0||!!paket||!!d.hargaPerpanjangan||!!d.hargaTokenPerpanjangan||!!d.hargaToken||!!d.harga||!!d.price;
 }
 
-function tokenValueFromDoc(d){
-  return tokenData(d).token;
-}
-
-function tokenTypeMatches(d,requestType){
-  const t=tokenData(d);
-
-  // Jika dokumen token memiliki tipe, wajib sesuai request.
-  if(t.jenis) return t.jenis===requestType;
-
-  // Dukungan flag boolean untuk database lama.
-  const x=t.data||{};
-  if(requestType==="registrasi"){
-    if(x.registrasi===true || x.isRegistrasi===true || x.registration===true) return true;
-    if(x.perpanjangan===true || x.isPerpanjangan===true || x.renewal===true) return false;
-  }else{
-    if(x.perpanjangan===true || x.isPerpanjangan===true || x.renewal===true) return true;
-    if(x.registrasi===true || x.isRegistrasi===true || x.registration===true) return false;
-  }
-
-  // Kalau token lama sama sekali tidak punya penanda tipe,
-  // jangan mencampurkan token ke dropdown yang jenisnya tidak diketahui.
-  return false;
-}
-
-function tokenAvailable(d){
-  const t=tokenData(d);
-  const x=t.data||{};
-  const status=String(x.status??x.state??x.kondisi??"").toLowerCase().trim();
-
-  if(x.used===true || x.terpakai===true || x.dipakai===true ||
-     x.isUsed===true || x.assigned===true || x.sold===true) return false;
-
-  if(["used","terpakai","dipakai","assigned","sold","inactive","nonaktif","disabled","expired"].includes(status)) return false;
-  if(x.available===false || x.tersedia===false) return false;
-
-  return !!t.token;
-}
-
-async function loadAvailableTokens(requestType=""){
-  const snap=await getDocs(collection(db,"tokens"));
-  const arr=[];
+async function loadAvailableTokens(requestType,requestPrice=0){
+  availableTokens=[];
   const seen=new Set();
+  const collections=requestType==='registrasi'?['registrationTokens']:['tokens'];
 
-  snap.forEach(d=>{
-    if(!tokenAvailable(d))return;
-    if(requestType && !tokenTypeMatches(d,requestType))return;
+  for(const colName of collections){
+    let snap;
+    try{ snap=await getDocs(collection(db,colName)); }catch(e){ continue; }
 
-    const t=tokenData(d);
-    const key=t.token.toLowerCase();
-    if(seen.has(key))return;
-    seen.add(key);
+    snap.forEach(d=>{
+      const data=d.data()||{};
+      const token=tokenValueFromDoc(data,d.id);
+      if(!token||seen.has(token.toLowerCase()))return;
+      if(!tokenValidForRequest(data,requestType,colName))return;
 
-    arr.push({
-      id:d.id,
-      token:t.token,
-      harga:t.harga,
-      jenis:t.jenis,
-      data:t.data
+      const price=tokenPrice(data,requestType,requestPrice);
+      // Perpanjangan wajib punya harga agar tagihan benar-benar mengikuti token.
+      if(requestType==='perpanjangan'&&price<=0)return;
+
+      availableTokens.push({id:d.id,collection:colName,token,price,data});
+      seen.add(token.toLowerCase());
     });
-  });
+  }
 
-  availableTokens=arr;
-  return arr;
-}
-
-async function loadAvailableTokens(){
-  const snap=await getDocs(collection(db,"tokens"));
-  const arr=[];
-  const seen=new Set();
-
-  snap.forEach(d=>{
-    if(!tokenAvailable(d))return;
-    const token=tokenValueFromDoc(d);
-    const key=token.toLowerCase();
-    if(seen.has(key))return;
-    seen.add(key);
-    arr.push({id:d.id,token,data:d.data()||{}});
-  });
-
-  availableTokens=arr;
-  return arr;
+  availableTokens.sort((a,b)=>String(a.token).localeCompare(String(b.token)));
+  return availableTokens;
 }
 
 function selectedFor(id){
@@ -464,119 +423,105 @@ function selectedFor(id){
   return selectedTokensByRequest[id];
 }
 
+function selectedTokenDocs(id){
+  const set=selectedFor(id);
+  return availableTokens.filter(t=>set.has(t.id));
+}
+
+function selectedTotal(id){
+  return selectedTokenDocs(id).reduce((sum,t)=>sum+(Number(t.price)||0),0);
+}
+
+function selectedUnitPrice(id){
+  const prices=selectedTokenDocs(id).map(t=>Number(t.price)||0).filter(v=>v>0);
+  if(!prices.length)return 0;
+  const unique=[...new Set(prices)];
+  return unique.length===1?unique[0]:0;
+}
+
 function updateSelectedUI(id){
   const set=selectedFor(id);
-  const qty=$("qty-"+id);
-  const price=$("price-"+id);
-  const count=$("token-count-"+id);
-  const total=$("live-total-"+id);
+  const qty=$('qty-'+id);
+  const price=$('price-'+id);
+  const count=$('token-count-'+id);
+  const total=$('live-total-'+id);
+  const selected=selectedTokenDocs(id);
+  const sum=selected.reduce((n,t)=>n+(Number(t.price)||0),0);
+  const unit=selectedUnitPrice(id);
 
   if(qty)qty.value=set.size;
   if(count)count.textContent=`${set.size} token dipilih`;
-
-  const selected=selectedTokenDocs(id);
-  const sum=selected.reduce((n,t)=>n+(Number(t.harga)||0),0);
-
-  if(price){
-    if(selected.length){
-      const samePrice=selected.every(t=>
-        Number(t.harga||0)===Number(selected[0].harga||0)
-      );
-      price.value=samePrice ? (Number(selected[0].harga)||0) : sum;
-    }else{
-      price.value="";
-    }
-  }
-
+  if(price)price.value=unit>0?unit:(selected.length?'Harga mengikuti token':'');
   if(total)total.textContent=rupiah(sum);
 
-  const panel=$("token-panel-"+id);
+  const panel=$('token-panel-'+id);
   if(panel){
-    panel.querySelectorAll("input[data-token-id]").forEach(cb=>{
-      cb.checked=set.has(cb.dataset.tokenId);
-    });
-
-    const btn=$("token-select-"+id);
-    const preview=$("token-preview-"+id);
-
-    if(btn){
-      btn.classList.toggle("open",panel.classList.contains("show"));
-    }
-
+    panel.querySelectorAll('input[data-token-id]').forEach(cb=>{ cb.checked=set.has(cb.dataset.tokenId); });
+    const btn=$('token-select-'+id);
+    const preview=$('token-preview-'+id);
+    if(btn)btn.classList.toggle('open',panel.classList.contains('show'));
     if(preview){
       if(set.size){
-        const selected=selectedTokenDocs(id).map(t=>t.token);
-        preview.textContent=`${set.size} token dipilih • ${selected.slice(0,2).join(", ")}${selected.length>2?" ...":""}`;
-      }else{
-        preview.textContent="Klik di sini untuk melihat daftar token";
-      }
+        const names=selected.map(t=>t.token);
+        preview.textContent=`${set.size} token dipilih • ${names.slice(0,2).join(', ')}${names.length>2?' ...':''}`;
+      }else preview.textContent='Klik di sini untuk melihat daftar token';
     }
   }
 }
 
 function renderTokenOptions(id){
-  const box=$("token-options-"+id);
+  const box=$('token-options-'+id);
   if(!box)return;
-
-  const search=($("token-search-"+id)?.value||"").trim().toLowerCase();
+  const search=($('token-search-'+id)?.value||'').trim().toLowerCase();
   const set=selectedFor(id);
   const list=availableTokens.filter(t=>!search||t.token.toLowerCase().includes(search));
 
   if(!list.length){
-    box.innerHTML='<div class="token-empty">Tidak ada token tersedia.</div>';
+    box.innerHTML='<div class="token-empty">Tidak ada token tersedia untuk jenis request ini.</div>';
     updateSelectedUI(id);
     return;
   }
 
   box.innerHTML=list.map(t=>`
     <label class="token-option">
-      <input type="checkbox" data-token-id="${esc(t.id)}"
-        ${set.has(t.id)?"checked":""}
+      <input type="checkbox" data-token-id="${esc(t.id)}" ${set.has(t.id)?'checked':''}
         onchange="selectToken('${esc(id)}','${esc(t.id)}',this.checked)">
-      <span class="token-value">
-        ${esc(t.token)}
-        ${Number(t.harga)>0
-          ? `<small style="display:block;color:#166534;margin-top:3px">
-               Rp ${Number(t.harga).toLocaleString("id-ID")}
-             </small>`
-          : ""}
-      </span>
-      <span class="token-status">TERSEDIA</span>
+      <span class="token-value">${esc(t.token)}</span>
+      <span class="token-status">${t.price>0?esc(rupiah(t.price)):'Harga belum ada'}</span>
     </label>
-  `).join("");
-
+  `).join('');
   updateSelectedUI(id);
 }
 
 window.toggleTokenPicker=async id=>{
-  const panel=$("token-panel-"+id);
+  const panel=$('token-panel-'+id);
   if(!panel)return;
-  panel.classList.toggle("show");
-  const btn=$("token-select-"+id);
-  if(btn)btn.classList.toggle("open",panel.classList.contains("show"));
+  panel.classList.toggle('show');
+  const btn=$('token-select-'+id);
+  if(btn)btn.classList.toggle('open',panel.classList.contains('show'));
 
-  if(panel.classList.contains("show")){
+  if(panel.classList.contains('show')){
     try{
-      const request=allRequests.find(x=>x.id===id);
-      const requestType=String(request?.requestType||"registrasi").toLowerCase();
-      await loadAvailableTokens(requestType);
+      const request=allRequests.find(x=>x.id===id)||{};
+      const type=request.requestType==='perpanjangan'?'perpanjangan':'registrasi';
+      const requestPrice=Number(request.hargaToken||0)||0;
+      await loadAvailableTokens(type,requestPrice);
       renderTokenOptions(id);
       setTimeout(()=>{
-        const search=$("token-search-"+id);
-        if(search) search.focus({preventScroll:true});
+        const search=$('token-search-'+id);
+        if(search)search.focus({preventScroll:true});
       },50);
     }catch(e){
-      $("token-options-"+id).innerHTML=
-        `<div class="token-empty">Gagal membaca daftar token: ${esc(e.message)}</div>`;
+      $('token-options-'+id).innerHTML=`<div class="token-empty">Gagal membaca daftar token: ${esc(e.message)}</div>`;
     }
   }
 };
 
 window.closeTokenPicker=id=>{
-  const panel=$("token-panel-"+id);
-  if(panel)panel.classList.remove("show");
-  const btn=$("token-select-"+id);
-  if(btn)btn.classList.remove("open");
+  const panel=$('token-panel-'+id);
+  if(panel)panel.classList.remove('show');
+  const btn=$('token-select-'+id);
+  if(btn)btn.classList.remove('open');
   updateSelectedUI(id);
 };
 
@@ -589,27 +534,17 @@ window.selectToken=(requestId,tokenId,checked)=>{
 
   if(checked){
     if(set.size>=max){
-      const cb=document.querySelector(
-        `#token-options-${CSS.escape(requestId)} input[data-token-id="${CSS.escape(tokenId)}"]`
-      );
+      const cb=document.querySelector(`#token-options-${CSS.escape(requestId)} input[data-token-id="${CSS.escape(tokenId)}"]`);
       if(cb)cb.checked=false;
-      showModal("Batas Request",`Reseller hanya meminta ${max} token.`);
+      showModal('Batas Request',`Reseller meminta ${max} token. Anda boleh menyetujui kurang dari ${max}, tetapi tidak boleh lebih.`);
       return;
     }
     set.add(tokenId);
-  }else{
-    set.delete(tokenId);
-  }
+  }else set.delete(tokenId);
 
   updateSelectedUI(requestId);
-  const qtyEl=$("qty-"+requestId);
-  if(qtyEl)qtyEl.value=set.size;
 };
 
-function selectedTokenDocs(id){
-  const set=selectedFor(id);
-  return availableTokens.filter(t=>set.has(t.id));
-}
 
 function render(){
   const status=$("statusFilter").value;
@@ -708,10 +643,9 @@ function render(){
           <div class="admin-box">
             <div class="price-row">
               <div class="form-row">
-                <label>Harga Token (otomatis dari token yang dipilih)</label>
-                <input id="price-${esc(x.id)}" type="number" min="0" inputmode="numeric"
-                  value="${Number(x.hargaToken||0)||""}"
-                  placeholder="Contoh: 5000">
+                <label>Harga Token (otomatis)</label>
+                <input id="price-${esc(x.id)}" type="text" readonly
+                  value="" placeholder="Pilih token terlebih dahulu">
               </div>
               <div class="form-row">
                 <label>Jumlah Disetujui</label>
@@ -754,7 +688,7 @@ function render(){
                 </div>
               </div>
               <div class="tokens-hint">
-                Klik kolom di atas → daftar token muncul. Ceklis token yang mau diberikan.
+                Klik kolom di atas → pilih token sesuai jenis request. Harga dan tagihan mengikuti token yang diceklis.
               </div>
             </div>
 
@@ -852,185 +786,91 @@ async function loadRequests(){
 
 window.approveRequest=async id=>{
   if(!adminUser){
-    showModal("Belum Login","Silakan login Firebase sebagai admin.");
+    showModal('Belum Login','Silakan login Firebase sebagai admin.');
     return;
   }
 
   const item=allRequests.find(x=>x.id===id);
   if(!item)return;
 
-  const qtyRequested=
-    Number(item.jumlahRequest??item.jumlahTokenDiminta??1)||1;
-
-  let qty=Number($("qty-"+id)?.value||0);
-  let price=Number($("price-"+id)?.value||0);
-
-  if(!Number.isSafeInteger(qty)||qty<1){
-    showModal("Jumlah Tidak Valid","Jumlah disetujui minimal 1 token.");
-    return;
-  }
-
-  if(qty>qtyRequested){
-    showModal(
-      "Jumlah Melebihi Request",
-      `Reseller meminta ${qtyRequested} token. Jumlah disetujui tidak boleh lebih dari jumlah request.`
-    );
-    return;
-  }
-
-  if(!Number.isFinite(price)||price<0){
-    showModal("Harga Tidak Valid","Masukkan harga per token yang benar.");
-    return;
-  }
-
+  const qtyRequested=Number(item.jumlahRequest??item.jumlahTokenDiminta??1)||1;
   const selectedDocs=selectedTokenDocs(id);
-  const tokens=selectedDocs.map(t=>t.token);
-  qty=selectedDocs.length;
-  $("qty-"+id).value=qty;
+  const qty=selectedDocs.length;
 
   if(qty<1){
-    showModal("Token Belum Dipilih","Pilih token dari daftar Firebase terlebih dahulu.");
+    showModal('Token Belum Dipilih','Pilih token dari daftar terlebih dahulu.');
     return;
   }
-
-  // Request tidak boleh disetujui sebagian.
-  // Jika reseller meminta 4 token, admin harus memilih tepat 4 token.
-  if(qty!==qtyRequested){
-    showModal(
-      "Jumlah Token Belum Lengkap",
-      `Request ini meminta ${qtyRequested} token. Pilih tepat ${qtyRequested} token dari dropdown. Jika token tidak mencukupi, gunakan tombol Tolak dan beri catatan.`
-    );
-    return;
-  }
-
   if(qty>qtyRequested){
-    showModal("Jumlah Melebihi Request",`Reseller meminta ${qtyRequested} token.`);
+    showModal('Jumlah Melebihi Request',`Reseller meminta ${qtyRequested} token. Jumlah yang disetujui tidak boleh lebih.`);
     return;
   }
 
-  const note=$("note-"+id)?.value.trim()||"";
-
-  // Harga setiap token berasal dari dokumen token Firebase.
-  // Tagihan = jumlah harga token yang benar-benar diberikan.
-  const calculatedTotal=selectedDocs.reduce(
-    (n,t)=>n+(Number(t.harga)||0),0
-  );
-
-  if(selectedDocs.some(t=>!(Number(t.harga)>0))){
-    showModal(
-      "Harga Token Belum Ada",
-      "Ada token terpilih yang belum memiliki harga di Firebase. Lengkapi field harga pada token tersebut terlebih dahulu."
-    );
+  // Tagihan dihitung dari token yang benar-benar diceklis.
+  const prices=selectedDocs.map(t=>Number(t.price)||0);
+  if(prices.some(p=>p<=0)){
+    showModal('Harga Token Belum Ada','Semua token yang dipilih harus memiliki harga agar tagihan dapat dihitung otomatis.');
     return;
   }
+  const total=prices.reduce((sum,p)=>sum+p,0);
+  const uniquePrices=[...new Set(prices)];
+  const price=uniquePrices.length===1?uniquePrices[0]:0;
+  const tokens=selectedDocs.map(t=>t.token);
+  const note=$('note-'+id)?.value.trim()||'';
 
-  price=qty>0 ? calculatedTotal/qty : 0;
-
-  const btn=document.querySelector(
-    `button[onclick="approveRequest('${CSS.escape(id)}')"]`
-  );
-
-  if(btn){
-    btn.disabled=true;
-    btn.textContent="Menyimpan...";
-  }
+  const btn=document.querySelector(`button[onclick="approveRequest('${CSS.escape(id)}')"]`);
+  if(btn){btn.disabled=true;btn.textContent='Menyimpan...';}
 
   try{
-    const total=calculatedTotal;
-
-    await runTransaction(db, async transaction=>{
-      // Pastikan token masih tersedia sebelum diberikan.
+    await runTransaction(db,async transaction=>{
+      // Cek ulang stok di dalam transaction supaya token tidak bisa diberikan dua kali.
       for(const selected of selectedDocs){
-        const tokenRef=doc(db,"tokens",selected.id);
-        const snap=await transaction.get(tokenRef);
-        if(!snap.exists()) throw new Error(`Token ${selected.token} sudah tidak tersedia.`);
-
+        const ref=doc(db,selected.collection,selected.id);
+        const snap=await transaction.get(ref);
+        if(!snap.exists())throw new Error(`Token ${selected.token} sudah tidak tersedia.`);
         const fresh=snap.data()||{};
-        const status=String(fresh.status||"").toLowerCase();
-        if(
-          fresh.used===true || fresh.terpakai===true || fresh.dipakai===true ||
-          fresh.assigned===true || fresh.sold===true ||
-          ["used","terpakai","dipakai","assigned","sold"].includes(status)
-        ){
-          throw new Error(`Token ${selected.token} sudah digunakan.`);
-        }
+        if(tokenUsed(fresh))throw new Error(`Token ${selected.token} sudah digunakan.`);
       }
 
       for(const selected of selectedDocs){
-        transaction.update(doc(db,"tokens",selected.id),{
-          status:"used",
-          used:true,
-          terpakai:true,
-          assigned:true,
-          assignedTo:item.resellerUid||"",
-          assignedEmail:item.resellerEmail||"",
-          assignedRequestId:id,
-          assignedAt:serverTimestamp(),
-          updatedAt:serverTimestamp()
+        transaction.update(doc(db,selected.collection,selected.id),{
+          status:'used',used:true,terpakai:true,assigned:true,
+          assignedTo:item.resellerUid||'',assignedEmail:item.resellerEmail||'',
+          assignedRequestId:id,assignedAt:serverTimestamp(),updatedAt:serverTimestamp()
         });
       }
 
-      transaction.update(
-        doc(db,"registrationTokens",id),
-        {
-          requestStatus:"approved",
-        status:"approved",
-
+      transaction.update(doc(db,'registrationTokens',id),{
+        requestStatus:'approved',status:'approved',
         jumlahDisetujui:qty,
+        jumlahTokenDisetujui:qty,
         jumlahTagihan:total,
         totalTagihan:total,
         hargaToken:price,
-        tokenRequestType:String(item.requestType||"registrasi").toLowerCase(),
-
-        tokens:tokens,
-
-        /*
-         * Field lama tetap diisi agar kompatibel dengan halaman reseller.
-         */
-        token:tokens.length===1?tokens[0]:"",
-        kodeToken:tokens.length===1?tokens[0]:"",
-        registrationToken:tokens.length===1?tokens[0]:"",
-
+        hargaPerToken:price,
+        hargaTokens:prices,
+        tokens,
+        token:tokens.length===1?tokens[0]:'',
+        kodeToken:tokens.length===1?tokens[0]:'',
+        registrationToken:tokens.length===1?tokens[0]:'',
         adminUid:adminUser.uid,
-        adminEmail:adminUser.email||"",
-        adminNama:
-          adminProfile.namaToko||
-          adminProfile.nama||
-          adminProfile.displayName||
-          adminUser.email||
-          "",
-
+        adminEmail:adminUser.email||'',
+        adminNama:adminProfile.namaToko||adminProfile.nama||adminProfile.displayName||adminUser.email||'',
         adminNote:note,
-
         notificationReseller:true,
         notificationAdmin:false,
-
-        approvedAt:serverTimestamp(),
-        updatedAt:serverTimestamp()
-      }
-      );
+        approvedAt:serverTimestamp(),updatedAt:serverTimestamp()
+      });
     });
 
+    await loadAvailableTokens(item.requestType==='perpanjangan'?'perpanjangan':'registrasi',Number(item.hargaToken||0));
     await loadRequests();
-
-    showModal(
-      "Berhasil Disetujui",
-      `${qty} token telah disetujui dengan tagihan ${rupiah(total)}. Data akan terbaca oleh reseller dari Firebase.`
-    );
-
+    showModal('Berhasil Disetujui',`${qty} token telah disetujui. Tagihan otomatis ${rupiah(total)}.`);
   }catch(e){
-    console.error("approve:",e);
-    showModal(
-      "Gagal Menyetujui",
-      e?.code==="permission-denied"
-        ? "Firebase menolak update. Pastikan akun admin benar-benar login dan Rules registrationTokens mengizinkan update untuk user yang login."
-        : (e?.message||String(e))
-    );
+    console.error('approve:',e);
+    showModal('Gagal Menyetujui',e?.code==='permission-denied'?'Firebase menolak perubahan stok/request. Pastikan Rules mengizinkan admin update pada collection token dan registrationTokens.':(e?.message||String(e)));
   }finally{
-    if(btn){
-      btn.disabled=false;
-      btn.textContent="✅ Setujui";
-    }
+    if(btn){btn.disabled=false;btn.textContent='✅ Setujui';}
   }
 };
 
