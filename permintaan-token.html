@@ -451,8 +451,8 @@ async function openTokenPicker(){
    Perbaikan utama:
    - jumlah request dibaca dari banyak field
    - semua token disimpan dalam array
-   - token01...token10 juga disimpan agar laporan
-     lama yang hanya membaca field token tidak kehilangan data
+   - token1...tokenN juga disimpan untuk kompatibilitas laporan lama
+     tanpa membatasi jumlah token yang dapat disetujui
    - batch dipakai untuk perubahan stok token
 ========================= */
 function buildTokenUpdate(){
@@ -475,19 +475,26 @@ async function markChosenTokens(chosen){
 
 function tokenFields(tokens){
  const out={
+  // Array ini adalah sumber utama dan tidak dibatasi 10 token.
   tokens:tokens,
   tokenCount:tokens.length,
   jumlahTokenDisetujui:tokens.length,
+
+  // Field pertama tetap dipertahankan untuk kompatibilitas halaman lama.
   token:tokens[0]||"",
   kodeToken:tokens[0]||"",
   registrationToken:tokens[0]||""
  };
- for(let i=0;i<10;i++){
+
+ // Simpan token1..tokenN sesuai jumlah yang benar-benar disetujui.
+ // Tidak lagi dibatasi hanya token1 sampai token10.
+ tokens.forEach((token,i)=>{
   const n=i+1;
-  out["token"+n]=tokens[i]||"";
-  out["kodeToken"+n]=tokens[i]||"";
-  out["registrationToken"+n]=tokens[i]||"";
- }
+  out["token"+n]=token||"";
+  out["kodeToken"+n]=token||"";
+  out["registrationToken"+n]=token||"";
+ });
+
  return out;
 }
 
