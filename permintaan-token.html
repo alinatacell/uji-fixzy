@@ -52,6 +52,18 @@ textarea{min-height:110px;resize:vertical}
 .green{background:#16a34a;color:#fff;flex:1}.danger{background:#fee2e2;color:#991b1b;flex:1}.secondary{background:#e5e7eb;color:#111827}
 .price-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .tokens-hint{font-size:11px;color:#64748b;margin-top:5px}
+.token-picker{position:relative}
+.token-select{width:100%;min-height:48px;border:2px solid #111827;border-radius:9px;padding:11px 12px;background:#fff;color:#111827;font:inherit;font-weight:800;text-align:left;cursor:pointer}
+.token-panel{display:none;margin-top:7px;border:2px solid #111827;border-radius:10px;background:#fff;max-height:280px;overflow:auto;padding:6px}
+.token-panel.show{display:block}
+.token-search{width:100%;min-height:40px;margin-bottom:6px;border:1px solid #cbd5e1;border-radius:8px;padding:8px;background:#f8fafc}
+.token-option{display:flex;align-items:center;gap:9px;padding:9px 8px;border-bottom:1px solid #e5e7eb;font-size:12px;cursor:pointer}
+.token-option:last-child{border-bottom:0}
+.token-option input{width:19px;min-height:19px;flex:0 0 19px}
+.token-value{font-family:monospace;font-weight:800;word-break:break-all}
+.token-status{font-size:10px;color:#64748b;margin-left:auto}
+.token-count{font-size:11px;font-weight:900;color:#166534;margin-top:6px}
+.token-loading,.token-empty{padding:12px;text-align:center;color:#64748b;font-size:12px}
 .empty{text-align:center;color:#94a3b8;padding:25px;font-size:13px}
 .loading{text-align:center;color:#64748b;padding:25px;font-size:13px}
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:100;align-items:center;justify-content:center;padding:14px}
@@ -174,7 +186,8 @@ import {
   updateDoc,
   doc,
   getDoc,
-  serverTimestamp
+  serverTimestamp,
+  runTransaction
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const firebaseConfig={
@@ -193,6 +206,8 @@ const db=getFirestore(app);
 let adminUser=null;
 let adminProfile={};
 let allRequests=[];
+let availableTokens=[];
+const selectedTokensByRequest={};
 
 const $=id=>document.getElementById(id);
 
@@ -254,6 +269,7 @@ async function loadAdminProfile(user){
   $("adminArea").classList.remove("hidden");
   $("logoutBtn").classList.remove("hidden");
 
+  await loadAvailableTokens().catch(e=>console.warn("Daftar token:",e));
   await loadRequests();
 }
 
@@ -288,6 +304,148 @@ function getTokens(x){
   });
 
   return [...new Set(vals.map(v=>String(v||"").trim()).filter(Boolean))];
+}
+
+
+function tokenValueFromDoc(d){
+  const x=d.data?d.data():(d||{});
+  return String(
+    x.token ?? x.kodeToken ?? x.registrationToken ??
+    x.code ?? x.kode ?? x.value ?? ""
+  ).trim();
+}
+
+function tokenAvailable(d){
+  const x=d.data?d.data():(d||{});
+  const status=String(x.status??x.state??x.kondisi??"").toLowerCase().trim();
+
+  if(x.used===true || x.terpakai===true || x.dipakai===true ||
+     x.isUsed===true || x.assigned===true || x.sold===true) return false;
+
+  if(["used","terpakai","dipakai","assigned","sold","inactive","nonaktif","disabled","expired"].includes(status)) return false;
+  if(x.available===false || x.tersedia===false) return false;
+
+  return !!tokenValueFromDoc(d);
+}
+
+async function loadAvailableTokens(){
+  const snap=await getDocs(collection(db,"tokens"));
+  const arr=[];
+  const seen=new Set();
+
+  snap.forEach(d=>{
+    if(!tokenAvailable(d))return;
+    const token=tokenValueFromDoc(d);
+    const key=token.toLowerCase();
+    if(seen.has(key))return;
+    seen.add(key);
+    arr.push({id:d.id,token,data:d.data()||{}});
+  });
+
+  availableTokens=arr;
+  return arr;
+}
+
+function selectedFor(id){
+  if(!selectedTokensByRequest[id])selectedTokensByRequest[id]=new Set();
+  return selectedTokensByRequest[id];
+}
+
+function updateSelectedUI(id){
+  const set=selectedFor(id);
+  const qty=$("qty-"+id);
+  const price=$("price-"+id);
+  const count=$("token-count-"+id);
+  const total=$("live-total-"+id);
+
+  if(qty)qty.value=set.size;
+  if(count)count.textContent=`${set.size} token dipilih`;
+
+  const p=Number(price?.value||0);
+  if(total)total.textContent=rupiah(p*set.size);
+
+  const panel=$("token-panel-"+id);
+  if(panel){
+    panel.querySelectorAll("input[data-token-id]").forEach(cb=>{
+      cb.checked=set.has(cb.dataset.tokenId);
+    });
+    const btn=panel.previousElementSibling;
+    if(btn)btn.textContent=set.size
+      ? `🔑 ${set.size} Token Dipilih — Klik untuk ubah`
+      : "🔑 Pilih Token dari Daftar";
+  }
+}
+
+function renderTokenOptions(id){
+  const box=$("token-options-"+id);
+  if(!box)return;
+
+  const search=($("token-search-"+id)?.value||"").trim().toLowerCase();
+  const set=selectedFor(id);
+  const list=availableTokens.filter(t=>!search||t.token.toLowerCase().includes(search));
+
+  if(!list.length){
+    box.innerHTML='<div class="token-empty">Tidak ada token tersedia.</div>';
+    updateSelectedUI(id);
+    return;
+  }
+
+  box.innerHTML=list.map(t=>`
+    <label class="token-option">
+      <input type="checkbox" data-token-id="${esc(t.id)}"
+        ${set.has(t.id)?"checked":""}
+        onchange="selectToken('${esc(id)}','${esc(t.id)}',this.checked)">
+      <span class="token-value">${esc(t.token)}</span>
+      <span class="token-status">TERSEDIA</span>
+    </label>
+  `).join("");
+
+  updateSelectedUI(id);
+}
+
+window.toggleTokenPicker=async id=>{
+  const panel=$("token-panel-"+id);
+  if(!panel)return;
+  panel.classList.toggle("show");
+
+  if(panel.classList.contains("show")){
+    try{
+      await loadAvailableTokens();
+      renderTokenOptions(id);
+    }catch(e){
+      $("token-options-"+id).innerHTML=
+        `<div class="token-empty">Gagal membaca daftar token: ${esc(e.message)}</div>`;
+    }
+  }
+};
+
+window.filterTokenOptions=id=>renderTokenOptions(id);
+
+window.selectToken=(requestId,tokenId,checked)=>{
+  const set=selectedFor(requestId);
+  const request=allRequests.find(x=>x.id===requestId);
+  const max=Number(request?.jumlahRequest??request?.jumlahTokenDiminta??1)||1;
+
+  if(checked){
+    if(set.size>=max){
+      const cb=document.querySelector(
+        `#token-options-${CSS.escape(requestId)} input[data-token-id="${CSS.escape(tokenId)}"]`
+      );
+      if(cb)cb.checked=false;
+      showModal("Batas Request",`Reseller hanya meminta ${max} token.`);
+      return;
+    }
+    set.add(tokenId);
+  }else{
+    set.delete(tokenId);
+  }
+
+  updateSelectedUI(requestId);
+};
+
+function selectedTokenDocs(id){
+  const set=selectedFor(id);
+  return availableTokens.filter(t=>set.has(t.id));
 }
 
 function render(){
@@ -395,16 +553,33 @@ function render(){
               <div class="form-row">
                 <label>Jumlah Disetujui</label>
                 <input id="qty-${esc(x.id)}" type="number" min="0" max="${requested}" inputmode="numeric"
-                  value="${approved||requested}">
+                  value="${approved||0}" readonly>
               </div>
             </div>
 
+            <div class="info" style="margin-bottom:12px">
+              <span>TAGIHAN BERJALAN</span>
+              <b id="live-total-${esc(x.id)}">Rp 0</b>
+            </div>
+
             <div class="form-row">
-              <label>Token — 1 token per baris</label>
-              <textarea id="tokens-${esc(x.id)}"
-                placeholder="Masukkan token di sini, satu token setiap baris">${esc(tokens.join("\\n"))}</textarea>
+              <label>Token yang Diberikan</label>
+              <div class="token-picker">
+                <button class="token-select" type="button" onclick="toggleTokenPicker('${esc(x.id)}')">
+                  🔑 Pilih Token dari Daftar
+                </button>
+                <div id="token-panel-${esc(x.id)}" class="token-panel">
+                  <input id="token-search-${esc(x.id)}" class="token-search"
+                    type="search" placeholder="Cari token..."
+                    oninput="filterTokenOptions('${esc(x.id)}')">
+                  <div id="token-options-${esc(x.id)}" class="token-loading">
+                    Memuat daftar token...
+                  </div>
+                </div>
+                <div id="token-count-${esc(x.id)}" class="token-count">0 token dipilih</div>
+              </div>
               <div class="tokens-hint">
-                Jumlah token yang dimasukkan harus sesuai dengan jumlah disetujui.
+                Klik kolom → daftar token muncul → centang token yang akan diberikan. Tagihan otomatis mengikuti jumlah token.
               </div>
             </div>
 
@@ -533,19 +708,18 @@ window.approveRequest=async id=>{
     return;
   }
 
-  const tokenText=$("tokens-"+id)?.value||"";
-  const tokens=[...new Set(
-    tokenText
-      .split(/\r?\n/)
-      .map(v=>v.trim())
-      .filter(Boolean)
-  )];
+  const selectedDocs=selectedTokenDocs(id);
+  const tokens=selectedDocs.map(t=>t.token);
+  qty=selectedDocs.length;
+  $("qty-"+id).value=qty;
 
-  if(tokens.length!==qty){
-    showModal(
-      "Jumlah Token Tidak Sesuai",
-      `Jumlah disetujui ${qty} token, tetapi token yang dimasukkan ${tokens.length}. Masukkan tepat ${qty} token, satu token per baris.`
-    );
+  if(qty<1){
+    showModal("Token Belum Dipilih","Pilih minimal 1 token dari daftar token Firebase.");
+    return;
+  }
+
+  if(qty>qtyRequested){
+    showModal("Jumlah Melebihi Request",`Reseller meminta ${qtyRequested} token.`);
     return;
   }
 
@@ -563,10 +737,42 @@ window.approveRequest=async id=>{
   try{
     const total=price*qty;
 
-    await updateDoc(
-      doc(db,"registrationTokens",id),
-      {
-        requestStatus:"approved",
+    await runTransaction(db, async transaction=>{
+      // Pastikan token masih tersedia sebelum diberikan.
+      for(const selected of selectedDocs){
+        const tokenRef=doc(db,"tokens",selected.id);
+        const snap=await transaction.get(tokenRef);
+        if(!snap.exists()) throw new Error(`Token ${selected.token} sudah tidak tersedia.`);
+
+        const fresh=snap.data()||{};
+        const status=String(fresh.status||"").toLowerCase();
+        if(
+          fresh.used===true || fresh.terpakai===true || fresh.dipakai===true ||
+          fresh.assigned===true || fresh.sold===true ||
+          ["used","terpakai","dipakai","assigned","sold"].includes(status)
+        ){
+          throw new Error(`Token ${selected.token} sudah digunakan.`);
+        }
+      }
+
+      for(const selected of selectedDocs){
+        transaction.update(doc(db,"tokens",selected.id),{
+          status:"used",
+          used:true,
+          terpakai:true,
+          assigned:true,
+          assignedTo:item.resellerUid||"",
+          assignedEmail:item.resellerEmail||"",
+          assignedRequestId:id,
+          assignedAt:serverTimestamp(),
+          updatedAt:serverTimestamp()
+        });
+      }
+
+      transaction.update(
+        doc(db,"registrationTokens",id),
+        {
+          requestStatus:"approved",
         status:"approved",
 
         jumlahDisetujui:qty,
@@ -600,7 +806,8 @@ window.approveRequest=async id=>{
         approvedAt:serverTimestamp(),
         updatedAt:serverTimestamp()
       }
-    );
+      );
+    });
 
     await loadRequests();
 
