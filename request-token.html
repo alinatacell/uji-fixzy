@@ -112,7 +112,7 @@ body.dark .modal-box{background:#151b23;color:#f3f4f6}
 
       <div class="form-row">
         <label>JUMLAH TOKEN YANG DIMINTA</label>
-        <input id="jumlahRequest" type="number" min="1" max="100" value="1" inputmode="numeric">
+        <input id="jumlahRequest" type="number" min="1" value="1" inputmode="numeric" placeholder="Contoh: 10, 25, 100, 500">
       </div>
 
       <div class="form-row">
@@ -586,10 +586,11 @@ async function loadHarga(jenis){
 }
 
 function getQuantity(){
-  let n=parseInt($("jumlahRequest").value,10);
+  let n=Number($("jumlahRequest").value);
 
-  if(!Number.isFinite(n)||n<1)n=1;
-  if(n>100)n=100;
+  // Tidak ada batas maksimum jumlah token dari sisi reseller.
+  // Admin tetap menentukan persetujuan dan ketersediaan stok token.
+  if(!Number.isSafeInteger(n)||n<1)n=1;
 
   $("jumlahRequest").value=n;
 
