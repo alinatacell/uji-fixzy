@@ -13,13 +13,33 @@ html,body{margin:0;width:100%;height:100%;font-family:Arial,Helvetica,sans-serif
 body{overflow:hidden}
 .header{height:62px;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;position:fixed;top:0;left:0;right:0;z-index:20;box-shadow:0 2px 12px rgba(0,0,0,.06)}
 .menu-btn{width:44px;height:44px;margin-left:9px;border:0;border-radius:11px;background:#111827;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer}
-.menu-btn span{width:21px;height:2px;background:#fff;border-radius:4px}
+
+/* Hanya warna 3 garis hamburger yang diubah menjadi kuning */
+.menu-btn span{width:21px;height:2px;background:#FFC107;border-radius:4px;box-shadow:0 1px 0 rgba(255,193,7,.45)}
+
 .header-running{flex:1;min-width:0;height:42px;margin-left:12px;margin-right:8px;overflow:hidden;display:flex;align-items:center;position:relative;border-radius:10px;background:#fff}
 .running-track{display:flex;align-items:center;width:max-content;white-space:nowrap;animation:fixzyRunning 28s linear infinite;font-size:12px;font-weight:800;color:#374151}
 .running-track span{display:inline-flex;align-items:center;margin-right:42px}
 @keyframes fixzyRunning{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+
+/* Nama akun dibuat efek 3D, posisi dan elemen lain tetap */
 .header-account{margin-left:auto;margin-right:13px;text-align:right;line-height:1.15}
-.account-name{font-size:12px;font-weight:900;max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.account-name{
+  font-size:12px;
+  font-weight:900;
+  max-width:190px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  color:#111827;
+  text-shadow:
+    1px 1px 0 #d1d5db,
+    2px 2px 0 #b8bec7,
+    3px 3px 0 #9ca3af,
+    0 4px 7px rgba(0,0,0,.20);
+  transform:perspective(160px) rotateX(2deg);
+  transform-origin:right center;
+}
 .account-exp{font-size:9px;color:#6b7280;margin-top:3px}
 .content{position:fixed;top:62px;left:0;right:0;bottom:0;background:#f3f4f6;overflow:hidden}
 .content iframe{width:100%;height:100%;border:0;display:block;background:#fff}
@@ -123,7 +143,6 @@ body{overflow:hidden}
    <button class="menu-link" data-page="saldo-token.html" data-roles="owner,employee,karyawan,kasir,kurir,reseller" data-permission="cekAktivasi" onclick="bukaHalaman(this)">
       <span class="ico">🪙</span>Resseler Fixzy
     </button>
-
 
     <button class="menu-link" data-page="cek-paket.html" data-roles="owner,employee,karyawan,kasir,kurir,reseller" data-permission="cekAktivasi" onclick="bukaHalaman(this)">
       <span class="ico">⌛</span>Cek Aktivasi
