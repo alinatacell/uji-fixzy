@@ -51,14 +51,13 @@ textarea{min-height:110px;resize:vertical}
 .green,.danger,.secondary{border:0;border-radius:10px;padding:12px;font-weight:900;box-shadow:3px 3px 0 #111827}
 .green{background:#16a34a;color:#fff;flex:1}.danger{background:#fee2e2;color:#991b1b;flex:1}.secondary{background:#e5e7eb;color:#111827}
 .price-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.tokens-hint{font-size:11px;color:#64748b;margin-top:5px;line-height:1.5}
-.free-label{display:inline-block;font-size:10px;font-weight:900;color:#166534;background:#dcfce7;border:1px solid #86efac;border-radius:999px;padding:4px 7px;margin-left:5px}
-.token-picker{position:relative;width:100%}
+.tokens-hint{font-size:11px;color:#64748b;margin-top:5px}
+.token-picker{position:relative}
 .token-select{
   width:100%;min-height:64px;border:2px solid #111827;border-radius:12px;
   padding:12px 44px 12px 14px;background:#fff;color:#111827;font:inherit;
   font-weight:800;text-align:left;cursor:pointer;position:relative;
-  box-shadow:2px 2px 0 #111827;display:block
+  box-shadow:2px 2px 0 #111827
 }
 .token-select:after{
   content:"▾";position:absolute;right:14px;top:50%;transform:translateY(-50%);
@@ -70,9 +69,9 @@ textarea{min-height:110px;resize:vertical}
   margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
 }
 .token-panel{
-  display:none;position:relative;width:100%;margin-top:8px;
+  display:none;position:absolute;left:0;right:0;top:calc(100% + 7px);
   z-index:80;border:2px solid #111827;border-radius:12px;background:#fff;
-  max-height:360px;overflow:hidden;padding:8px;box-shadow:4px 4px 0 #111827
+  max-height:330px;overflow:hidden;padding:8px;box-shadow:5px 5px 0 #111827
 }
 .token-panel.show{display:block}
 .token-search{
@@ -87,7 +86,36 @@ textarea{min-height:110px;resize:vertical}
 .token-option:last-child{border-bottom:0}
 .token-option input{width:20px;height:20px;flex:0 0 20px;accent-color:#16a34a}
 .token-value{font-family:monospace;font-weight:800;word-break:break-all;flex:1}
-.token-status{font-size:10px;color:#16a34a;font-weight:900;white-space:nowrap}
+.token-status{font-size:10px;color:#16a34a;font-weight:900}
+
+/* TOKEN RESELLER: SUDAH DIBELI/DIBERIKAN, TETAPI BELUM TERPAKAI */
+.token-option.reseller-owned{
+  background:#fff8d6;
+}
+.token-option.reseller-owned .token-status{
+  color:#92400e;
+}
+.reseller-owned-badge{
+  display:inline-block;
+  margin-top:8px;
+  padding:5px 8px;
+  border-radius:999px;
+  background:#ffc107;
+  color:#111827;
+  font-size:10px;
+  font-weight:900;
+}
+.token-owned-note{
+  margin-top:8px;
+  padding:8px 10px;
+  border-radius:9px;
+  background:#fff3b0;
+  color:#7c4a03;
+  font-size:10px;
+  line-height:1.45;
+  font-weight:800;
+}
+
 .token-count{font-size:11px;font-weight:900;color:#166534;margin-top:7px}
 .token-loading,.token-empty{padding:14px;text-align:center;color:#64748b;font-size:12px}
 .token-footer{
@@ -108,7 +136,6 @@ textarea{min-height:110px;resize:vertical}
  .grid,.price-row,.filters{grid-template-columns:1fr}
  .wrap{padding:12px}.card{padding:14px}
  .req-head{display:block}.badge{display:inline-block;margin-top:8px}
- .token-status{font-size:9px}
 }
 body.dark{background:#0b0f14;color:#f3f4f6}
 body.dark .card,body.dark .req{background:#151b23;color:#f3f4f6;border-color:#000}
@@ -133,64 +160,64 @@ body.dark .modal-box{background:#151b23;color:#f3f4f6}
 
 <main class="wrap">
 
-<section id="loginCard" class="card login-card">
-  <h2>Login Admin Firebase</h2>
-  <div class="sub">
-    Halaman admin login langsung ke Firebase Auth project FIXZY.
-    Setelah login, UID akan dicek ke <b>users/{UID}</b>.
-  </div>
-
-  <div id="loginError" class="error hidden"></div>
-
-  <div class="form-row">
-    <label>Email Admin</label>
-    <input id="loginEmail" type="email" autocomplete="username" placeholder="email admin">
-  </div>
-
-  <div class="form-row">
-    <label>Password</label>
-    <input id="loginPassword" type="password" autocomplete="current-password" placeholder="password">
-  </div>
-
-  <button id="loginBtn" class="primary" type="button">🔐 Login Firebase</button>
-</section>
-
-<section id="adminArea" class="hidden">
-<section class="card">
-  <div class="account">
-    <div>
-      <small>ADMIN LOGIN</small>
-      <b id="adminName">-</b>
-      <small id="adminEmail">-</small>
+  <section id="loginCard" class="card login-card">
+    <h2>Login Admin Firebase</h2>
+    <div class="sub">
+      Halaman admin login langsung ke Firebase Auth project FIXZY.
+      Setelah login, UID akan dicek ke <b>users/{UID}</b>.
     </div>
-    <div>
-      <small>ROLE</small>
-      <b id="adminRole">-</b>
+
+    <div id="loginError" class="error hidden"></div>
+
+    <div class="form-row">
+      <label>Email Admin</label>
+      <input id="loginEmail" type="email" autocomplete="username" placeholder="email admin">
     </div>
-  </div>
 
-  <h2>Request Token Masuk</h2>
-  <div class="sub">
-    Semua request dibaca dari collection <b>registrationTokens</b>.
-    <b>Token registrasi = GRATIS</b>. Token perpanjangan memakai harga paket/token.
-    <b>Keuntungan reseller = Rp 20.000 per token</b>.
-  </div>
+    <div class="form-row">
+      <label>Password</label>
+      <input id="loginPassword" type="password" autocomplete="current-password" placeholder="password">
+    </div>
 
-  <div class="filters">
-    <select id="statusFilter">
-      <option value="all">Semua Status</option>
-      <option value="pending">Menunggu</option>
-      <option value="approved">Disetujui</option>
-      <option value="rejected">Ditolak</option>
-    </select>
-    <input id="searchInput" type="search" placeholder="Cari nama, email, UID...">
-  </div>
+    <button id="loginBtn" class="primary" type="button">🔐 Login Firebase</button>
+  </section>
 
-  <div id="requestList" class="list">
-    <div class="loading">Memuat request...</div>
-  </div>
-</section>
-</section>
+  <section id="adminArea" class="hidden">
+
+    <section class="card">
+      <div class="account">
+        <div>
+          <small>ADMIN LOGIN</small>
+          <b id="adminName">-</b>
+          <small id="adminEmail">-</small>
+        </div>
+        <div>
+          <small>ROLE</small>
+          <b id="adminRole">-</b>
+        </div>
+      </div>
+
+      <h2>Request Token Masuk</h2>
+      <div class="sub">
+        Semua request dibaca dari collection <b>registrationTokens</b>.
+        Admin dapat menyetujui atau menolak request. Token yang diberikan ke reseller diberi tanda DIBELI RESELLER dan BELUM TERPAKAI; token baru menjadi terpakai saat benar-benar digunakan untuk aktivasi.
+      </div>
+
+      <div class="filters">
+        <select id="statusFilter">
+          <option value="all">Semua Status</option>
+          <option value="pending">Menunggu</option>
+          <option value="approved">Disetujui</option>
+          <option value="rejected">Ditolak</option>
+        </select>
+        <input id="searchInput" type="search" placeholder="Cari nama, email, UID...">
+      </div>
+
+      <div id="requestList" class="list">
+        <div class="loading">Memuat request...</div>
+      </div>
+    </section>
+  </section>
 </main>
 
 <div id="modal" class="modal">
@@ -204,11 +231,22 @@ body.dark .modal-box{background:#151b23;color:#f3f4f6}
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import {
-  getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import {
-  getFirestore,collection,query,orderBy,getDocs,updateDoc,doc,getDoc,
-  serverTimestamp,runTransaction
+  getFirestore,
+  collection,
+  query,
+  orderBy,
+  getDocs,
+  updateDoc,
+  doc,
+  getDoc,
+  serverTimestamp,
+  runTransaction
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const firebaseConfig={
@@ -252,25 +290,45 @@ window.closeModal=()=>$("modal").classList.remove("show");
 
 function roleIsAdmin(role){
   const r=String(role||"").toLowerCase().trim();
-  return ["owner","admin","superadmin","administrator","super_admin"].includes(r);
+  return [
+    "owner","admin","superadmin",
+    "administrator","super_admin"
+  ].includes(r);
 }
 
 async function loadAdminProfile(user){
   const snap=await getDoc(doc(db,"users",user.uid));
-  if(!snap.exists())throw new Error("Profil users/{UID} admin tidak ditemukan.");
+
+  if(!snap.exists()){
+    throw new Error("Profil users/{UID} admin tidak ditemukan.");
+  }
 
   const data=snap.data()||{};
+
   if(!roleIsAdmin(data.role)){
-    throw new Error("Akun berhasil login, tetapi role akun bukan owner/admin/superadmin.");
+    throw new Error(
+      "Akun berhasil login, tetapi role akun bukan owner/admin/superadmin."
+    );
   }
 
   adminProfile=data;
-  $("adminName").textContent=data.namaToko||data.nama||data.displayName||data.name||user.email||"-";
+
+  $("adminName").textContent=
+    data.namaToko||
+    data.nama||
+    data.displayName||
+    data.name||
+    user.email||
+    "-";
+
   $("adminEmail").textContent=user.email||"-";
   $("adminRole").textContent=String(data.role||"-").toUpperCase();
+
   $("loginCard").classList.add("hidden");
   $("adminArea").classList.remove("hidden");
   $("logoutBtn").classList.remove("hidden");
+
+  await loadAvailableTokens().catch(e=>console.warn("Daftar token:",e));
   await loadRequests();
 }
 
@@ -283,7 +341,9 @@ function requestStatus(x){
 
 function requestDate(x){
   try{
-    if(x.createdAt?.toDate)return x.createdAt.toDate().toLocaleString("id-ID");
+    if(x.createdAt?.toDate){
+      return x.createdAt.toDate().toLocaleString("id-ID");
+    }
   }catch(e){}
   return x.createdAtText||"-";
 }
@@ -292,237 +352,72 @@ function getTokens(x){
   if(Array.isArray(x.tokens)){
     return x.tokens.map(v=>String(v||"").trim()).filter(Boolean);
   }
+
   const vals=[];
   [x.token,x.kodeToken,x.registrationToken].forEach(v=>{
-    if(Array.isArray(v))v.forEach(t=>vals.push(t));
-    else if(v)String(v).split(/\r?\n|[,;]+/).forEach(t=>vals.push(t));
+    if(Array.isArray(v)){
+      v.forEach(t=>vals.push(t));
+    }else if(v){
+      String(v).split(/\r?\n|[,;]+/).forEach(t=>vals.push(t));
+    }
   });
+
   return [...new Set(vals.map(v=>String(v||"").trim()).filter(Boolean))];
 }
 
-function tokenUsed(d){
-  const s=String(d.status??d.tokenStatus??d.state??"").toLowerCase().trim();
-  return d.used===true||d.digunakan===true||d.terpakai===true||d.isUsed===true||
-    d.assigned===true||d.sold===true||!!d.usedBy||!!d.usedAt||
-    ["used","terpakai","dipakai","usedup","assigned","sold","inactive","nonaktif","disabled","expired"].includes(s);
-}
 
-function tokenValueFromDoc(d,id=""){
+function tokenValueFromDoc(d){
   const x=d.data?d.data():(d||{});
-  return String(x.token??x.kodeToken??x.registrationToken??x.tokenCode??x.code??x.kode??x.value??id??"").trim();
+  return String(
+    x.token ?? x.kodeToken ?? x.registrationToken ??
+    x.code ?? x.kode ?? x.value ?? ""
+  ).trim();
 }
 
-function tokenType(d){
+function tokenAvailable(d){
   const x=d.data?d.data():(d||{});
-  return String(x.tipe??x.tokenType??x.jenis??x.jenisToken??x.type??x.kategori??x.requestType??"").toLowerCase().trim();
+  const status=String(x.status??x.state??x.kondisi??"").toLowerCase().trim();
+
+  // Token yang sudah dimiliki/dibeli reseller bukan stok umum.
+  // Token tetap hidup di collection tokens dan masih bisa dipakai untuk aktivasi.
+  const resellerOwned =
+    x.purchasedByReseller===true ||
+    x.soldToReseller===true ||
+    !!x.soldToResellerUid ||
+    ["dibeli_reseller","sold_reseller"].includes(status);
+
+  if(resellerOwned) return false;
+
+  if(x.used===true || x.terpakai===true || x.dipakai===true ||
+     x.isUsed===true) return false;
+
+  if(["used","terpakai","dipakai","inactive","nonaktif","disabled","expired"].includes(status)) return false;
+  if(x.available===false || x.tersedia===false) return false;
+
+  return !!tokenValueFromDoc(d);
 }
 
-function tokenPrice(d,type,requestPrice=0){
-  const x=d.data?d.data():(d||{});
-  const v=type==="registrasi"
-    ?(x.hargaRegistrasi??x.hargaTokenRegistrasi??x.hargaToken??x.harga??x.price??x.amount)
-    :(x.hargaPerpanjangan??x.hargaTokenPerpanjangan??x.hargaToken??x.harga??x.price??x.amount);
-  const n=Number(v);
-  return Number.isFinite(n)&&n>0?n:Number(requestPrice)||0;
-}
-
-/* Harga normal paket:
-   3 bulan = 50.000
-   6 bulan = 80.000
-   12 bulan = 120.000
-   Keuntungan reseller = 20.000/token.
-*/
-const RESELLER_DISCOUNT=20000;
-
-function resellerTokenPrice(price,type){
-  const n=Number(price)||0;
-  if(type!=="perpanjangan")return 0;
-  if(n<=0)return 0;
-  return Math.max(0,n-RESELLER_DISCOUNT);
-}
-
-/* Perhitungan final selalu dilakukan dari harga masing-masing token,
-   bukan dari total lama/request. */
-function calculateBilling(selectedDocs,type){
-  if(type==="registrasi"){
-    return {
-      originalPrices:selectedDocs.map(()=>0),
-      resellerPrices:selectedDocs.map(()=>0),
-      originalTotal:0,
-      discountTotal:0,
-      total:0,
-      unitPrice:0
-    };
-  }
-
-  const originalPrices=selectedDocs.map(t=>Number(t.price)||0);
-
-  if(originalPrices.some(p=>p<=0)){
-    return null;
-  }
-
-  const resellerPrices=originalPrices.map(p=>resellerTokenPrice(p,type));
-  const originalTotal=originalPrices.reduce((a,b)=>a+b,0);
-  const discountTotal=RESELLER_DISCOUNT*selectedDocs.length;
-  const total=resellerPrices.reduce((a,b)=>a+b,0);
-  const unique=[...new Set(resellerPrices)];
-
-  return {
-    originalPrices,
-    resellerPrices,
-    originalTotal,
-    discountTotal,
-    total,
-    unitPrice:unique.length===1?unique[0]:0
-  };
-}
-
-function isRequestDocument(colName,d){
-  if(colName!=="registrationTokens")return false;
-  return !!(d.resellerUid||d.requestStatus||d.jumlahRequest||d.jumlahTokenDiminta||
-    d.notificationAdmin||d.requestType==="registrasi"||d.requestType==="perpanjangan");
-}
-
-function requestedDurationMonths(request){
-  const x=request||{};
-
-  // Field khusus request perpanjangan diprioritaskan agar paket tidak salah terbaca.
-  const fields=[
-    x.masaPerpanjangan,x.perpanjanganLabel,x.perpanjanganHari,
-    x.packageMonths,x.packageDays,x.packageLabel,
-    x.durasiBulan,x.masaAktifBulan,x.jumlahBulan,x.bulan,
-    x.paketBulan,x.lamaBulan,x.durasi,x.masaAktif,
-    x.paket,x.paketLabel,x.paketTerakhir,
-    x.durasiHari,x.masaAktifHari,x.paketHari
-  ];
-
-  for(const raw of fields){
-    if(raw===undefined||raw===null||raw==="")continue;
-    const s=String(raw).toLowerCase().trim().replace(/_/g," " );
-
-    const m=s.match(/(\d+(?:[.,]\d+)?)\s*(?:bulan|bln|month|months)/i);
-    if(m){
-      const n=Number(m[1].replace(",","."));
-      if(Number.isFinite(n)&&n>0)return Math.round(n);
-    }
-
-    const m2=s.match(/(?:^|\s)(3|6|12)\s*m(?:\s|$)/i);
-    if(m2)return Number(m2[1]);
-
-    if(/^(3|6|12)$/.test(s))return Number(s);
-
-    const n=Number(raw);
-    if(n===90)return 3;
-    if(n===180)return 6;
-    if(n===360||n===365)return 12;
-  }
-  return 0;
-}
-
-function tokenDurationMonths(d){
-  const x=d.data?d.data():(d||{});
-  return requestedDurationMonths({
-    // Struktur token stok FIXZY dan token pembelian reseller.
-    packageMonths:x.packageMonths,packageDays:x.packageDays,packageLabel:x.packageLabel,
-    durasiBulan:x.durasiBulan,masaAktifBulan:x.masaAktifBulan,
-    jumlahBulan:x.jumlahBulan,bulan:x.bulan,paketBulan:x.paketBulan,
-    lamaBulan:x.lamaBulan,durasi:x.durasi,masaAktif:x.masaAktif,
-    paket:x.paket,paketLabel:x.paketLabel,paketTerakhir:x.paketTerakhir,
-    durasiHari:x.durasiHari,masaAktifHari:x.masaAktifHari,paketHari:x.paketHari
-  });
-}
-
-function tokenMatchesRequestedDuration(tokenDoc,request){
-  const requested=requestedDurationMonths(request);
-  if(!requested)return true;
-  return tokenDurationMonths(tokenDoc)===requested;
-}
-
-function tokenValidForRequest(d,type,colName,request=null){
-  if(tokenUsed(d))return false;
-  if(isRequestDocument(colName,d))return false;
-
-  // Token yang sudah dibeli/dimiliki reseller tidak boleh muncul lagi
-  // di daftar token milik admin untuk request reseller lain.
-  const ownerStatus=String(d.status??d.tokenStatus??d.state??"").toLowerCase().trim();
-  if(d.resellerOwned===true||d.dibeliReseller===true||ownerStatus==="dibeli_reseller")return false;
-
-  if(request&&!tokenMatchesRequestedDuration(d,request))return false;
-
-  const tipe=tokenType(d);
-  const hari=Number(d.paketHari??d.durasiHari??d.masaAktifHari??0);
-  const paket=String(d.paketLabel??d.paketTerakhir??d.paket??d.durasi??d.masaAktif??"").trim();
-
-  if(type==="registrasi"){
-    if(colName!=="registrationTokens")return false;
-    if(tipe&&!["registrasi_baru","aktivasi_baru","registrasi","registration"].includes(tipe))return false;
-    if(d.hanyaRegistrasiBaru!==undefined&&d.hanyaRegistrasiBaru!==true)return false;
-    return true;
-  }
-
-  if(colName!=="tokens")return false;
-  if(tipe==="registrasi_baru"||tipe==="aktivasi_baru"||d.hanyaRegistrasiBaru===true)return false;
-  return hari>0||!!paket||!!d.hargaPerpanjangan||!!d.hargaTokenPerpanjangan||
-    !!d.hargaToken||!!d.harga||!!d.price;
-}
-
-async function loadAvailableTokens(requestType,requestPrice=0,request=null){
-  availableTokens=[];
+async function loadAvailableTokens(){
+  const snap=await getDocs(collection(db,"tokens"));
+  const arr=[];
   const seen=new Set();
-  const collections=requestType==="registrasi"?["registrationTokens"]:["tokens"];
 
-  for(const colName of collections){
-    let snap;
-    try{snap=await getDocs(collection(db,colName));}catch(e){continue;}
-
-    snap.forEach(d=>{
-      const data=d.data()||{};
-      const token=tokenValueFromDoc(data,d.id);
-      if(!token||seen.has(token.toLowerCase()))return;
-      if(!tokenValidForRequest(data,requestType,colName,request))return;
-
-      const price=tokenPrice(data,requestType,requestPrice);
-
-      if(requestType==="perpanjangan"&&price<=0)return;
-
-      availableTokens.push({id:d.id,collection:colName,token,price,data});
-      seen.add(token.toLowerCase());
-    });
-  }
-
-  // Urutkan berdasarkan masa aktif terlebih dahulu, lalu token.
-  // Ini membuat paket request tetap konsisten dan tidak tercampur.
-  const requested=requestedDurationMonths(request||{});
-  availableTokens.sort((a,b)=>{
-    const da=tokenDurationMonths(a.data), db=tokenDurationMonths(b.data);
-    if(requested && da!==db)return da-db;
-    return String(a.token).localeCompare(String(b.token));
+  snap.forEach(d=>{
+    if(!tokenAvailable(d))return;
+    const token=tokenValueFromDoc(d);
+    const key=token.toLowerCase();
+    if(seen.has(key))return;
+    seen.add(key);
+    arr.push({id:d.id,token,data:d.data()||{}});
   });
-  return availableTokens;
+
+  availableTokens=arr;
+  return arr;
 }
 
 function selectedFor(id){
   if(!selectedTokensByRequest[id])selectedTokensByRequest[id]=new Set();
   return selectedTokensByRequest[id];
-}
-
-function selectedTokenDocs(id){
-  const set=selectedFor(id);
-  return availableTokens.filter(t=>set.has(t.id));
-}
-
-function selectedTotal(id){
-  const request=allRequests.find(x=>x.id===id);
-  const type=request?.requestType==="perpanjangan"?"perpanjangan":"registrasi";
-  const billing=calculateBilling(selectedTokenDocs(id),type);
-  return billing?.total||0;
-}
-
-function selectedUnitPrice(id){
-  const request=allRequests.find(x=>x.id===id);
-  const type=request?.requestType==="perpanjangan"?"perpanjangan":"registrasi";
-  const billing=calculateBilling(selectedTokenDocs(id),type);
-  return billing?.unitPrice||0;
 }
 
 function updateSelectedUI(id){
@@ -531,37 +426,12 @@ function updateSelectedUI(id){
   const price=$("price-"+id);
   const count=$("token-count-"+id);
   const total=$("live-total-"+id);
-  const selected=selectedTokenDocs(id);
-  const request=allRequests.find(x=>x.id===id);
-  const type=request?.requestType==="perpanjangan"?"perpanjangan":"registrasi";
-  const billing=calculateBilling(selected,type);
 
   if(qty)qty.value=set.size;
+  if(count)count.textContent=`${set.size} token dipilih`;
 
-  const requested=Number(request?.jumlahRequest??request?.jumlahTokenDiminta??1)||1;
-  if(count){
-    count.textContent=set.size>=requested
-      ?`${requested} token siap disetujui`
-      :`${set.size} dari ${requested} token dipilih`;
-  }
-
-  if(price){
-    if(type==="registrasi"){
-      price.value="GRATIS";
-    }else if(billing?.unitPrice>0){
-      price.value=`${rupiah(billing.unitPrice)} / token`;
-    }else if(selected.length){
-      price.value="Harga berbeda per token";
-    }else{
-      price.value="";
-    }
-  }
-
-  if(total){
-    total.textContent=type==="registrasi"
-      ?"GRATIS — Rp 0"
-      :rupiah(billing?.total||0);
-  }
+  const p=Number(price?.value||0);
+  if(total)total.textContent=rupiah(p*set.size);
 
   const panel=$("token-panel-"+id);
   if(panel){
@@ -572,13 +442,14 @@ function updateSelectedUI(id){
     const btn=$("token-select-"+id);
     const preview=$("token-preview-"+id);
 
-    if(btn)btn.classList.toggle("open",panel.classList.contains("show"));
+    if(btn){
+      btn.classList.toggle("open",panel.classList.contains("show"));
+    }
 
     if(preview){
       if(set.size){
-        const names=selected.map(t=>t.token);
-        preview.textContent=
-          `${set.size} token dipilih • ${names.slice(0,2).join(", ")}${names.length>2?" ...":""}`;
+        const selected=selectedTokenDocs(id).map(t=>t.token);
+        preview.textContent=`${set.size} token dipilih • ${selected.slice(0,2).join(", ")}${selected.length>2?" ...":""}`;
       }else{
         preview.textContent="Klik di sini untuk melihat daftar token";
       }
@@ -591,47 +462,24 @@ function renderTokenOptions(id){
   if(!box)return;
 
   const search=($("token-search-"+id)?.value||"").trim().toLowerCase();
-  const request=allRequests.find(x=>x.id===id)||{};
-  const max=Number(request.jumlahRequest??request.jumlahTokenDiminta??1)||1;
-  const duration=requestedDurationMonths(request);
-
-  let list=availableTokens.filter(t=>!search||t.token.toLowerCase().includes(search));
+  const set=selectedFor(id);
+  const list=availableTokens.filter(t=>!search||t.token.toLowerCase().includes(search));
 
   if(!list.length){
-    box.innerHTML=duration
-      ?`<div class="token-empty">Token ${duration} bulan yang tersedia belum mencukupi.</div>`
-      :'<div class="token-empty">Tidak ada token tersedia untuk jenis request ini.</div>';
+    box.innerHTML='<div class="token-empty">Tidak ada token tersedia.</div>';
     updateSelectedUI(id);
     return;
   }
 
-  const alreadySelected=selectedFor(id);
-
-  if(!alreadySelected.size){
-    list.slice(0,max).forEach(t=>alreadySelected.add(t.id));
-  }
-
-  const displayList=list.slice(0,max);
-
-  box.innerHTML=displayList.map(t=>{
-    const type=request.requestType==="perpanjangan"?"perpanjangan":"registrasi";
-    const resellerPrice=resellerTokenPrice(t.price,type);
-
-    return `
-      <label class="token-option">
-        <input type="checkbox"
-          data-token-id="${esc(t.id)}"
-          ${alreadySelected.has(t.id)?"checked":""}
-          onchange="selectToken('${esc(id)}','${esc(t.id)}',this.checked)">
-        <span class="token-value">${esc(t.token)}</span>
-        <span class="token-status">
-          ${type==="registrasi"
-            ?"GRATIS"
-            :`${esc(rupiah(t.price))} → ${esc(rupiah(resellerPrice))}`}
-        </span>
-      </label>
-    `;
-  }).join("");
+  box.innerHTML=list.map(t=>`
+    <label class="token-option">
+      <input type="checkbox" data-token-id="${esc(t.id)}"
+        ${set.has(t.id)?"checked":""}
+        onchange="selectToken('${esc(id)}','${esc(t.id)}',this.checked)">
+      <span class="token-value">${esc(t.token)}</span>
+      <span class="token-status">TERSEDIA • SIAP DIBERIKAN</span>
+    </label>
+  `).join("");
 
   updateSelectedUI(id);
 }
@@ -639,31 +487,14 @@ function renderTokenOptions(id){
 window.toggleTokenPicker=async id=>{
   const panel=$("token-panel-"+id);
   if(!panel)return;
-
   panel.classList.toggle("show");
   const btn=$("token-select-"+id);
   if(btn)btn.classList.toggle("open",panel.classList.contains("show"));
 
   if(panel.classList.contains("show")){
     try{
-      const request=allRequests.find(x=>x.id===id)||{};
-      const type=request.requestType==="perpanjangan"?"perpanjangan":"registrasi";
-      const requestPrice=Number(request.hargaToken||0)||0;
-
-      await loadAvailableTokens(type,requestPrice,request);
-
-      const selected=selectedFor(id);
-      const validIds=new Set(availableTokens.map(t=>t.id));
-      [...selected].forEach(tokenId=>{
-        if(!validIds.has(tokenId))selected.delete(tokenId);
-      });
-
+      await loadAvailableTokens();
       renderTokenOptions(id);
-
-      setTimeout(()=>{
-        const search=$("token-search-"+id);
-        if(search)search.focus({preventScroll:true});
-      },50);
     }catch(e){
       $("token-options-"+id).innerHTML=
         `<div class="token-empty">Gagal membaca daftar token: ${esc(e.message)}</div>`;
@@ -692,11 +523,7 @@ window.selectToken=(requestId,tokenId,checked)=>{
         `#token-options-${CSS.escape(requestId)} input[data-token-id="${CSS.escape(tokenId)}"]`
       );
       if(cb)cb.checked=false;
-
-      showModal(
-        "Batas Request",
-        `Reseller meminta ${max} token. Anda boleh menyetujui kurang dari ${max}, tetapi tidak boleh lebih.`
-      );
+      showModal("Batas Request",`Reseller hanya meminta ${max} token.`);
       return;
     }
     set.add(tokenId);
@@ -706,6 +533,11 @@ window.selectToken=(requestId,tokenId,checked)=>{
 
   updateSelectedUI(requestId);
 };
+
+function selectedTokenDocs(id){
+  const set=selectedFor(id);
+  return availableTokens.filter(t=>set.has(t.id));
+}
 
 function render(){
   const status=$("statusFilter").value;
@@ -717,8 +549,11 @@ function render(){
 
     if(search){
       const hay=[
-        x.resellerNama,x.resellerEmail,x.resellerUid,
-        x.requestType,x.catatan
+        x.resellerNama,
+        x.resellerEmail,
+        x.resellerUid,
+        x.requestType,
+        x.catatan
       ].join(" ").toLowerCase();
 
       if(!hay.includes(search))return false;
@@ -734,28 +569,39 @@ function render(){
 
   $("requestList").innerHTML=list.map(x=>{
     const st=requestStatus(x);
-    const label=st==="approved"?"DISETUJUI":st==="rejected"?"DITOLAK":"MENUNGGU";
-    const jenis=x.requestType==="perpanjangan"?"Perpanjangan":"Registrasi";
-    const requested=Number(x.jumlahRequest??x.jumlahTokenDiminta??1)||1;
-    const approved=Number(x.jumlahDisetujui??0)||0;
-    const total=Number(x.jumlahTagihan??x.totalTagihan??0)||0;
+    const cls=st;
+    const label=
+      st==="approved"?"DISETUJUI":
+      st==="rejected"?"DITOLAK":
+      "MENUNGGU";
+
+    const jenis=
+      x.requestType==="perpanjangan"
+        ?"Perpanjangan":"Registrasi";
+
+    const requested=
+      Number(x.jumlahRequest??x.jumlahTokenDiminta??1)||1;
+
+    const approved=
+      Number(x.jumlahDisetujui??0)||0;
+
+    const total=
+      Number(x.jumlahTagihan??x.totalTagihan??0)||0;
+
     const tokens=getTokens(x);
-    const duration=requestedDurationMonths(x);
+
     const canProcess=st==="pending";
 
     return `
       <article class="req">
         <div class="req-head">
           <div>
-            <div class="req-title">
-              🔑 ${esc(jenis)}
-              ${x.requestType==="registrasi"?'<span class="free-label">GRATIS</span>':""}
-            </div>
+            <div class="req-title">🔑 ${esc(jenis)}</div>
             <div class="req-meta">
               ${esc(x.resellerNama||"-")} • ${esc(x.resellerEmail||"-")}
             </div>
           </div>
-          <span class="badge ${st}">${label}</span>
+          <span class="badge ${cls}">${label}</span>
         </div>
 
         <div class="grid">
@@ -777,7 +623,7 @@ function render(){
           </div>
           <div class="info">
             <span>TAGIHAN</span>
-            <b>${x.requestType==="registrasi"?"GRATIS — Rp 0":rupiah(total)}</b>
+            <b>${rupiah(total)}</b>
           </div>
           <div class="info">
             <span>CATATAN RESELLER</span>
@@ -785,58 +631,43 @@ function render(){
           </div>
         </div>
 
-        ${canProcess?`
+        ${
+          canProcess ? `
           <div class="admin-box">
             <div class="price-row">
               <div class="form-row">
-                <label>Harga Token (otomatis)</label>
-                <input id="price-${esc(x.id)}" type="text" readonly
-                  value="${x.requestType==="registrasi"?"GRATIS":""}"
-                  placeholder="${x.requestType==="registrasi"?"Registrasi gratis":"Pilih token terlebih dahulu"}">
+                <label>Harga per Token</label>
+                <input id="price-${esc(x.id)}" type="number" min="0" inputmode="numeric"
+                  value="${Number(x.hargaToken||0)||""}"
+                  placeholder="Contoh: 5000">
               </div>
-
               <div class="form-row">
                 <label>Jumlah Disetujui</label>
-                <input id="qty-${esc(x.id)}" type="number" min="0" max="${requested}"
-                  inputmode="numeric" value="${approved||0}" readonly>
+                <input id="qty-${esc(x.id)}" type="number" min="0" max="${requested}" inputmode="numeric"
+                  value="${approved||0}" readonly>
               </div>
             </div>
 
             <div class="info" style="margin-bottom:12px">
               <span>TAGIHAN BERJALAN</span>
-              <b id="live-total-${esc(x.id)}">
-                ${x.requestType==="registrasi"?"GRATIS — Rp 0":"Rp 0"}
-              </b>
+              <b id="live-total-${esc(x.id)}">Rp 0</b>
             </div>
-
-            ${x.requestType==="perpanjangan"?`
-              <div class="info" style="margin-bottom:12px;background:#fff7d6;border-color:#f2c94c">
-                <span>ATURAN HARGA RESELLER</span>
-                <b>Harga token − Rp 20.000/token</b>
-                <div style="font-size:11px;color:#92400e;margin-top:5px;line-height:1.5">
-                  3 bulan: Rp50.000 → Rp30.000/token<br>
-                  6 bulan: Rp80.000 → Rp60.000/token<br>
-                  12 bulan: Rp120.000 → Rp100.000/token
-                </div>
-              </div>
-            `:""}
 
             <div class="form-row">
               <label>Token yang Diberikan</label>
-
               <div class="token-picker">
                 <button id="token-select-${esc(x.id)}" class="token-select" type="button"
                   onclick="toggleTokenPicker('${esc(x.id)}')">
-                  ${duration?`🔑 Pilih Token ${duration} Bulan`:"🔑 Pilih Token dari Daftar"}
+                  🔑 Pilih Token
                   <span id="token-preview-${esc(x.id)}" class="token-selected-preview">
-                    Klik kolom ini untuk membuka daftar token
+                    Klik di sini untuk melihat daftar token
                   </span>
                 </button>
 
                 <div id="token-panel-${esc(x.id)}" class="token-panel">
                   <input id="token-search-${esc(x.id)}" class="token-search"
                     type="search" autocomplete="off"
-                    placeholder="${duration?`🔎 Cari token ${duration} bulan...`:"🔎 Cari token..."}"
+                    placeholder="🔎 Cari token..."
                     oninput="filterTokenOptions('${esc(x.id)}')">
 
                   <div id="token-options-${esc(x.id)}" class="token-options-scroll">
@@ -844,66 +675,59 @@ function render(){
                   </div>
 
                   <div class="token-footer">
-                    <span id="token-count-${esc(x.id)}" class="token-count">
-                      0 token dipilih
-                    </span>
+                    <span id="token-count-${esc(x.id)}" class="token-count">0 token dipilih</span>
                     <button type="button" class="token-close"
                       onclick="closeTokenPicker('${esc(x.id)}')">Selesai</button>
                   </div>
                 </div>
               </div>
-
               <div class="tokens-hint">
-                ${duration
-                  ?`Request ${duration} bulan + ${requested} token → daftar hanya token ${duration} bulan dan otomatis mengambil maksimal ${requested} token.`
-                  :"Token ditampilkan sesuai jenis request."}
-                ${x.requestType==="perpanjangan"
-                  ?"<br><b>Tagihan reseller dihitung otomatis: harga token dikurangi Rp20.000 untuk setiap token.</b>"
-                  :"<br><b>Registrasi gratis — tagihan Rp0.</b>"}
+                Klik kolom di atas → daftar token muncul. Ceklis token yang mau diberikan.
               </div>
             </div>
 
             <div class="form-row">
               <label>Catatan Admin</label>
-              <textarea id="note-${esc(x.id)}" style="min-height:65px"
+              <textarea id="note-${esc(x.id)}"
+                style="min-height:65px"
                 placeholder="Catatan untuk reseller...">${esc(x.adminNote||"")}</textarea>
             </div>
 
             <div class="actions">
-              <button class="green" type="button"
-                onclick="approveRequest('${esc(x.id)}')">✅ Setujui</button>
-              <button class="danger" type="button"
-                onclick="rejectRequest('${esc(x.id)}')">❌ Tolak</button>
+              <button class="green" type="button" onclick="approveRequest('${esc(x.id)}')">
+                ✅ Setujui
+              </button>
+              <button class="danger" type="button" onclick="rejectRequest('${esc(x.id)}')">
+                ❌ Tolak
+              </button>
             </div>
           </div>
-        `:`
+          ` : `
           <div class="admin-box">
-            ${tokens.length?`
-              <div class="info">
-                <span>TOKEN YANG DIBERIKAN</span>
-                <b>${tokens.map(t=>esc(t)).join("<br>")}</b>
-              </div>
-            `:""}
-
-            ${x.requestType==="perpanjangan"&&x.diskonPerToken
-              ?`<div class="info" style="margin-top:8px">
-                  <span>KEUNTUNGAN RESELLER</span>
-                  <b>${rupiah(Number(x.diskonPerToken)||0)} / token</b>
-                </div>`
-              :""}
-
-            ${x.adminNote?`
-              <div class="info" style="margin-top:8px">
-                <span>CATATAN ADMIN</span>
-                <b>${esc(x.adminNote)}</b>
-              </div>
-            `:""}
-
+            ${
+              tokens.length
+                ? `<div class="info" style="background:#fff8d6;border-color:#f2c94c">
+                    <span>TOKEN YANG DIBERIKAN</span>
+                    <div class="reseller-owned-badge">🟡 DIBELI / DIBERIKAN KE RESELLER • BELUM TERPAKAI</div>
+                    <b style="display:block;margin-top:8px">${tokens.map(t=>esc(t)).join("<br>")}</b>
+                    <div class="token-owned-note">♻️ Token tetap bisa dipakai untuk registrasi/perpanjangan. Token baru menjadi TERPAKAI setelah benar-benar digunakan pada halaman aktivasi.</div>
+                  </div>`
+                : ""
+            }
+            ${
+              x.adminNote
+                ? `<div class="info" style="margin-top:8px">
+                    <span>CATATAN ADMIN</span>
+                    <b>${esc(x.adminNote)}</b>
+                  </div>`
+                : ""
+            }
             <div style="font-size:11px;color:#64748b;margin-top:8px">
               Request ini sudah diproses.
             </div>
           </div>
-        `}
+          `
+        }
       </article>
     `;
   }).join("");
@@ -913,19 +737,34 @@ async function loadRequests(){
   $("requestList").innerHTML='<div class="loading">Memuat request...</div>';
 
   try{
-    const q=query(collection(db,"registrationTokens"),orderBy("createdAt","desc"));
+    const q=query(
+      collection(db,"registrationTokens"),
+      orderBy("createdAt","desc")
+    );
+
     const snap=await getDocs(q);
 
     allRequests=[];
-    snap.forEach(d=>allRequests.push({id:d.id,...d.data()}));
+    snap.forEach(d=>{
+      allRequests.push({id:d.id,...d.data()});
+    });
+
     render();
+
   }catch(e){
     console.error(e);
 
+    /*
+     * Fallback tanpa orderBy supaya tetap bisa membaca jika
+     * data lama belum mempunyai createdAt yang konsisten.
+     */
     try{
       const snap=await getDocs(collection(db,"registrationTokens"));
+
       allRequests=[];
-      snap.forEach(d=>allRequests.push({id:d.id,...d.data()}));
+      snap.forEach(d=>{
+        allRequests.push({id:d.id,...d.data()});
+      });
 
       allRequests.sort((a,b)=>{
         const ta=a.createdAt?.seconds||0;
@@ -950,53 +789,46 @@ window.approveRequest=async id=>{
   const item=allRequests.find(x=>x.id===id);
   if(!item)return;
 
-  const qtyRequested=Number(item.jumlahRequest??item.jumlahTokenDiminta??1)||1;
-  const selectedDocs=selectedTokenDocs(id);
-  const qty=selectedDocs.length;
+  const qtyRequested=
+    Number(item.jumlahRequest??item.jumlahTokenDiminta??1)||1;
 
-  if(qty<1){
-    showModal("Token Belum Dipilih","Pilih token dari daftar terlebih dahulu.");
+  let qty=Number($("qty-"+id)?.value||0);
+  let price=Number($("price-"+id)?.value||0);
+
+  if(!Number.isSafeInteger(qty)||qty<1){
+    showModal("Jumlah Tidak Valid","Jumlah disetujui minimal 1 token.");
     return;
   }
 
   if(qty>qtyRequested){
     showModal(
       "Jumlah Melebihi Request",
-      `Reseller meminta ${qtyRequested} token. Jumlah yang disetujui tidak boleh lebih.`
+      `Reseller meminta ${qtyRequested} token. Jumlah disetujui tidak boleh lebih dari jumlah request.`
     );
     return;
   }
 
-  const requestType=item.requestType==="perpanjangan"?"perpanjangan":"registrasi";
-  const billing=calculateBilling(selectedDocs,requestType);
-
-  if(requestType==="perpanjangan"&&!billing){
-    showModal(
-      "Harga Token Belum Ada",
-      "Semua token perpanjangan yang dipilih harus memiliki harga."
-    );
+  if(!Number.isFinite(price)||price<0){
+    showModal("Harga Tidak Valid","Masukkan harga per token yang benar.");
     return;
   }
 
+  const selectedDocs=selectedTokenDocs(id);
   const tokens=selectedDocs.map(t=>t.token);
-  const note=$("note-"+id)?.value.trim()||"";
+  qty=selectedDocs.length;
+  $("qty-"+id).value=qty;
 
-  /* VALIDASI TAMBAHAN:
-     Masa aktif token yang diberikan harus sama dengan request.
-     Ini menjadi pengaman kedua sebelum transaksi Firebase. */
-  const requestedDuration=requestedDurationMonths(item);
-
-  if(requestedDuration){
-    const invalid=selectedDocs.find(t=>tokenDurationMonths(t.data)!==requestedDuration);
-
-    if(invalid){
-      showModal(
-        "Token Tidak Sesuai",
-        `Request ${requestedDuration} bulan hanya boleh diberikan token ${requestedDuration} bulan. Token ${invalid.token} tidak sesuai.`
-      );
-      return;
-    }
+  if(qty<1){
+    showModal("Token Belum Dipilih","Pilih minimal 1 token dari daftar token Firebase.");
+    return;
   }
+
+  if(qty>qtyRequested){
+    showModal("Jumlah Melebihi Request",`Reseller meminta ${qtyRequested} token.`);
+    return;
+  }
+
+  const note=$("note-"+id)?.value.trim()||"";
 
   const btn=document.querySelector(
     `button[onclick="approveRequest('${CSS.escape(id)}')"]`
@@ -1008,160 +840,127 @@ window.approveRequest=async id=>{
   }
 
   try{
-    await runTransaction(db,async transaction=>{
-      const freshSelected=[];
+    const total=price*qty;
 
-      /* Semua token dibaca ulang di transaction. */
+    await runTransaction(db, async transaction=>{
+      // Pastikan token masih tersedia sebelum diberikan.
       for(const selected of selectedDocs){
-        const ref=doc(db,selected.collection,selected.id);
-        const snap=await transaction.get(ref);
-
-        if(!snap.exists()){
-          throw new Error(`Token ${selected.token} sudah tidak tersedia.`);
-        }
+        const tokenRef=doc(db,"tokens",selected.id);
+        const snap=await transaction.get(tokenRef);
+        if(!snap.exists()) throw new Error(`Token ${selected.token} sudah tidak tersedia.`);
 
         const fresh=snap.data()||{};
+        const status=String(fresh.status||"").toLowerCase();
 
-        if(tokenUsed(fresh)){
-          throw new Error(`Token ${selected.token} sudah digunakan.`);
+        // Token milik reseller yang sudah ada tidak boleh dipilih lagi.
+        const resellerOwned =
+          fresh.purchasedByReseller===true ||
+          fresh.soldToReseller===true ||
+          !!fresh.soldToResellerUid ||
+          ["dibeli_reseller","sold_reseller"].includes(status);
+
+        if(resellerOwned){
+          throw new Error(`Token ${selected.token} sudah dimiliki reseller dan tidak boleh diberikan lagi.`);
         }
 
-        if(requestType==="perpanjangan"){
-          const freshPrice=tokenPrice(fresh,requestType,0);
-          if(freshPrice<=0){
-            throw new Error(`Token ${selected.token} tidak memiliki harga.`);
-          }
-
-          if(requestedDuration&&tokenDurationMonths(fresh)!==requestedDuration){
-            throw new Error(`Token ${selected.token} tidak sesuai paket ${requestedDuration} bulan.`);
-          }
-
-          freshSelected.push({
-            ...selected,
-            data:fresh,
-            price:freshPrice
-          });
-        }else{
-          freshSelected.push({...selected,data:fresh,price:0});
+        // Hanya token yang benar-benar belum dipakai yang boleh diberikan.
+        if(
+          fresh.used===true || fresh.terpakai===true || fresh.dipakai===true ||
+          fresh.isUsed===true ||
+          ["used","terpakai","dipakai","inactive","nonaktif","disabled","expired"].includes(status)
+        ){
+          throw new Error(`Token ${selected.token} sudah digunakan atau tidak tersedia.`);
         }
       }
 
-      /* Hitung ULANG dari data token terbaru di Firebase.
-         Jadi tidak mungkin memakai angka tagihan lama dari request. */
-      const freshBilling=calculateBilling(freshSelected,requestType);
+      for(const selected of selectedDocs){
+        transaction.update(doc(db,"tokens",selected.id),{
+          /*
+           * PENTING:
+           * Diberikan/dibeli reseller BUKAN berarti terpakai.
+           * Token tetap berada di collection tokens.
+           * Status baru akan menjadi used/terpakai hanya saat
+           * halaman aktivasi benar-benar menggunakan token tersebut.
+           */
+          status:"dibeli_reseller",
+          tokenStatus:"dibeli_reseller",
 
-      if(requestType==="perpanjangan"&&!freshBilling){
-        throw new Error("Harga token perpanjangan tidak lengkap.");
-      }
+          used:false,
+          terpakai:false,
+          dipakai:false,
+          isUsed:false,
 
-      const finalOriginalPrices=freshBilling.originalPrices;
-      const finalResellerPrices=freshBilling.resellerPrices;
-      const finalOriginalTotal=freshBilling.originalTotal;
-      const finalDiscountTotal=freshBilling.discountTotal;
-      const finalTotal=freshBilling.total;
-      const finalUnitPrice=freshBilling.unitPrice;
+          // Kepemilikan reseller
+          assigned:true,
+          assignedTo:item.resellerUid||"",
+          assignedEmail:item.resellerEmail||"",
+          assignedRequestId:id,
+          purchasedByReseller:true,
+          soldToReseller:true,
+          soldToResellerUid:item.resellerUid||"",
+          soldToResellerEmail:item.resellerEmail||"",
 
-      for(const selected of freshSelected){
-        transaction.update(
-          doc(db,selected.collection,selected.id),
-          {
-            status:"used",
-            used:true,
-            terpakai:true,
-            assigned:true,
-            assignedTo:item.resellerUid||"",
-            assignedEmail:item.resellerEmail||"",
-            assignedRequestId:id,
-            assignedAt:serverTimestamp(),
-            updatedAt:serverTimestamp()
-          }
-        );
+          assignedAt:serverTimestamp(),
+          soldAt:serverTimestamp(),
+          purchasedAt:serverTimestamp(),
+          updatedAt:serverTimestamp()
+        });
       }
 
       transaction.update(
         doc(db,"registrationTokens",id),
         {
           requestStatus:"approved",
-          status:"approved",
+        status:"approved",
 
-          jumlahDisetujui:qty,
-          jumlahTokenDisetujui:qty,
+        jumlahDisetujui:qty,
+        jumlahTagihan:total,
+        totalTagihan:total,
+        hargaToken:price,
 
-          /* NILAI TAGIHAN FINAL */
-          jumlahTagihan:finalTotal,
-          totalTagihan:finalTotal,
+        tokens:tokens,
 
-          /* Harga jual reseller per token.
-             Jika harga token berbeda-beda, disimpan 0 di field tunggal
-             dan rincian lengkap disimpan di hargaTokens. */
-          hargaToken:finalUnitPrice,
-          hargaPerToken:finalUnitPrice,
-          hargaTokens:finalResellerPrices,
+        /*
+         * Field lama tetap diisi agar kompatibel dengan halaman reseller.
+         */
+        token:tokens.length===1?tokens[0]:"",
+        kodeToken:tokens.length===1?tokens[0]:"",
+        registrationToken:tokens.length===1?tokens[0]:"",
 
-          /* Harga normal sebelum keuntungan reseller */
-          hargaTokenAsli:
-            requestType==="registrasi"
-              ?0
-              :(finalOriginalPrices.length===1?finalOriginalPrices[0]:0),
-          hargaTokensAsli:
-            requestType==="registrasi"?[]:finalOriginalPrices,
+        adminUid:adminUser.uid,
+        adminEmail:adminUser.email||"",
+        adminNama:
+          adminProfile.namaToko||
+          adminProfile.nama||
+          adminProfile.displayName||
+          adminUser.email||
+          "",
 
-          diskonPerToken:
-            requestType==="perpanjangan"?RESELLER_DISCOUNT:0,
+        adminNote:note,
 
-          totalDiskon:
-            requestType==="perpanjangan"?finalDiscountTotal:0,
+        notificationReseller:true,
+        notificationAdmin:false,
 
-          totalHargaAsli:
-            requestType==="perpanjangan"?finalOriginalTotal:0,
-
-          gratisRegistrasi:requestType==="registrasi",
-
-          tokens,
-          token:tokens.length===1?tokens[0]:"",
-          kodeToken:tokens.length===1?tokens[0]:"",
-          registrationToken:tokens.length===1?tokens[0]:"",
-
-          adminUid:adminUser.uid,
-          adminEmail:adminUser.email||"",
-          adminNama:
-            adminProfile.namaToko||
-            adminProfile.nama||
-            adminProfile.displayName||
-            adminUser.email||
-            "",
-
-          adminNote:note,
-          notificationReseller:true,
-          notificationAdmin:false,
-          approvedAt:serverTimestamp(),
-          updatedAt:serverTimestamp()
-        }
+        approvedAt:serverTimestamp(),
+        updatedAt:serverTimestamp()
+      }
       );
     });
 
-    await loadAvailableTokens(
-      requestType,
-      Number(item.hargaToken||0),
-      item
-    );
-
     await loadRequests();
 
-    const billingText=requestType==="registrasi"
-      ?`${qty} token registrasi telah disetujui GRATIS. Tagihan Rp 0.`
-      :`${qty} token disetujui. Harga normal ${rupiah(billing.originalTotal)}, keuntungan reseller ${rupiah(billing.discountTotal)}, sehingga tagihan reseller ${rupiah(billing.total)}.`;
-
-    showModal("Berhasil Disetujui",billingText);
+    showModal(
+      "Berhasil Disetujui",
+      `${qty} token telah disetujui dengan tagihan ${rupiah(total)}. Data akan terbaca oleh reseller dari Firebase.`
+    );
 
   }catch(e){
     console.error("approve:",e);
-
     showModal(
       "Gagal Menyetujui",
       e?.code==="permission-denied"
-        ?"Firebase menolak perubahan stok/request. Pastikan Rules mengizinkan admin update pada collection token dan registrationTokens."
-        :(e?.message||String(e))
+        ? "Firebase menolak update. Pastikan akun admin benar-benar login dan Rules registrationTokens mengizinkan update untuk user yang login."
+        : (e?.message||String(e))
     );
   }finally{
     if(btn){
@@ -1202,13 +1001,16 @@ window.rejectRequest=async id=>{
       {
         requestStatus:"rejected",
         status:"rejected",
+
         jumlahDisetujui:0,
         jumlahTagihan:0,
         totalTagihan:0,
+
         tokens:[],
         token:"",
         kodeToken:"",
         registrationToken:"",
+
         adminUid:adminUser.uid,
         adminEmail:adminUser.email||"",
         adminNama:
@@ -1217,9 +1019,12 @@ window.rejectRequest=async id=>{
           adminProfile.displayName||
           adminUser.email||
           "",
+
         adminNote:note,
+
         notificationReseller:true,
         notificationAdmin:false,
+
         rejectedAt:serverTimestamp(),
         updatedAt:serverTimestamp()
       }
@@ -1227,16 +1032,18 @@ window.rejectRequest=async id=>{
 
     await loadRequests();
 
-    showModal("Request Ditolak","Request sudah ditolak dan catatan admin disimpan.");
+    showModal(
+      "Request Ditolak",
+      "Request sudah ditolak dan catatan admin disimpan."
+    );
 
   }catch(e){
     console.error("reject:",e);
-
     showModal(
       "Gagal Menolak",
       e?.code==="permission-denied"
-        ?"Firebase menolak update. Pastikan akun admin benar-benar login."
-        :(e?.message||String(e))
+        ? "Firebase menolak update. Pastikan akun admin benar-benar login."
+        : (e?.message||String(e))
     );
   }finally{
     if(btn){
@@ -1269,10 +1076,15 @@ $("loginBtn").onclick=async()=>{
 
     let msg=e.message||"Login gagal.";
 
-    if(e.code==="auth/invalid-credential")msg="Email atau password Firebase salah.";
-    else if(e.code==="auth/user-not-found")msg="Akun admin tidak ditemukan di Firebase Authentication.";
-    else if(e.code==="auth/wrong-password")msg="Password Firebase salah.";
-    else if(e.code==="auth/too-many-requests")msg="Terlalu banyak percobaan login. Coba lagi nanti.";
+    if(e.code==="auth/invalid-credential"){
+      msg="Email atau password Firebase salah.";
+    }else if(e.code==="auth/user-not-found"){
+      msg="Akun admin tidak ditemukan di Firebase Authentication.";
+    }else if(e.code==="auth/wrong-password"){
+      msg="Password Firebase salah.";
+    }else if(e.code==="auth/too-many-requests"){
+      msg="Terlalu banyak percobaan login. Coba lagi nanti.";
+    }
 
     $("loginError").textContent=msg;
     $("loginError").classList.remove("hidden");
@@ -1292,7 +1104,10 @@ $("logoutBtn").onclick=async()=>{
 
 $("refreshBtn").onclick=async()=>{
   if(!adminUser){
-    showModal("Belum Login","Login Firebase admin terlebih dahulu.");
+    showModal(
+      "Belum Login",
+      "Login Firebase admin terlebih dahulu."
+    );
     return;
   }
 
@@ -1332,7 +1147,10 @@ onAuthStateChanged(auth,async user=>{
 
     await signOut(auth);
 
-    $("loginError").textContent=e.message||"Akun tidak mempunyai izin admin.";
+    $("loginError").textContent=
+      e.message||
+      "Akun tidak mempunyai izin admin.";
+
     $("loginError").classList.remove("hidden");
   }
 });
