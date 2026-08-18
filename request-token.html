@@ -21,6 +21,11 @@ header{
 .logo{width:52px;height:52px;flex:0 0 52px;border-radius:13px;background:#000;border:1px solid #334155;padding:4px;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .logo img{width:100%;height:100%;object-fit:contain}
 .head-title{min-width:0;flex:1}.head-title b{font-size:18px;display:block}.head-title small{font-size:11px;color:#cbd5e1}
+.head-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.refresh-btn,.dark-btn{width:44px;height:44px;padding:0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.refresh-btn{background:#ffc107;color:#111827}
+.refresh-btn.loading{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .wrap{width:min(760px,100%);margin:auto;padding:14px}
 .card{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:4px 4px 0 #111827}
 h2{margin:0 0 5px;font-size:18px}.sub{font-size:12px;color:var(--muted);margin-bottom:14px}
@@ -34,19 +39,22 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .request-box{display:none;margin-top:14px;border:2px solid #111827;border-radius:12px;padding:14px;background:#f8fafc}
 .request-box.show{display:block}
 label{display:block;font-size:12px;font-weight:800;margin:0 0 5px}
-select,textarea{width:100%;min-height:42px;border:2px solid #111827;border-radius:9px;padding:9px 10px;background:#fff;font:inherit}
+input,select,textarea{width:100%;min-height:42px;border:2px solid #111827;border-radius:9px;padding:9px 10px;background:#fff;font:inherit}
 textarea{min-height:70px;resize:vertical}
 .form-row{margin-bottom:10px}
 .price{font-size:18px;font-weight:900;background:#fff7d6;border:1px solid #f2c94c;border-radius:9px;padding:10px;margin:10px 0}
+.price small{display:block;font-size:10px;color:#92400e;margin-top:3px}
 .actions{display:flex;gap:8px}.send{background:var(--green);color:#fff;flex:1}.cancel{background:#e5e7eb;color:#111827}
 .notice{font-size:11px;color:#64748b;margin-top:8px;line-height:1.5}
 .req{border:1px solid #dbe2ea;border-radius:11px;padding:12px;margin-top:10px;background:#fff}
 .req-top{display:flex;justify-content:space-between;gap:10px;align-items:center}
 .badge{font-size:10px;font-weight:900;padding:5px 8px;border-radius:999px}
 .pending{background:#fef3c7;color:#92400e}.approved{background:#dcfce7;color:#166534}.rejected{background:#fee2e2;color:#991b1b}
-.req small{color:#64748b}.token{margin-top:9px;padding:10px;border-radius:9px;background:#ecfdf5;border:1px solid #86efac}
+.req small{color:#64748b}
+.token{margin-top:9px;padding:10px;border-radius:9px;background:#ecfdf5;border:1px solid #86efac}
 .token code{font-size:16px;font-weight:900;word-break:break-all}
 .empty{text-align:center;color:#94a3b8;font-size:12px;padding:18px}
+.loading{text-align:center;color:#64748b;font-size:12px;padding:18px}
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:50;align-items:center;justify-content:center;padding:14px}
 .modal.show{display:flex}.modal-box{width:min(430px,100%);background:#fff;border:2px solid #111827;border-radius:14px;padding:18px;box-shadow:6px 6px 0 #111827}
 .modal-box h3{margin:0 0 8px}.modal-box p{font-size:13px;line-height:1.5}.ok{width:100%;background:#111827;color:#fff}
@@ -56,33 +64,37 @@ textarea{min-height:70px;resize:vertical}
  .card{padding:14px}
 }
 body.dark{background:#0b0f14;color:#f3f4f6}
-body.dark .card,.dark .req{background:#151b23;color:#f3f4f6;border-color:#000}
+body.dark .card,body.dark .req{background:#151b23;color:#f3f4f6;border-color:#000}
 body.dark .info{background:#10161e;border-color:#334155}
 body.dark .request-box{background:#10161e}
-body.dark select,body.dark textarea{background:#0f141b;color:#f3f4f6;border-color:#334155}
+body.dark input,body.dark select,body.dark textarea{background:#0f141b;color:#f3f4f6;border-color:#334155}
 body.dark .modal-box{background:#151b23;color:#f3f4f6}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo"><img src="logo.png" onerror="this.style.display='none'"></div>
+  <div class="logo"><img src="logo.png" alt="FIXZY" onerror="this.style.display='none'"></div>
   <div class="head-title">
     <b>Request Token Reseller</b>
     <small>Pengajuan token registrasi & perpanjangan</small>
   </div>
-  <button id="darkBtn" type="button" style="background:#000;color:#fff;padding:10px 12px">☾</button>
+  <div class="head-actions">
+    <button id="refreshBtn" class="refresh-btn" type="button" title="Refresh data" aria-label="Refresh data">↻</button>
+    <button id="darkBtn" class="dark-btn" type="button" title="Dark Mode" aria-label="Dark Mode">☾</button>
+  </div>
 </header>
 
 <main class="wrap">
   <section class="card">
     <h2>Akun Reseller</h2>
-    <div class="sub">Request akan masuk ke Firebase untuk diperiksa dan disetujui admin.</div>
+    <div class="sub">Akun dibaca dari Firebase Auth dan users/{UID}, mengikuti pola penjualan.html. Tidak ada login ulang di halaman ini.</div>
+
     <div class="identity">
-      <div class="info"><span>Email</span><b id="email">-</b></div>
-      <div class="info"><span>Nama / Toko</span><b id="nama">-</b></div>
+      <div class="info"><span>Email</span><b id="email">Memuat...</b></div>
+      <div class="info"><span>Nama / Toko</span><b id="nama">Memuat...</b></div>
       <div class="info"><span>Role</span><b id="role">RESELLER</b></div>
-      <div class="info"><span>Status Akun</span><b id="statusAkun">-</b></div>
+      <div class="info"><span>Status Akun</span><b id="statusAkun">Memuat...</b></div>
     </div>
 
     <div class="buttons">
@@ -92,31 +104,43 @@ body.dark .modal-box{background:#151b23;color:#f3f4f6}
 
     <div id="requestBox" class="request-box">
       <h3 id="requestTitle" style="margin:0 0 10px">Request</h3>
+
       <div class="form-row">
         <label>Jenis Request</label>
-        <input id="jenisView" readonly style="width:100%;min-height:42px;border:2px solid #111827;border-radius:9px;padding:9px 10px">
+        <input id="jenisView" readonly>
       </div>
+
       <div class="form-row">
         <label>JUMLAH TOKEN YANG DIMINTA</label>
         <input id="jumlahRequest" type="number" min="1" max="100" value="1" inputmode="numeric">
       </div>
+
       <div class="form-row">
         <label>Catatan untuk Admin (opsional)</label>
         <textarea id="catatan" placeholder="Contoh: mohon diproses..."></textarea>
       </div>
-      <div class="price">Tagihan: <span id="hargaView">Menunggu penetapan / persetujuan admin</span></div>
+
+      <div class="price">
+        Tagihan perkiraan:
+        <span id="hargaView">Menunggu penetapan / persetujuan admin</span>
+        <small id="hargaInfo">Harga final ditetapkan berdasarkan data admin.</small>
+      </div>
+
       <div class="actions">
         <button class="cancel" onclick="closeRequest()">Batal</button>
         <button class="send" onclick="kirimRequest()">📨 Kirim Request</button>
       </div>
-      <div class="notice">Harga dan token final mengikuti data yang ditetapkan admin di Firebase. Halaman reseller tidak mengubah harga dan tidak membuat token sendiri.</div>
+
+      <div class="notice">
+        Request dikirim menggunakan UID akun reseller yang sedang login di Index. Token tidak dibuat oleh halaman reseller.
+      </div>
     </div>
   </section>
 
   <section class="card">
     <h2>Request Saya</h2>
     <div class="sub">Setelah admin menyetujui, token dan jumlah tagihan akan tampil di sini.</div>
-    <div id="requestList"><div class="empty">Memuat data...</div></div>
+    <div id="requestList"><div class="loading">Memuat data...</div></div>
   </section>
 </main>
 
@@ -130,14 +154,26 @@ body.dark .modal-box{background:#151b23;color:#f3f4f6}
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import {
-  getFirestore,collection,query,where,getDocs,addDoc,doc,getDoc,
-  onSnapshot,orderBy,limit
+  getAuth,
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  doc,
+  getDoc,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const firebaseConfig={
-  apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",
+  apiKey:"AIzaSy_C_PcarMTT5Un7qfSLzf92o5OGn5rginsI",
   authDomain:"fixzy-update.firebaseapp.com",
   projectId:"fixzy-update",
   storageBucket:"fixzy-update.appspot.com",
@@ -153,6 +189,7 @@ let currentUser=null;
 let profile={};
 let selectedJenis="";
 let unsub=null;
+let authReady=false;
 
 const $=id=>document.getElementById(id);
 
@@ -162,7 +199,9 @@ function rupiah(v){
 }
 
 function esc(v){
-  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+  return String(v??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[m]));
 }
 
 function showInfo(title,text){
@@ -172,195 +211,689 @@ function showInfo(title,text){
 }
 window.closeInfo=()=>$("infoModal").classList.remove("show");
 
-function setProfile(){
-  $("email").textContent=currentUser?.email||"-";
-  $("nama").textContent=profile.namaToko||profile.nama||profile.displayName||profile.name||currentUser?.email?.split("@")[0]||"-";
-  $("role").textContent=(profile.role||"reseller").toUpperCase();
-  $("statusAkun").textContent=profile.status||"aktif";
+/*
+ * ============================================================
+ * POLA AKUN FIXZY - MENGIKUTI penjualan.html
+ * ============================================================
+ * 1. Firebase Auth menentukan akun aktif.
+ * 2. UID akun dipakai sebagai ID dokumen users/{UID}.
+ * 3. Data profil reseller dibaca dari dokumen tersebut.
+ * 4. Tidak mencari akun berdasarkan nama/email.
+ * 5. Tidak ada login atau pemeriksaan izin kedua di halaman ini.
+ */
+async function loadProfile(u){
+  if(!u)return false;
+
+  let p={};
+
+  try{
+    /*
+     * Sama dengan pola penjualan.html:
+     * query users berdasarkan document ID = Firebase Auth UID.
+     */
+    const snap=await getDocs(
+      query(collection(db,"users"),where("__name__","==",u.uid))
+    );
+
+    if(!snap.empty){
+      p=snap.docs[0].data()||{};
+    }else{
+      /*
+       * Fallback langsung ke users/{UID}.
+       */
+      const direct=await getDoc(doc(db,"users",u.uid));
+      if(direct.exists())p=direct.data()||{};
+    }
+  }catch(e){
+    /*
+     * Jika query __name__ gagal karena rules/index,
+     * tetap coba membaca document ID langsung.
+     */
+    try{
+      const direct=await getDoc(doc(db,"users",u.uid));
+      if(direct.exists())p=direct.data()||{};
+    }catch(err){
+      console.error("Gagal membaca users/{UID}:",err);
+    }
+  }
+
+  profile=p||{};
+
+  /*
+   * Email utama tetap dari Firebase Auth.
+   * Data nama/role/status tetap dari users/{UID}.
+   */
+  profile.uid=profile.uid||u.uid;
+  profile.email=profile.email||u.email||"";
+
+  setProfile();
+  return Object.keys(profile).length>0;
 }
 
-async function loadProfile(u){
-  try{
-    const ref=doc(db,"users",u.uid);
-    const snap=await getDoc(ref);
-    profile=snap.exists()?snap.data():{};
-  }catch(e){profile={};}
-  setProfile();
+function setProfile(){
+  $("email").textContent=
+    profile.email||
+    currentUser?.email||
+    "-";
+
+  $("nama").textContent=
+    profile.namaToko||
+    profile.nama||
+    profile.displayName||
+    profile.name||
+    currentUser?.email?.split("@")[0]||
+    "-";
+
+  $("role").textContent=
+    String(profile.role||"reseller").toUpperCase();
+
+  $("statusAkun").textContent=
+    profile.status||
+    "aktif";
+}
+
+function profileIsReseller(){
+  const role=String(profile.role||"reseller").toLowerCase();
+  return role==="reseller" || role==="reseller_user" || role==="mitra";
+}
+
+/*
+ * Tidak redirect ke login.
+ * Jika user sudah login di Index dan Firebase Auth memakai
+ * project/config yang sama, Firebase akan memulihkan sesi otomatis.
+ */
+async function startWithUser(u){
+  if(!u)return;
+
+  currentUser=u;
+
+  await loadProfile(u);
+
+  /*
+   * Jangan blokir berdasarkan role di halaman ini.
+   * Data akun sudah memiliki role dari users/{UID}.
+   * Jika halaman memang dibuka melalui menu reseller,
+   * request menggunakan UID akun tersebut.
+   */
+  await listenRequests();
 }
 
 async function getExistingRequests(){
   const arr=[];
+
+  if(!currentUser?.uid)return arr;
+
   try{
-    const q=query(collection(db,"registrationTokens"),where("resellerUid","==",currentUser.uid));
+    const q=query(
+      collection(db,"registrationTokens"),
+      where("resellerUid","==",currentUser.uid)
+    );
+
     const s=await getDocs(q);
-    s.forEach(d=>arr.push({id:d.id,...d.data()}));
-  }catch(e){}
+
+    s.forEach(d=>{
+      arr.push({id:d.id,...d.data()});
+    });
+  }catch(e){
+    console.error("Gagal membaca request:",e);
+  }
+
   arr.sort((a,b)=>{
-    const ta=a.createdAt?.seconds||0, tb=b.createdAt?.seconds||0;
+    const ta=a.createdAt?.seconds||0;
+    const tb=b.createdAt?.seconds||0;
     return tb-ta;
   });
+
   return arr;
+}
+
+function getTokens(x){
+  const arr=[];
+
+  if(Array.isArray(x.tokens)){
+    x.tokens.forEach(t=>arr.push(t));
+  }
+
+  [x.token,x.kodeToken,x.registrationToken].forEach(v=>{
+    if(Array.isArray(v)){
+      v.forEach(t=>arr.push(t));
+    }else if(v){
+      String(v)
+        .split(/\r?\n|[,;]+/)
+        .forEach(t=>arr.push(t.trim()));
+    }
+  });
+
+  return [...new Set(
+    arr.map(v=>String(v||"").trim()).filter(Boolean)
+  )];
+}
+
+function requestDate(x){
+  try{
+    if(x.createdAt?.toDate){
+      return x.createdAt.toDate().toLocaleString("id-ID");
+    }
+  }catch(e){}
+  return x.createdAtText||"";
 }
 
 function renderRequests(list){
   const el=$("requestList");
+
   if(!list.length){
     el.innerHTML='<div class="empty">Belum ada request token.</div>';
     return;
   }
+
   el.innerHTML=list.map(x=>{
-    const status=(x.requestStatus||x.status||"pending").toLowerCase();
-    const cls=status.includes("approve")||status==="disetujui"?"approved":status.includes("tolak")||status==="rejected"?"rejected":"pending";
-    const label=cls==="approved"?"DISETUJUI":cls==="rejected"?"DITOLAK":"MENUNGGU ADMIN";
-    const jenis=x.requestType==="perpanjangan"?"Perpanjangan":"Registrasi";
-    const harga=x.jumlahTagihan??x.totalTagihan??x.hargaToken??x.amount??0;
-    const token=x.token||x.kodeToken||x.registrationToken||"";
-    return `<div class="req">
-      <div class="req-top">
-        <div><b>Request ${esc(jenis)}</b><br><small>${esc(x.createdAtText||x.createdAt?.toDate?.()?.toLocaleString("id-ID")||"")}</small></div>
-        <span class="badge ${cls}">${label}</span>
+    const rawStatus=String(
+      x.requestStatus||x.status||"pending"
+    ).toLowerCase();
+
+    const cls=
+      rawStatus.includes("approve")||rawStatus==="disetujui"
+        ?"approved":
+      rawStatus.includes("tolak")||rawStatus==="rejected"
+        ?"rejected":
+        "pending";
+
+    const label=
+      cls==="approved"
+        ?"DISETUJUI":
+      cls==="rejected"
+        ?"DITOLAK":
+        "MENUNGGU ADMIN";
+
+    const jenis=
+      x.requestType==="perpanjangan"
+        ?"Perpanjangan":
+        "Registrasi";
+
+    const jumlah=
+      Number(
+        x.jumlahRequest??
+        x.jumlahTokenDiminta??
+        1
+      )||1;
+
+    const tagihan=
+      x.jumlahTagihan??
+      x.totalTagihan??
+      x.amount??
+      0;
+
+    const tokens=getTokens(x);
+
+    return `
+      <div class="req">
+        <div class="req-top">
+          <div>
+            <b>Request Token ${esc(jenis)}</b><br>
+            <small>${esc(requestDate(x))}</small>
+          </div>
+          <span class="badge ${cls}">${label}</span>
+        </div>
+
+        <div style="margin-top:8px;font-size:12px">
+          Jumlah: <b>${jumlah} Token</b>
+          ${Number(tagihan)>0
+            ?` • Tagihan: <b>${rupiah(tagihan)}</b>`
+            :""
+          }
+        </div>
+
+        ${
+          x.catatan
+            ?`<div style="margin-top:7px;font-size:11px;color:#64748b">
+                Catatan: ${esc(x.catatan)}
+              </div>`
+            :""
+        }
+
+        ${
+          x.adminNote
+            ?`<div style="margin-top:6px;font-size:11px;color:#166534">
+                Admin: ${esc(x.adminNote)}
+              </div>`
+            :""
+        }
+
+        ${
+          tokens.length
+            ?`
+              <div class="token">
+                <div style="font-size:10px;color:#166534;font-weight:800;margin-bottom:4px">
+                  TOKEN ANDA • ${tokens.length} TOKEN
+                </div>
+                ${tokens.map((t,i)=>`
+                  <div style="
+                    padding:7px 0;
+                    ${i?"border-top:1px solid #bbf7d0;":""}
+                  ">
+                    <code>${esc(t)}</code>
+                  </div>
+                `).join("")}
+              </div>
+            `
+            :""
+        }
+
+        ${
+          cls==="approved"
+            ?`<div style="font-size:11px;color:#166534;margin-top:7px">
+                Token dan tagihan sudah disetujui admin.
+              </div>`
+            :""
+        }
       </div>
-      <div style="margin-top:8px;font-size:12px">Tagihan: <b>${rupiah(harga)}</b></div>
-      ${x.adminNote?`<div style="margin-top:6px;font-size:11px;color:#64748b">Admin: ${esc(x.adminNote)}</div>`:""}
-      ${(()=>{
-        const arr=Array.isArray(x.tokens)?x.tokens.filter(Boolean):
-          [x.token||x.kodeToken||x.registrationToken].filter(Boolean);
-        return arr.length?`<div class="token"><div style="font-size:10px;color:#166534;font-weight:800;margin-bottom:4px">TOKEN ANDA</div>${arr.map((t,i)=>`<div style="padding:7px 0;border-top:${i?'1px solid #bbf7d0':'0'} solid #bbf7d0"><code>${esc(t)}</code></div>`).join("")}</div>`:"";
-      })()}
-      ${status==="approved"||status==="disetujui"?`<div style="font-size:11px;color:#166534;margin-top:7px">Token dan tagihan sudah disetujui admin.</div>`:""}
-    </div>`;
+    `;
   }).join("");
 }
 
 async function listenRequests(){
-  if(unsub) unsub();
-  // Query hanya berdasarkan resellerUid agar tidak memerlukan index tambahan.
+  if(unsub){
+    try{unsub()}catch(e){}
+    unsub=null;
+  }
+
+  if(!currentUser?.uid){
+    $("requestList").innerHTML=
+      '<div class="empty">Menunggu sesi akun dari Index...</div>';
+    return;
+  }
+
   try{
-    const q=query(collection(db,"registrationTokens"),where("resellerUid","==",currentUser.uid));
-    unsub=onSnapshot(q,s=>{
-      const list=[];
-      s.forEach(d=>list.push({id:d.id,...d.data()}));
-      list.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-      renderRequests(list);
-    },async()=>{
-      renderRequests(await getExistingRequests());
-    });
+    /*
+     * Hanya menggunakan resellerUid.
+     * Tidak perlu composite index.
+     */
+    const q=query(
+      collection(db,"registrationTokens"),
+      where("resellerUid","==",currentUser.uid)
+    );
+
+    unsub=onSnapshot(
+      q,
+      s=>{
+        const list=[];
+
+        s.forEach(d=>{
+          list.push({id:d.id,...d.data()});
+        });
+
+        list.sort((a,b)=>{
+          const ta=a.createdAt?.seconds||0;
+          const tb=b.createdAt?.seconds||0;
+          return tb-ta;
+        });
+
+        renderRequests(list);
+      },
+      async error=>{
+        console.error("Listener request:",error);
+        renderRequests(await getExistingRequests());
+      }
+    );
   }catch(e){
+    console.error("Listener request gagal:",e);
     renderRequests(await getExistingRequests());
   }
 }
 
 async function loadHarga(jenis){
-  // Tidak membuat/menyimpan harga di halaman reseller.
-  // Coba membaca dokumen pengaturan yang umum dipakai; jika tidak ditemukan,
-  // admin tetap dapat menetapkan jumlahTagihan pada request.
-  const ids=jenis==="registrasi"
-    ? ["tokenRegistrasi","registrasi","token"]
-    : ["tokenPerpanjangan","perpanjangan","token"];
-  const cols=["pengaturan","settings","tokenSettings"];
+  const ids=
+    jenis==="registrasi"
+      ?["tokenRegistrasi","registrasi","token"]
+      :["tokenPerpanjangan","perpanjangan","token"];
+
+  const cols=[
+    "pengaturan",
+    "settings",
+    "tokenSettings"
+  ];
+
   for(const col of cols){
     for(const id of ids){
       try{
         const s=await getDoc(doc(db,col,id));
-        if(s.exists()){
-          const d=s.data();
-          const v=jenis==="registrasi"
-            ? (d.hargaRegistrasi??d.hargaTokenRegistrasi??d.hargaToken??d.harga)
-            : (d.hargaPerpanjangan??d.hargaTokenPerpanjangan??d.hargaToken??d.harga);
-          if(Number(v)>0) return Number(v);
-        }
+
+        if(!s.exists())continue;
+
+        const d=s.data()||{};
+
+        const v=
+          jenis==="registrasi"
+            ?(
+              d.hargaRegistrasi??
+              d.hargaTokenRegistrasi??
+              d.hargaToken??
+              d.harga
+            )
+            :(
+              d.hargaPerpanjangan??
+              d.hargaTokenPerpanjangan??
+              d.hargaToken??
+              d.harga
+            );
+
+        if(Number(v)>0)return Number(v);
       }catch(e){}
     }
   }
+
   return 0;
 }
 
+function getQuantity(){
+  let n=parseInt($("jumlahRequest").value,10);
+
+  if(!Number.isFinite(n)||n<1)n=1;
+  if(n>100)n=100;
+
+  $("jumlahRequest").value=n;
+
+  return n;
+}
+
+async function updateHargaView(){
+  if(!selectedJenis)return;
+
+  const qty=getQuantity();
+  const harga=await loadHarga(selectedJenis);
+
+  if(harga>0){
+    $("hargaView").textContent=rupiah(harga*qty);
+    $("hargaInfo").textContent=
+      `${rupiah(harga)} × ${qty} token. Tagihan final mengikuti persetujuan admin.`;
+  }else{
+    $("hargaView").textContent=
+      "Menunggu penetapan / persetujuan admin";
+    $("hargaInfo").textContent=
+      "Harga final ditetapkan berdasarkan data admin.";
+  }
+}
+
 window.openRequest=async jenis=>{
-  selectedJenis=jenis;
-  $("requestTitle").textContent=jenis==="registrasi"?"Request Token Registrasi":"Request Token Perpanjangan";
-  $("jenisView").value=jenis==="registrasi"?"Token Registrasi":"Token Perpanjangan";
-  $("jumlahRequest").value=1;
-  $("catatan").value="";
-  $("hargaView").textContent="Memuat harga...";
-  $("requestBox").classList.add("show");
-  const harga=await loadHarga(jenis);
-  const qty=Math.max(1,Math.min(100,parseInt($("jumlahRequest").value,10)||1));
-  $("hargaView").textContent=harga?rupiah(harga*qty):"Menunggu penetapan / persetujuan admin";
-};
-
-window.closeRequest=()=>{$("requestBox").classList.remove("show");selectedJenis=""};
-
-window.kirimRequest=async()=>{
-  if(!currentUser||!selectedJenis)return;
-  const status=(profile.status||"aktif").toLowerCase();
-  if(status==="nonaktif"){
-    showInfo("Akun Nonaktif","Akun reseller sedang nonaktif. Request token tidak dapat dikirim.");
+  if(!currentUser?.uid){
+    showInfo(
+      "Sesi Belum Siap",
+      "Akun belum terbaca dari sesi Index. Tunggu sebentar lalu tekan Refresh."
+    );
     return;
   }
 
+  selectedJenis=jenis;
+
+  $("requestTitle").textContent=
+    jenis==="registrasi"
+      ?"Request Token Registrasi"
+      :"Request Token Perpanjangan";
+
+  $("jenisView").value=
+    jenis==="registrasi"
+      ?"Token Registrasi"
+      :"Token Perpanjangan";
+
+  $("jumlahRequest").value=1;
+  $("catatan").value="";
+  $("hargaView").textContent="Memuat harga...";
+  $("hargaInfo").textContent="Membaca pengaturan harga Firebase...";
+  $("requestBox").classList.add("show");
+
+  await updateHargaView();
+};
+
+window.closeRequest=()=>{
+  $("requestBox").classList.remove("show");
+  selectedJenis="";
+};
+
+$("jumlahRequest").addEventListener("input",()=>{
+  updateHargaView();
+});
+
+window.kirimRequest=async()=>{
+  if(!currentUser?.uid){
+    showInfo(
+      "Akun Belum Terbaca",
+      "Sesi Firebase dari Index belum tersedia. Silakan tekan Refresh."
+    );
+    return;
+  }
+
+  if(!selectedJenis)return;
+
+  const status=String(
+    profile.status||"aktif"
+  ).toLowerCase();
+
+  if(
+    status==="nonaktif"||
+    status==="inactive"||
+    status==="disabled"
+  ){
+    showInfo(
+      "Akun Nonaktif",
+      "Akun reseller sedang nonaktif. Request token tidak dapat dikirim."
+    );
+    return;
+  }
+
+  const qty=getQuantity();
+  const catatan=$("catatan").value.trim();
   const btn=document.querySelector(".send");
+
   btn.disabled=true;
   btn.textContent="Mengirim...";
 
   try{
     const harga=await loadHarga(selectedJenis);
-    const nama=profile.namaToko||profile.nama||profile.displayName||profile.name||currentUser.email.split("@")[0];
 
-    // Tetap memakai collection registrationTokens yang sudah digunakan sistem token.
-    // Admin dapat melihat dokumen dengan requestStatus = pending.
-    await addDoc(collection(db,"registrationTokens"),{
-      requestType:selectedJenis,
-      requestStatus:"pending",
-      resellerUid:currentUser.uid,
-      resellerEmail:currentUser.email,
-      resellerNama:nama,
-      role:"reseller",
-      catatan:$("catatan").value.trim(),
-      jumlahRequest:Math.max(1,Math.min(100,parseInt($("jumlahRequest").value,10)||1)),\n      jumlahTokenDiminta:Math.max(1,Math.min(100,parseInt($("jumlahRequest").value,10)||1)),
-      hargaToken:harga||0,
-      jumlahTagihan:0,
-      token:"",
-      adminNote:"",
-      createdAt:new Date(),
-      createdAtText:new Date().toLocaleString("id-ID"),
-      updatedAt:new Date(),
-      notificationAdmin:true,
-      notificationText:`Request token ${selectedJenis} dari ${nama}`
-    });
+    const nama=
+      profile.namaToko||
+      profile.nama||
+      profile.displayName||
+      profile.name||
+      currentUser.email?.split("@")[0]||
+      "Reseller";
+
+    /*
+     * Data request memakai UID akun Firebase yang sedang aktif.
+     * Ini yang membuat request reseller terbaca oleh halaman admin.
+     */
+    await addDoc(
+      collection(db,"registrationTokens"),
+      {
+        requestType:selectedJenis,
+        requestStatus:"pending",
+        status:"pending",
+
+        resellerUid:currentUser.uid,
+        resellerEmail:
+          profile.email||
+          currentUser.email||
+          "",
+
+        resellerNama:nama,
+        role:String(
+          profile.role||"reseller"
+        ).toLowerCase(),
+
+        /*
+         * Mengikuti struktur penjualan.html:
+         * ownerId / ownerUid dapat berasal dari profil users/{UID}.
+         */
+        ownerUid:
+          profile.ownerUid||
+          profile.ownerId||
+          "",
+
+        ownerId:
+          profile.ownerId||
+          profile.ownerUid||
+          "",
+
+        catatan,
+
+        jumlahRequest:qty,
+        jumlahTokenDiminta:qty,
+
+        hargaToken:harga||0,
+
+        jumlahTagihan:0,
+        totalTagihan:0,
+
+        token:"",
+        kodeToken:"",
+        registrationToken:"",
+        tokens:[],
+
+        adminNote:"",
+
+        createdAt:new Date(),
+        createdAtText:new Date().toLocaleString("id-ID"),
+        updatedAt:new Date(),
+
+        notificationAdmin:true,
+        notificationReseller:false,
+
+        notificationText:
+          `Request token ${selectedJenis} sebanyak ${qty} token dari ${nama}`
+      }
+    );
 
     closeRequest();
-    showInfo("Request Terkirim","Request sudah dikirim ke admin. Setelah disetujui, token dan jumlah tagihan akan otomatis tampil di halaman ini.");
+
+    showInfo(
+      "Request Terkirim",
+      `Request ${selectedJenis} sebanyak ${qty} token sudah dikirim ke admin. Setelah disetujui, token dan tagihan akan tampil otomatis di halaman ini.`
+    );
+
   }catch(e){
-    showInfo("Gagal","Request gagal dikirim: "+e.message);
+    console.error("Kirim request:",e);
+
+    showInfo(
+      "Gagal",
+      "Request gagal dikirim: "+e.message
+    );
   }finally{
     btn.disabled=false;
     btn.textContent="📨 Kirim Request";
   }
 };
 
-onAuthStateChanged(auth,async u=>{
-  if(!u){
-    // Tidak meminta login kedua. Halaman ini memang dibuka dari Index.
-    $("email").textContent="-";
-    $("nama").textContent="-";
-    $("statusAkun").textContent="Sesi Index belum terbaca";
-    $("requestList").innerHTML='<div class="empty">Buka halaman ini melalui Index setelah login.</div>';
-    return;
+/*
+ * ============================================================
+ * FIREBASE AUTH
+ * ============================================================
+ * Tidak ada:
+ * - login.html
+ * - redirect login
+ * - Anonymous Authentication
+ * - pemeriksaan izin kedua
+ *
+ * Halaman hanya memakai sesi Firebase Auth yang sudah dibuat
+ * oleh Index.
+ */
+async function initAuth(){
+  try{
+    /*
+     * Memastikan sesi Firebase tetap tersedia ketika berpindah
+     * dari Index ke halaman lain pada domain yang sama.
+     * Ini bukan login baru.
+     */
+    await setPersistence(
+      auth,
+      browserLocalPersistence
+    );
+  }catch(e){
+    console.warn("Persistence:",e);
   }
-  currentUser=u;
-  await loadProfile(u);
-  await listenRequests();
-});
 
-window.addEventListener("message",event=>{
-  if(event.origin!==location.origin)return;
-  if(!event.data||event.data.type!=="FIXZY_AUTH_SESSION")return;
-  // Index sudah mengirim sesi. Firebase Auth tetap dipakai untuk akses Firestore.
-  if(event.data.profile){
-    profile={...profile,...event.data.profile};
-    setProfile();
+  onAuthStateChanged(
+    auth,
+    async u=>{
+      authReady=true;
+
+      if(!u){
+        /*
+         * Jangan redirect.
+         * Tunggu Firebase memulihkan sesi dari Index.
+         */
+        $("email").textContent="-";
+        $("nama").textContent="Sesi Index belum terbaca";
+        $("role").textContent="RESELLER";
+        $("statusAkun").textContent="Menunggu sesi...";
+        $("requestList").innerHTML=
+          '<div class="empty">Sesi akun dari Index sedang dipulihkan...</div>';
+        return;
+      }
+
+      try{
+        await startWithUser(u);
+      }catch(e){
+        console.error("Start user:",e);
+        $("requestList").innerHTML=
+          `<div class="empty">Gagal membaca data akun: ${esc(e.message)}</div>`;
+      }
+    }
+  );
+}
+
+/*
+ * Jalankan Auth tanpa login tambahan.
+ */
+initAuth();
+
+async function refreshPageData(){
+  const btn=$("refreshBtn");
+
+  if(!btn)return;
+
+  btn.disabled=true;
+  btn.classList.add("loading");
+  btn.textContent="↻";
+
+  try{
+    /*
+     * Ambil user Firebase Auth terbaru.
+     */
+    const u=auth.currentUser;
+
+    if(!u){
+      showInfo(
+        "Sesi Belum Tersedia",
+        "Firebase belum memulihkan akun dari Index. Coba tunggu sebentar lalu tekan Refresh lagi."
+      );
+      return;
+    }
+
+    currentUser=u;
+
+    await loadProfile(u);
+    await listenRequests();
+
+    showInfo(
+      "Berhasil",
+      "Data akun dan request token sudah diperbarui."
+    );
+
+  }catch(e){
+    console.error("Refresh:",e);
+
+    showInfo(
+      "Refresh Gagal",
+      "Data gagal diperbarui: "+e.message
+    );
+  }finally{
+    btn.disabled=false;
+    btn.classList.remove("loading");
+    btn.textContent="↻";
   }
-});
+}
+
+$("refreshBtn").onclick=refreshPageData;
 
 $("darkBtn").onclick=()=>{
   document.body.classList.toggle("dark");
