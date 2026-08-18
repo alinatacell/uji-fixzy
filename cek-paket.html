@@ -17,40 +17,28 @@ body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f7;color:#1
 .val{font-size:20px;font-weight:900}
 .input{width:100%;padding:14px;border:1px solid #cbd5e1;border-radius:12px;font-size:16px;text-transform:uppercase;letter-spacing:2px;font-weight:900}
 .badge{display:inline-block;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:900}
-.badge.green{background:#dcfce7;color:#166534}
-.badge.red{background:#fee2e2;color:#991b1b}
-.badge.yellow{background:#fef3c7;color:#92400e}
+.badge.green{background:#dcfce7;color:#166534}.badge.red{background:#fee2e2;color:#991b1b}.badge.yellow{background:#fef3c7;color:#92400e}
 .small-info{font-size:11px;color:#64748b;margin-top:7px}
 </style>
 </head>
-
 <body>
 
 <div class="top">
   <div style="flex:1">
     <h1 style="margin:0;font-size:22px">FIXZY - Cek Aktivasi</h1>
-    <p style="margin:4px 0 0;font-size:12px;opacity:.8">
-      Cek dan perpanjang masa aktif akun
-    </p>
+    <p style="margin:4px 0 0;font-size:12px;opacity:.8">Cek dan perpanjang masa aktif akun</p>
   </div>
-
   <button class="btn btn-y" onclick="loadData()">&#8635;</button>
   <button class="btn btn-r" onclick="tutupHalaman()">X</button>
 </div>
 
 <div class="wrap">
 
-  <!-- =====================================================
-       FUNGSI 1 : CEK AKTIVASI
-       ===================================================== -->
+  <!-- FUNGSI 1: CEK AKTIVASI -->
   <div class="card">
-
-    <div style="font-size:22px;font-weight:900;margin-bottom:10px">
-      🔐 Aktivasi Akun
-    </div>
+    <div style="font-size:22px;font-weight:900;margin-bottom:10px">🔐 Aktivasi Akun</div>
 
     <div style="display:grid;gap:10px">
-
       <div style="background:#fff;color:#111827;border-radius:14px;padding:12px">
         <div class="label">Nama Konter</div>
         <div class="val" id="namaKonter">-</div>
@@ -62,67 +50,32 @@ body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f7;color:#1
         <div id="sisaHari" style="margin-top:6px"></div>
         <div id="sumberAktivasi" class="small-info"></div>
       </div>
-
     </div>
   </div>
 
-
-  <!-- =====================================================
-       FUNGSI 2 : PERPANJANGAN
-       ===================================================== -->
+  <!-- FUNGSI 2: PERPANJANGAN -->
   <div class="card white">
-
-    <h3 style="margin:0 0 8px">
-      Perpanjang Aktivasi Pakai Token
-    </h3>
-
+    <h3 style="margin:0 0 8px">Perpanjang Aktivasi Pakai Token</h3>
     <p style="font-size:12px;color:#64748b;margin:0 0 10px">
-      Masukkan token perpanjangan.
-      Token reseller yang sudah dibeli dapat digunakan untuk
-      perpanjangan dan <b>tidak dikunci kepada reseller pembeli</b>.
+      Masukkan token perpanjangan. Token reseller yang sudah dibeli dapat dijual dan digunakan untuk perpanjangan.
       Token baru dianggap terpakai setelah berhasil digunakan.
+      Masa aktif akan <b>ditambahkan</b> dari tanggal aktif yang sekarang.
     </p>
 
-    <input
-      id="tokenInput"
-      class="input"
-      placeholder="AB12-9F3K-Q7WZ"
-      maxlength="50"
-      autocomplete="off"
-    >
+    <input id="tokenInput" class="input" placeholder="AB12-9F3K-Q7WZ" maxlength="50" autocomplete="off">
 
-    <button
-      id="btnPakaiToken"
-      class="btn btn-y"
+    <button id="btnPakaiToken" class="btn btn-y"
       style="width:100%;margin-top:10px;padding:14px;font-size:16px"
-      onclick="pakaiToken()"
-    >
-      Aktifkan Token
-    </button>
+      onclick="pakaiToken()">Aktifkan Token</button>
 
-    <div
-      id="tokenMsg"
-      style="margin-top:10px;font-size:12px;font-weight:800;white-space:pre-line"
-    ></div>
-
+    <div id="tokenMsg" style="margin-top:10px;font-size:12px;font-weight:800;white-space:pre-line"></div>
   </div>
 
 </div>
 
-
 <script type="module">
-
-import {
-  initializeApp,
-  getApps,
-  getApp
-} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import {
   getFirestore,
   doc,
@@ -131,17 +84,12 @@ import {
   query,
   where,
   getDocs,
-  runTransaction,
+  updateDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-
-/* =========================================================
-   FIREBASE
-   ========================================================= */
-
 const cfg={
-  apiKey:"AIzaSyC_CparMTT5Un7qfSLzf92o5OGn5rginsI",
+  apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",
   authDomain:"fixzy-update.firebaseapp.com",
   projectId:"fixzy-update",
   storageBucket:"fixzy-update.firebasestorage.app",
@@ -149,203 +97,88 @@ const cfg={
   appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"
 };
 
-const app=
-  getApps().length
-  ? getApp()
-  : initializeApp(cfg);
-
+const app=getApps().length ? getApp() : initializeApp(cfg);
 const auth=getAuth(app);
 const db=getFirestore(app);
-
 
 let currentUid=null;
 let currentUserData=null;
 let authReady=false;
 
-
-/* =========================================================
-   TUTUP HALAMAN
-   ========================================================= */
-
 window.tutupHalaman=function(){
-
   try{
-
     if(parent!==window){
-
-      parent.postMessage(
-        {type:"FIXZY_CLOSE_PAGE"},
-        "*"
-      );
-
+      parent.postMessage({type:"FIXZY_CLOSE_PAGE"},"*");
       return;
     }
-
   }catch(e){}
-
   location.href="index.html";
 };
 
-
 /* =========================================================
    NORMALISASI TANGGAL
+   Prioritas:
+   1. tanggalBerakhir -> akun registrasi token / sistem baru
+   2. exp             -> Free Trial / sistem lama
+   3. expAt           -> kompatibilitas
+   4. expiredAt       -> kompatibilitas
    ========================================================= */
-
 function parseDateValue(v){
-
-  if(
-    v===undefined ||
-    v===null ||
-    v===""
-  )return null;
+  if(v===undefined || v===null || v==="") return null;
 
   try{
-
-    if(
-      typeof v==="object" &&
-      typeof v.toDate==="function"
-    ){
-
+    if(typeof v==="object" && typeof v.toDate==="function"){
       const d=v.toDate();
-
-      return isNaN(d.getTime())
-        ? null
-        : d;
+      return isNaN(d.getTime()) ? null : d;
     }
 
-    if(
-      typeof v==="object" &&
-      v.seconds!==undefined
-    ){
-
-      const d=
-        new Date(
-          Number(v.seconds)*1000
-        );
-
-      return isNaN(d.getTime())
-        ? null
-        : d;
+    if(typeof v==="object" && v.seconds!==undefined){
+      const d=new Date(Number(v.seconds)*1000);
+      return isNaN(d.getTime()) ? null : d;
     }
 
     if(v instanceof Date){
-
-      return isNaN(v.getTime())
-        ? null
-        : v;
+      return isNaN(v.getTime()) ? null : v;
     }
 
     const d=new Date(v);
-
-    return isNaN(d.getTime())
-      ? null
-      : d;
-
+    return isNaN(d.getTime()) ? null : d;
   }catch(e){
-
     return null;
   }
 }
 
-
-/* =========================================================
-   AMBIL TANGGAL BERAKHIR
-   ========================================================= */
-
 function getExpirationFromUser(data){
-
-  if(!data)return null;
+  if(!data) return null;
 
   const candidates=[
-
-    [
-      "tanggalBerakhir",
-      data.tanggalBerakhir
-    ],
-
-    [
-      "exp",
-      data.exp
-    ],
-
-    [
-      "expAt",
-      data.expAt
-    ],
-
-    [
-      "expiredAt",
-      data.expiredAt
-    ]
-
+    ["tanggalBerakhir",data.tanggalBerakhir],
+    ["exp",data.exp],
+    ["expAt",data.expAt],
+    ["expiredAt",data.expiredAt]
   ];
 
-  for(
-    const [field,value]
-    of candidates
-  ){
-
-    const d=
-      parseDateValue(value);
-
-    if(d){
-
-      return {
-        date:d,
-        field
-      };
-
-    }
-
+  for(const [field,value] of candidates){
+    const d=parseDateValue(value);
+    if(d) return {date:d,field};
   }
 
   return null;
 }
 
-
-/* =========================================================
-   FORMAT TANGGAL
-   ========================================================= */
-
 function formatTanggal(d){
-
-  return d.toLocaleDateString(
-    "id-ID",
-    {
-      day:"2-digit",
-      month:"long",
-      year:"numeric"
-    }
-  );
+  return d.toLocaleDateString("id-ID",{
+    day:"2-digit",
+    month:"long",
+    year:"numeric"
+  });
 }
 
-
-/* =========================================================
-   TAMPILKAN AKTIVASI
-   ========================================================= */
-
 function tampilkanAktivasi(data){
-
-  const namaEl=
-    document.getElementById(
-      "namaKonter"
-    );
-
-  const sampaiEl=
-    document.getElementById(
-      "aktifSampai"
-    );
-
-  const sisaEl=
-    document.getElementById(
-      "sisaHari"
-    );
-
-  const sumberEl=
-    document.getElementById(
-      "sumberAktivasi"
-    );
-
+  const namaEl=document.getElementById("namaKonter");
+  const sampaiEl=document.getElementById("aktifSampai");
+  const sisaEl=document.getElementById("sisaHari");
+  const sumberEl=document.getElementById("sumberAktivasi");
 
   const nama=
     data?.namaKonter ||
@@ -355,1185 +188,490 @@ function tampilkanAktivasi(data){
     data?.name ||
     "Akun Fixzy";
 
-
   namaEl.textContent=nama;
 
-
-  const hasil=
-    getExpirationFromUser(data);
-
+  const hasil=getExpirationFromUser(data);
 
   if(!hasil){
-
     sampaiEl.textContent="-";
-
-    sisaEl.innerHTML=
-      '<span class="badge red">Masa aktif belum ditemukan</span>';
-
-    sumberEl.textContent=
-      "Data tanggal aktivasi belum tersedia di users akun ini.";
-
+    sisaEl.innerHTML='<span class="badge red">Masa aktif belum ditemukan</span>';
+    sumberEl.textContent="Data tanggal aktivasi belum tersedia di users akun ini.";
     return;
   }
 
-
   const exp=hasil.date;
-
-  sampaiEl.textContent=
-    formatTanggal(exp);
-
+  sampaiEl.textContent=formatTanggal(exp);
 
   const now=new Date();
-
-  const today=
-    new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate()
-    );
-
-  const expDay=
-    new Date(
-      exp.getFullYear(),
-      exp.getMonth(),
-      exp.getDate()
-    );
-
-  const sisa=
-    Math.ceil(
-      (expDay-today)/
-      86400000
-    );
-
+  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const expDay=new Date(exp.getFullYear(),exp.getMonth(),exp.getDate());
+  const sisa=Math.ceil((expDay-today)/86400000);
 
   if(sisa>7){
-
-    sisaEl.innerHTML=
-      '<span class="badge green">'+
-      sisa+
-      ' hari lagi</span>';
-
+    sisaEl.innerHTML='<span class="badge green">'+sisa+' hari lagi</span>';
   }else if(sisa>0){
-
-    sisaEl.innerHTML=
-      '<span class="badge yellow">'+
-      sisa+
-      ' hari lagi</span>';
-
+    sisaEl.innerHTML='<span class="badge yellow">'+sisa+' hari lagi</span>';
   }else{
-
-    sisaEl.innerHTML=
-      '<span class="badge red">Kadaluarsa</span>';
-
+    sisaEl.innerHTML='<span class="badge red">Kadaluarsa</span>';
   }
 
-
-  if(
-    hasil.field===
-    "tanggalBerakhir"
-  ){
-
-    sumberEl.textContent=
-      "Sumber: tanggalBerakhir akun Firebase.";
-
+  if(hasil.field==="tanggalBerakhir"){
+    sumberEl.textContent="Sumber: tanggalBerakhir akun Firebase.";
   }else{
-
-    sumberEl.textContent=
-      "Sumber: "+
-      hasil.field+
-      " (kompatibilitas akun lama / Free Trial).";
-
+    sumberEl.textContent="Sumber: "+hasil.field+" (kompatibilitas akun lama / Free Trial).";
   }
-
 }
 
-
-/* =========================================================
-   AMBIL USER AKTIF
-   ========================================================= */
-
 async function ambilUserAktif(){
+  if(!currentUid) return null;
 
-  if(!currentUid)return null;
+  const ref=doc(db,"users",currentUid);
+  const snap=await getDoc(ref);
 
-  const ref=
-    doc(
-      db,
-      "users",
-      currentUid
-    );
+  if(!snap.exists()) return null;
 
-  const snap=
-    await getDoc(ref);
-
-  if(!snap.exists())
-    return null;
-
-  const data=
-    snap.data()||{};
-
+  const data=snap.data()||{};
   currentUserData=data;
-
   return data;
 }
 
-
-/* =========================================================
-   LOAD DATA
-   ========================================================= */
-
 window.loadData=async function(){
-
-  const namaEl=
-    document.getElementById(
-      "namaKonter"
-    );
-
-  const sampaiEl=
-    document.getElementById(
-      "aktifSampai"
-    );
-
-  const sisaEl=
-    document.getElementById(
-      "sisaHari"
-    );
-
-  const sumberEl=
-    document.getElementById(
-      "sumberAktivasi"
-    );
-
+  const namaEl=document.getElementById("namaKonter");
+  const sampaiEl=document.getElementById("aktifSampai");
+  const sisaEl=document.getElementById("sisaHari");
+  const sumberEl=document.getElementById("sumberAktivasi");
 
   if(!authReady){
-
     namaEl.textContent="Memuat...";
     sampaiEl.textContent="-";
-
     return;
   }
-
 
   if(!currentUid){
-
     namaEl.textContent="-";
     sampaiEl.textContent="-";
-
-    sisaEl.innerHTML=
-      '<span class="badge red">Belum login</span>';
-
-    sumberEl.textContent=
-      "Silakan login ke akun Fixzy terlebih dahulu.";
-
+    sisaEl.innerHTML='<span class="badge red">Belum login</span>';
+    sumberEl.textContent="Silakan login ke akun Fixzy terlebih dahulu.";
     return;
   }
 
-
   try{
-
-    const data=
-      await ambilUserAktif();
-
+    const data=await ambilUserAktif();
 
     if(!data){
-
       namaEl.textContent="-";
       sampaiEl.textContent="-";
-
-      sisaEl.innerHTML=
-        '<span class="badge red">Data akun tidak ditemukan</span>';
-
-      sumberEl.textContent=
-        "UID login tidak memiliki dokumen users/{uid}.";
-
+      sisaEl.innerHTML='<span class="badge red">Data akun tidak ditemukan</span>';
+      sumberEl.textContent="UID login tidak memiliki dokumen users/{uid}.";
       return;
     }
 
-
     tampilkanAktivasi(data);
-
   }catch(err){
-
-    console.error(
-      "CEK AKTIVASI:",
-      err
-    );
-
+    console.error("CEK AKTIVASI:",err);
     namaEl.textContent="-";
     sampaiEl.textContent="-";
-
-    sisaEl.innerHTML=
-      '<span class="badge red">Gagal membaca data</span>';
-
-    sumberEl.textContent=
-      err.message||
-      "Firebase error";
+    sisaEl.innerHTML='<span class="badge red">Gagal membaca data</span>';
+    sumberEl.textContent=err.message||"Firebase error";
   }
-
 };
-
 
 /* =========================================================
    AUTH
+   TIDAK DIUBAH.
+   Tetap membaca akun Firebase yang sedang login.
    ========================================================= */
+onAuthStateChanged(auth,async user=>{
+  authReady=true;
+  currentUid=user?.uid||null;
 
-onAuthStateChanged(
-  auth,
-  async user=>{
-
-    authReady=true;
-
-    currentUid=
-      user?.uid||
-      null;
-
-    if(user){
-
-      console.log(
-        "[FIXZY AKTIVASI] Login UID:",
-        user.uid
-      );
-
-    }else{
-
-      console.log(
-        "[FIXZY AKTIVASI] Tidak ada akun login."
-      );
-
-    }
-
-    await loadData();
-
-  }
-);
-
-
-/* =========================================================
-   AMBIL JUMLAH HARI TOKEN
-   ========================================================= */
-
-function getTokenDays(data){
-
-  let hari=Number(
-
-    data.paketHari ??
-    data.packageDays ??
-    data.durasiHari ??
-    data.masaAktifHari ??
-    0
-
-  );
-
-
-  if(hari>0)
-    return hari;
-
-
-  const bulan=Number(
-
-    data.paketBulan ??
-    data.packageMonths ??
-    data.durasiBulan ??
-    data.masaAktifBulan ??
-    0
-
-  );
-
-
-  if(bulan>0)
-    return bulan*30;
-
-
-  const paketText=
-    String(
-
-      data.packageLabel ||
-      data.paketLabel ||
-      data.paket ||
-      data.durasi ||
-      data.masaAktif ||
-      ""
-
-    ).toLowerCase();
-
-
-  const matchHari=
-    paketText.match(
-      /(\d+)\s*hari/
-    );
-
-  if(matchHari){
-
-    hari=
-      Number(
-        matchHari[1]
-      );
-
-    if(hari>0)
-      return hari;
+  if(user){
+    console.log("[FIXZY AKTIVASI] Login UID:",user.uid);
+  }else{
+    console.log("[FIXZY AKTIVASI] Tidak ada akun login.");
   }
 
-
-  const matchBulan=
-    paketText.match(
-      /(\d+)\s*bulan/
-    );
-
-  if(matchBulan){
-
-    hari=
-      Number(
-        matchBulan[1]
-      )*30;
-
-    if(hari>0)
-      return hari;
-  }
-
-
-  return 30;
-}
-
+  await loadData();
+});
 
 /* =========================================================
-   CEK APAKAH TOKEN SUDAH TERPAKAI
+   FUNGSI 2 — TOKEN PERPANJANGAN
+   ATURAN:
+   1. Token registrasi baru TIDAK boleh dipakai memperpanjang.
+   2. Token dari collection "tokens" boleh memperpanjang.
+   3. Token dari "resellerTokens" yang SUDAH DIBELI reseller
+      boleh dijual umum dan dipakai oleh akun pembeli token.
+   4. Token reseller TIDAK dikunci ke UID reseller pembeli.
+   5. Token baru menjadi used setelah berhasil dipakai.
    ========================================================= */
 
-function isTokenUsed(data){
+/* Cek apakah token reseller sudah dibeli/terjual.
+   Field-field yang diperiksa dibuat kompatibel dengan data lama.
+*/
+function resellerTokenSudahDibeli(data){
+  if(!data) return false;
 
-  return (
-
-    data.used===true ||
-
-    data.terpakai===true ||
-
-    data.dipakai===true ||
-
-    data.isUsed===true ||
-
-    String(
-      data.status||""
-    ).toLowerCase()==="terpakai" ||
-
-    String(
-      data.status||""
-    ).toLowerCase()==="used"
-
-  );
-
-}
-
-
-/* =========================================================
-   CEK TOKEN REGISTRASI BARU
-   ========================================================= */
-
-function isRegistrationOnlyToken(data){
-
-  const tipe=
-    String(
-      data.tipe||
-      data.tokenType||
-      ""
-    ).toLowerCase();
-
-
-  return (
-
-    tipe==="registrasi_baru" ||
-
-    tipe==="aktivasi_baru" ||
-
-    tipe==="registration" ||
-
-    tipe==="aktivasi" ||
-
-    data.hanyaRegistrasiBaru===true ||
-
-    data.registrationOnly===true ||
-
-    data.onlyRegistration===true
-
-  );
-
-}
-
-
-/* =========================================================
-   CEK TOKEN RESELLER SUDAH DIBELI
-   ========================================================= */
-
-function isPurchasedResellerToken(data){
-
-  const status=
-    String(
-      data.status||
-      data.tokenStatus||
-      ""
-    ).toLowerCase();
-
-
-  return (
-
+  if(
     data.purchasedByReseller===true ||
-
     data.soldToReseller===true ||
+    data.assigned===true ||
+    data.purchased===true ||
+    data.isPurchased===true ||
+    data.sudahDibeli===true ||
+    data.dibeli===true ||
+    data.terjual===true
+  ){
+    return true;
+  }
 
-    data.resellerPurchased===true ||
+  const status=String(
+    data.status||
+    data.tokenStatus||
+    data.purchaseStatus||
+    ""
+  ).trim().toLowerCase();
 
-    data.dibeliReseller===true ||
+  const statusBeli=[
+    "dibeli_reseller",
+    "dibeli reseller",
+    "dibeli",
+    "terjual",
+    "terjual_reseller",
+    "terjual reseller",
+    "sold",
+    "sold_reseller",
+    "sold reseller",
+    "owned",
+    "purchased",
+    "purchased_by_reseller",
+    "purchased by reseller"
+  ];
 
-    status==="dibeli_reseller" ||
+  if(statusBeli.includes(status)) return true;
 
-    status==="dimiliki_reseller" ||
+  /* Jika ada UID reseller yang menandakan token sudah dialokasikan,
+     token dianggap sudah dibeli. UID tersebut TIDAK dipakai untuk
+     mengunci pemakaian token ke reseller tersebut. */
+  const owner=String(
+    data.resellerUid||
+    data.assignedTo||
+    data.ownerUid||
+    data.purchasedBy||
+    data.buyerUid||
+    ""
+  ).trim();
 
-    status==="owned" ||
+  if(owner) return true;
 
-    status==="reseller_sold"
-
-  );
-
+  return false;
 }
 
+function tokenSudahTerpakai(data){
+  if(!data) return false;
 
-/* =========================================================
-   FUNGSI PERPANJANGAN TOKEN
-   ========================================================= */
+  return(
+    data.used===true||
+    data.terpakai===true||
+    data.dipakai===true||
+    data.isUsed===true||
+    String(data.status||"").trim().toLowerCase()==="terpakai"||
+    String(data.status||"").trim().toLowerCase()==="used"
+  );
+}
+
+function tokenKhususRegistrasi(data){
+  if(!data) return false;
+
+  const tipe=String(
+    data.tipe||
+    data.tokenType||
+    data.jenisToken||
+    data.type||
+    ""
+  ).trim().toLowerCase();
+
+  return(
+    tipe==="registrasi_baru"||
+    tipe==="aktivasi_baru"||
+    tipe==="registrasi"||
+    tipe==="registration"||
+    tipe==="registration_new"||
+    data.hanyaRegistrasiBaru===true||
+    data.untukRegistrasi===true
+  );
+}
 
 window.pakaiToken=async function(){
+  const input=document.getElementById("tokenInput");
+  const msg=document.getElementById("tokenMsg");
+  const btn=document.getElementById("btnPakaiToken");
 
-  const input=
-    document.getElementById(
-      "tokenInput"
-    );
-
-  const msg=
-    document.getElementById(
-      "tokenMsg"
-    );
-
-  const btn=
-    document.getElementById(
-      "btnPakaiToken"
-    );
-
-
-  const tokenStr=
-    (input.value||"")
-    .trim()
-    .toUpperCase();
-
+  const tokenStr=(input.value||"").trim().toUpperCase();
 
   if(!tokenStr){
-
-    msg.textContent=
-      "Masukkan token perpanjangan.";
-
+    msg.textContent="Masukkan token perpanjangan.";
     msg.style.color="#dc2626";
-
     return;
   }
-
 
   if(!currentUid){
-
-    msg.textContent=
-      "Akun belum terdeteksi. Silakan login ulang.";
-
+    msg.textContent="Akun belum terdeteksi. Silakan login ulang.";
     msg.style.color="#dc2626";
-
     return;
   }
 
-
   btn.disabled=true;
-
-  msg.textContent=
-    "Memeriksa token...";
-
+  msg.textContent="Memeriksa token...";
   msg.style.color="#2563eb";
 
-
   try{
-
-    /* =====================================================
-       VARIABEL TOKEN
-       ===================================================== */
-
     let tokenDoc=null;
     let tokenInfo=null;
     let tokenSource="";
 
+    /* ========================================================
+       A. TOKEN RESELLER
+       Token yang sudah dibeli reseller boleh dijual umum.
+       JANGAN membandingkan resellerUid/ownerUid dengan currentUid.
+       ======================================================== */
+    const resellerQuery=query(
+      collection(db,"resellerTokens"),
+      where("token","==",tokenStr)
+    );
 
-    /* =====================================================
-       1. CARI TOKEN RESELLER
-       
-       PENTING:
-       Tidak lagi mengecek resellerUid === currentUid.
+    const resellerSnap=await getDocs(resellerQuery);
 
-       Artinya:
-       - reseller beli token
-       - token diberi tanda dibeli reseller
-       - token tetap belum terpakai
-       - token tersebut boleh digunakan untuk perpanjangan
-         oleh umum
-       ===================================================== */
+    for(const d of resellerSnap.docs){
+      const data=d.data()||{};
 
-    const resellerQuery=
-      query(
-        collection(
-          db,
-          "resellerTokens"
-        ),
-        where(
-          "token",
-          "==",
-          tokenStr
-        )
-      );
+      if(tokenSudahTerpakai(data)) continue;
 
+      /* Token reseller harus sudah dibeli/terjual dahulu.
+         Tetapi siapa yang membeli TIDAK menjadi pembatas pemakaian. */
+      if(!resellerTokenSudahDibeli(data)) continue;
 
-    const resellerSnap=
-      await getDocs(
-        resellerQuery
-      );
-
-
-    for(
-      const d
-      of resellerSnap.docs
-    ){
-
-      const data=
-        d.data()||{};
-
-
-      /* Sudah terpakai = tidak boleh digunakan lagi */
-      if(
-        isTokenUsed(data)
-      ){
-        continue;
-      }
-
-
-      /*
-        Token reseller yang BELUM dibeli
-        tidak boleh langsung digunakan.
-
-        Token reseller yang SUDAH dibeli
-        boleh digunakan oleh umum.
-      */
-      if(
-        !isPurchasedResellerToken(data)
-      ){
-
-        continue;
-      }
-
+      /* Token registrasi tetap ditolak sebagai token perpanjangan. */
+      if(tokenKhususRegistrasi(data)) continue;
 
       tokenDoc=d;
       tokenInfo=data;
       tokenSource="resellerTokens";
-
       break;
     }
 
-
-    /* =====================================================
-       2. JIKA BUKAN RESELLER TOKEN,
-          CARI TOKEN BIASA
-       ===================================================== */
-
+    /* ========================================================
+       B. TOKEN BIASA
+       Collection "tokens" tetap seperti sistem sebelumnya.
+       Token yang memang ditugaskan ke reseller tertentu tetap
+       mengikuti aturan assignedTo/resellerUid yang sudah ada.
+       ======================================================== */
     if(!tokenDoc){
+      const normalQuery=query(
+        collection(db,"tokens"),
+        where("token","==",tokenStr)
+      );
 
-      const normalQuery=
-        query(
-          collection(
-            db,
-            "tokens"
-          ),
-          where(
-            "token",
-            "==",
-            tokenStr
-          )
-        );
+      const normalSnap=await getDocs(normalQuery);
 
+      for(const d of normalSnap.docs){
+        const data=d.data()||{};
 
-      const normalSnap=
-        await getDocs(
-          normalQuery
-        );
+        if(tokenSudahTerpakai(data)) continue;
 
-
-      for(
-        const d
-        of normalSnap.docs
-      ){
-
-        const data=
-          d.data()||{};
-
-
-        /*
-          Token yang sudah dipakai tidak boleh dipakai lagi.
-        */
-        if(
-          isTokenUsed(data)
-        ){
-
+        /* Token registrasi tidak boleh untuk perpanjangan. */
+        if(tokenKhususRegistrasi(data)){
           continue;
         }
 
+        const assignedTo=String(
+          data.assignedTo||
+          data.resellerUid||
+          ""
+        ).trim();
 
-        /*
-          Token biasa yang ditugaskan khusus
-          ke reseller tertentu tetap mempertahankan
-          aturan lama.
-        */
-        const assignedTo=
-          String(
-
-            data.assignedTo||
-            data.resellerUid||
-            ""
-
-          ).trim();
-
-
-        if(
-          assignedTo &&
-          assignedTo!==currentUid
-        ){
-
-          continue;
-        }
-
+        if(assignedTo && assignedTo!==currentUid) continue;
 
         tokenDoc=d;
         tokenInfo=data;
         tokenSource="tokens";
-
         break;
       }
-
     }
-
-
-    /* =====================================================
-       TOKEN TIDAK DITEMUKAN
-       ===================================================== */
 
     if(!tokenDoc){
-
       throw new Error(
-        "Token tidak ditemukan, sudah terpakai, belum dibeli reseller, atau tidak tersedia untuk perpanjangan."
+        "Token tidak ditemukan, belum dibeli reseller, sudah terpakai, atau token tersebut khusus registrasi akun baru."
       );
-
     }
 
-
-    /* =====================================================
-       TOKEN REGISTRASI BARU
-       
-       Tetap TIDAK boleh untuk perpanjangan.
-       ===================================================== */
-
-    if(
-      isRegistrationOnlyToken(
-        tokenInfo
-      )
-    ){
-
+    /* Pengaman tambahan: token registrasi TIDAK boleh lolos. */
+    if(tokenKhususRegistrasi(tokenInfo)){
       throw new Error(
         "Token ini khusus registrasi akun baru, bukan token perpanjangan."
       );
-
     }
 
-
-    /* =====================================================
-       BACA USER
-       ===================================================== */
-
-    const userRef=
-      doc(
-        db,
-        "users",
-        currentUid
-      );
-
-
-    const userSnap=
-      await getDoc(
-        userRef
-      );
-
+    const userRef=doc(db,"users",currentUid);
+    const userSnap=await getDoc(userRef);
 
     if(!userSnap.exists()){
-
-      throw new Error(
-        "Data akun tidak ditemukan di users."
-      );
-
+      throw new Error("Data akun tidak ditemukan di users.");
     }
 
+    const userData=userSnap.data()||{};
+    currentUserData=userData;
 
-    const userData=
-      userSnap.data()||{};
+    const oldExpInfo=getExpirationFromUser(userData);
+    const now=new Date();
 
-    currentUserData=
-      userData;
+    let baseDate=now;
 
-
-    /* =====================================================
-       HITUNG TANGGAL BARU
-       ===================================================== */
-
-    const oldExpInfo=
-      getExpirationFromUser(
-        userData
-      );
-
-
-    const now=
-      new Date();
-
-
-    let baseDate=
-      now;
-
-
-    /*
-      Kalau akun masih aktif,
-      tambahkan dari tanggal berakhir.
-
-      Kalau sudah expired,
-      mulai dari hari ini.
-    */
-    if(
-      oldExpInfo &&
-      oldExpInfo.date>now
-    ){
-
-      baseDate=
-        oldExpInfo.date;
-
+    if(oldExpInfo && oldExpInfo.date>now){
+      baseDate=oldExpInfo.date;
     }
 
-
-    const hari=
-      getTokenDays(
-        tokenInfo
-      );
-
-
-    if(
-      !hari ||
-      hari<=0
-    ){
-
-      throw new Error(
-        "Masa aktif token tidak valid."
-      );
-
-    }
-
-
-    const newExp=
-      new Date(
-        baseDate
-      );
-
-
-    newExp.setDate(
-      newExp.getDate()+hari
+    let hari=Number(
+      tokenInfo.paketHari??
+      tokenInfo.packageDays??
+      tokenInfo.durasiHari??
+      tokenInfo.masaAktifHari??
+      0
     );
 
-
-    /* =====================================================
-       REFERENSI TOKEN
-       ===================================================== */
-
-    const tokenRef=
-      doc(
-        db,
-        tokenSource,
-        tokenDoc.id
+    if(!hari){
+      const bulan=Number(
+        tokenInfo.paketBulan??
+        tokenInfo.packageMonths??
+        tokenInfo.durasiBulan??
+        0
       );
 
-
-    /* =====================================================
-       TRANSACTION
-       
-       INI BAGIAN PENTING.
-
-       Users + token diproses bersamaan.
-
-       Kalau token sudah dipakai orang lain
-       sebelum transaksi selesai:
-       transaksi dibatalkan.
-
-       Jadi tidak ada:
-       "akun bertambah tapi token masih tersedia".
-       ===================================================== */
-
-    await runTransaction(
-      db,
-      async transaction=>{
-
-        const liveUserSnap=
-          await transaction.get(
-            userRef
-          );
-
-
-        if(
-          !liveUserSnap.exists()
-        ){
-
-          throw new Error(
-            "Data akun tidak ditemukan."
-          );
-
-        }
-
-
-        const liveTokenSnap=
-          await transaction.get(
-            tokenRef
-          );
-
-
-        if(
-          !liveTokenSnap.exists()
-        ){
-
-          throw new Error(
-            "Token sudah tidak ditemukan."
-          );
-
-        }
-
-
-        const liveToken=
-          liveTokenSnap.data()||{};
-
-
-        /*
-          Cek ulang token saat transaksi.
-        */
-        if(
-          isTokenUsed(
-            liveToken
-          )
-        ){
-
-          throw new Error(
-            "Token baru saja digunakan dan sudah tidak tersedia."
-          );
-
-        }
-
-
-        /*
-          Untuk resellerTokens:
-          HARUS sudah dibeli reseller.
-
-          Tidak peduli siapa pembelinya.
-          Tidak ada pengecekan resellerUid.
-        */
-        if(
-          tokenSource==="resellerTokens"
-        ){
-
-          if(
-            !isPurchasedResellerToken(
-              liveToken
-            )
-          ){
-
-            throw new Error(
-              "Token reseller belum dibeli reseller sehingga belum dapat digunakan."
-            );
-
-          }
-
-        }
-
-
-        /*
-          Token registrasi tetap dilarang.
-        */
-        if(
-          isRegistrationOnlyToken(
-            liveToken
-          )
-        ){
-
-          throw new Error(
-            "Token ini khusus registrasi akun baru, bukan token perpanjangan."
-          );
-
-        }
-
-
-        /*
-          Hitung ulang tanggal dari data user
-          terbaru di dalam transaction.
-        */
-        const liveUser=
-          liveUserSnap.data()||{};
-
-
-        const liveExpInfo=
-          getExpirationFromUser(
-            liveUser
-          );
-
-
-        const transactionNow=
-          new Date();
-
-
-        let transactionBase=
-          transactionNow;
-
-
-        if(
-          liveExpInfo &&
-          liveExpInfo.date>
-          transactionNow
-        ){
-
-          transactionBase=
-            liveExpInfo.date;
-
-        }
-
-
-        const transactionExp=
-          new Date(
-            transactionBase
-          );
-
-
-        transactionExp.setDate(
-          transactionExp.getDate()+hari
-        );
-
-
-        /*
-          UPDATE USERS
-        */
-        transaction.update(
-          userRef,
-          {
-
-            tanggalBerakhir:
-              transactionExp.toISOString(),
-
-            exp:
-              transactionExp.toISOString(),
-
-            expAt:
-              transactionExp.toISOString(),
-
-            expiredAt:
-              transactionExp.toISOString(),
-
-            status:"aktif",
-
-            active:true,
-
-            masaAktif:"aktif",
-
-            updatedAt:
-              serverTimestamp(),
-
-            lastActivationUpdateAt:
-              serverTimestamp(),
-
-            lastActivationToken:
-              tokenStr,
-
-            lastActivationTokenId:
-              tokenDoc.id,
-
-            lastActivationTokenSource:
-              tokenSource,
-
-            lastActivationDays:
-              hari
-
-          }
-        );
-
-
-        /*
-          ===================================================
-          BARU SETELAH AKUN DIPERBARUI:
-          TOKEN DITANDAI TERPAKAI.
-          ===================================================
-        */
-
-        transaction.update(
-          tokenRef,
-          {
-
-            used:true,
-
-            terpakai:true,
-
-            dipakai:true,
-
-            isUsed:true,
-
-            status:"terpakai",
-
-            tokenStatus:"terpakai",
-
-            usedBy:
-              currentUid,
-
-            usedByEmail:
-              auth.currentUser?.email||"",
-
-            usedAt:
-              serverTimestamp(),
-
-            activationStatus:
-              "used",
-
-            activationType:
-              "perpanjangan",
-
-            activationDays:
-              hari,
-
-            updatedAt:
-              serverTimestamp()
-
-          }
-        );
-
+      if(bulan>0)hari=bulan*30;
+    }
+
+    if(!hari){
+      const paketText=String(
+        tokenInfo.packageLabel||
+        tokenInfo.paketLabel||
+        tokenInfo.paket||
+        tokenInfo.durasi||
+        tokenInfo.masaAktif||
+        ""
+      ).toLowerCase();
+
+      const matchHari=paketText.match(/(\d+)\s*hari/);
+      const matchBulan=paketText.match(/(\d+)\s*bulan/);
+
+      if(matchHari){
+        hari=Number(matchHari[1]);
+      }else if(matchBulan){
+        hari=Number(matchBulan[1])*30;
       }
-    );
+    }
 
+    if(!hari || hari<=0)hari=30;
 
-    /* =====================================================
-       BERHASIL
-       ===================================================== */
+    const newExp=new Date(baseDate);
+    newExp.setDate(newExp.getDate()+hari);
+
+    /* ========================================================
+       PERPANJANG USER TERLEBIH DAHULU.
+       Token baru ditandai terpakai setelah update user berhasil.
+       ======================================================== */
+    await updateDoc(userRef,{
+      tanggalBerakhir:newExp.toISOString(),
+      exp:newExp.toISOString(),
+      expAt:newExp.toISOString(),
+      expiredAt:newExp.toISOString(),
+
+      status:"aktif",
+      active:true,
+      masaAktif:"aktif",
+
+      updatedAt:serverTimestamp(),
+      lastActivationUpdateAt:serverTimestamp(),
+
+      lastActivationToken:tokenStr,
+      lastActivationTokenId:tokenDoc.id,
+      lastActivationTokenSource:tokenSource,
+      lastActivationDays:hari
+    });
+
+    const tokenRef=doc(db,tokenSource,tokenDoc.id);
+
+    if(tokenSource==="resellerTokens"){
+      await updateDoc(tokenRef,{
+        used:true,
+        terpakai:true,
+        dipakai:true,
+        isUsed:true,
+
+        status:"terpakai",
+        tokenStatus:"terpakai",
+
+        usedBy:currentUid,
+        usedByEmail:auth.currentUser?.email||"",
+        usedAt:serverTimestamp(),
+
+        activationStatus:"used",
+        activationType:"perpanjangan",
+        activationDays:hari,
+
+        updatedAt:serverTimestamp()
+      });
+    }else{
+      await updateDoc(tokenRef,{
+        used:true,
+        terpakai:true,
+        status:"terpakai",
+        usedBy:currentUid,
+        usedAt:serverTimestamp(),
+        updatedAt:serverTimestamp()
+      });
+    }
 
     input.value="";
 
-
     msg.textContent=
       "Berhasil! Token "+
-      (
-        tokenSource==="resellerTokens"
-          ? "RESELLER "
-          : ""
-      )+
+      (tokenSource==="resellerTokens"?"RESELLER ":"")+
       "digunakan.\n"+
-      "Masa aktif bertambah "+
-      hari+
+      "Masa aktif bertambah "+hari+
       " hari.\n"+
-      "Aktif sampai "+
-      formatTanggal(
-        newExp
-      );
+      "Aktif sampai "+formatTanggal(newExp);
 
-
-    msg.style.color=
-      "#16a34a";
-
+    msg.style.color="#16a34a";
 
     await loadData();
 
-
-    /*
-      Jika halaman berada di dalam index,
-      refresh parent setelah berhasil.
-    */
-    setTimeout(
-      ()=>{
-
-        try{
-
-          if(
-            parent!==window
-          ){
-
-            parent.location.reload();
-
-          }
-
-        }catch(e){}
-
-      },
-      800
-    );
-
+    setTimeout(()=>{
+      try{
+        if(parent!==window){
+          parent.location.reload();
+        }
+      }catch(e){}
+    },800);
 
   }catch(err){
+    console.error("PERPANJANGAN TOKEN:",err);
 
-    console.error(
-      "PERPANJANGAN TOKEN:",
-      err
-    );
+    let pesan=err?.message||"Gagal memperpanjang masa aktif.";
 
-
-    let pesan=
-      err?.message||
-      "Gagal memperpanjang masa aktif.";
-
-
-    if(
-      err?.code===
-      "permission-denied"
-    ){
-
-      pesan=
-        "Firebase menolak akses. Periksa Firestore Rules untuk users, resellerTokens, dan tokens.";
-
+    if(err?.code==="permission-denied"){
+      pesan="Firebase menolak akses. Periksa Firestore Rules untuk users, resellerTokens, dan tokens.";
     }
 
-
-    msg.textContent=
-      pesan;
-
-    msg.style.color=
-      "#dc2626";
-
+    msg.textContent=pesan;
+    msg.style.color="#dc2626";
 
   }finally{
-
     btn.disabled=false;
-
   }
-
 };
 
-
-/* =========================================================
-   INPUT TOKEN OTOMATIS HURUF BESAR
-   ========================================================= */
-
-document
-  .getElementById(
-    "tokenInput"
-  )
-  .addEventListener(
-    "input",
-    function(){
-
-      this.value=
-        this.value.toUpperCase();
-
-    }
-  );
-
+document.getElementById("tokenInput").addEventListener("input",function(){
+  this.value=this.value.toUpperCase();
+});
 </script>
 
 </body>
