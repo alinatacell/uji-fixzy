@@ -337,16 +337,72 @@ function getTokens(x){
 }
 
 
-function tokenValueFromDoc(d){
+function tokenData(d){
   const x=d.data?d.data():(d||{});
-  return String(
+
+  const token=String(
     x.token ?? x.kodeToken ?? x.registrationToken ??
     x.code ?? x.kode ?? x.value ?? ""
   ).trim();
+
+  const rawJenis=String(
+    x.jenisToken ?? x.tokenType ?? x.token_type ??
+    x.jenis ?? x.tipe ?? x.type ?? x.kategori ??
+    x.category ?? x.productType ?? x.requestType ?? ""
+  ).toLowerCase().trim();
+
+  let jenis="";
+  if(
+    rawJenis.includes("perpanjang") ||
+    rawJenis.includes("renew") ||
+    rawJenis.includes("extend")
+  ){
+    jenis="perpanjangan";
+  }else if(
+    rawJenis.includes("registr") ||
+    rawJenis.includes("baru") ||
+    rawJenis.includes("new")
+  ){
+    jenis="registrasi";
+  }
+
+  // Harga bisa tersimpan dengan beberapa nama field.
+  const harga=Number(
+    x.harga ?? x.price ?? x.hargaToken ??
+    x.pricePerToken ?? x.nominal ?? x.amount ?? 0
+  ) || 0;
+
+  return {token,jenis,harga,data:x};
+}
+
+function tokenValueFromDoc(d){
+  return tokenData(d).token;
+}
+
+function tokenTypeMatches(d,requestType){
+  const t=tokenData(d);
+
+  // Jika dokumen token memiliki tipe, wajib sesuai request.
+  if(t.jenis) return t.jenis===requestType;
+
+  // Dukungan flag boolean untuk database lama.
+  const x=t.data||{};
+  if(requestType==="registrasi"){
+    if(x.registrasi===true || x.isRegistrasi===true || x.registration===true) return true;
+    if(x.perpanjangan===true || x.isPerpanjangan===true || x.renewal===true) return false;
+  }else{
+    if(x.perpanjangan===true || x.isPerpanjangan===true || x.renewal===true) return true;
+    if(x.registrasi===true || x.isRegistrasi===true || x.registration===true) return false;
+  }
+
+  // Kalau token lama sama sekali tidak punya penanda tipe,
+  // jangan mencampurkan token ke dropdown yang jenisnya tidak diketahui.
+  return false;
 }
 
 function tokenAvailable(d){
-  const x=d.data?d.data():(d||{});
+  const t=tokenData(d);
+  const x=t.data||{};
   const status=String(x.status??x.state??x.kondisi??"").toLowerCase().trim();
 
   if(x.used===true || x.terpakai===true || x.dipakai===true ||
@@ -355,7 +411,34 @@ function tokenAvailable(d){
   if(["used","terpakai","dipakai","assigned","sold","inactive","nonaktif","disabled","expired"].includes(status)) return false;
   if(x.available===false || x.tersedia===false) return false;
 
-  return !!tokenValueFromDoc(d);
+  return !!t.token;
+}
+
+async function loadAvailableTokens(requestType=""){
+  const snap=await getDocs(collection(db,"tokens"));
+  const arr=[];
+  const seen=new Set();
+
+  snap.forEach(d=>{
+    if(!tokenAvailable(d))return;
+    if(requestType && !tokenTypeMatches(d,requestType))return;
+
+    const t=tokenData(d);
+    const key=t.token.toLowerCase();
+    if(seen.has(key))return;
+    seen.add(key);
+
+    arr.push({
+      id:d.id,
+      token:t.token,
+      harga:t.harga,
+      jenis:t.jenis,
+      data:t.data
+    });
+  });
+
+  availableTokens=arr;
+  return arr;
 }
 
 async function loadAvailableTokens(){
@@ -391,8 +474,21 @@ function updateSelectedUI(id){
   if(qty)qty.value=set.size;
   if(count)count.textContent=`${set.size} token dipilih`;
 
-  const p=Number(price?.value||0);
-  if(total)total.textContent=rupiah(p*set.size);
+  const selected=selectedTokenDocs(id);
+  const sum=selected.reduce((n,t)=>n+(Number(t.harga)||0),0);
+
+  if(price){
+    if(selected.length){
+      const samePrice=selected.every(t=>
+        Number(t.harga||0)===Number(selected[0].harga||0)
+      );
+      price.value=samePrice ? (Number(selected[0].harga)||0) : sum;
+    }else{
+      price.value="";
+    }
+  }
+
+  if(total)total.textContent=rupiah(sum);
 
   const panel=$("token-panel-"+id);
   if(panel){
@@ -437,7 +533,14 @@ function renderTokenOptions(id){
       <input type="checkbox" data-token-id="${esc(t.id)}"
         ${set.has(t.id)?"checked":""}
         onchange="selectToken('${esc(id)}','${esc(t.id)}',this.checked)">
-      <span class="token-value">${esc(t.token)}</span>
+      <span class="token-value">
+        ${esc(t.token)}
+        ${Number(t.harga)>0
+          ? `<small style="display:block;color:#166534;margin-top:3px">
+               Rp ${Number(t.harga).toLocaleString("id-ID")}
+             </small>`
+          : ""}
+      </span>
       <span class="token-status">TERSEDIA</span>
     </label>
   `).join("");
@@ -454,7 +557,9 @@ window.toggleTokenPicker=async id=>{
 
   if(panel.classList.contains("show")){
     try{
-      await loadAvailableTokens();
+      const request=allRequests.find(x=>x.id===id);
+      const requestType=String(request?.requestType||"registrasi").toLowerCase();
+      await loadAvailableTokens(requestType);
       renderTokenOptions(id);
       setTimeout(()=>{
         const search=$("token-search-"+id);
@@ -497,6 +602,8 @@ window.selectToken=(requestId,tokenId,checked)=>{
   }
 
   updateSelectedUI(requestId);
+  const qtyEl=$("qty-"+requestId);
+  if(qtyEl)qtyEl.value=set.size;
 };
 
 function selectedTokenDocs(id){
@@ -601,7 +708,7 @@ function render(){
           <div class="admin-box">
             <div class="price-row">
               <div class="form-row">
-                <label>Harga per Token</label>
+                <label>Harga Token (otomatis dari token yang dipilih)</label>
                 <input id="price-${esc(x.id)}" type="number" min="0" inputmode="numeric"
                   value="${Number(x.hargaToken||0)||""}"
                   placeholder="Contoh: 5000">
@@ -782,7 +889,17 @@ window.approveRequest=async id=>{
   $("qty-"+id).value=qty;
 
   if(qty<1){
-    showModal("Token Belum Dipilih","Pilih minimal 1 token dari daftar token Firebase.");
+    showModal("Token Belum Dipilih","Pilih token dari daftar Firebase terlebih dahulu.");
+    return;
+  }
+
+  // Request tidak boleh disetujui sebagian.
+  // Jika reseller meminta 4 token, admin harus memilih tepat 4 token.
+  if(qty!==qtyRequested){
+    showModal(
+      "Jumlah Token Belum Lengkap",
+      `Request ini meminta ${qtyRequested} token. Pilih tepat ${qtyRequested} token dari dropdown. Jika token tidak mencukupi, gunakan tombol Tolak dan beri catatan.`
+    );
     return;
   }
 
@@ -792,6 +909,22 @@ window.approveRequest=async id=>{
   }
 
   const note=$("note-"+id)?.value.trim()||"";
+
+  // Harga setiap token berasal dari dokumen token Firebase.
+  // Tagihan = jumlah harga token yang benar-benar diberikan.
+  const calculatedTotal=selectedDocs.reduce(
+    (n,t)=>n+(Number(t.harga)||0),0
+  );
+
+  if(selectedDocs.some(t=>!(Number(t.harga)>0))){
+    showModal(
+      "Harga Token Belum Ada",
+      "Ada token terpilih yang belum memiliki harga di Firebase. Lengkapi field harga pada token tersebut terlebih dahulu."
+    );
+    return;
+  }
+
+  price=qty>0 ? calculatedTotal/qty : 0;
 
   const btn=document.querySelector(
     `button[onclick="approveRequest('${CSS.escape(id)}')"]`
@@ -803,7 +936,7 @@ window.approveRequest=async id=>{
   }
 
   try{
-    const total=price*qty;
+    const total=calculatedTotal;
 
     await runTransaction(db, async transaction=>{
       // Pastikan token masih tersedia sebelum diberikan.
@@ -847,6 +980,7 @@ window.approveRequest=async id=>{
         jumlahTagihan:total,
         totalTagihan:total,
         hargaToken:price,
+        tokenRequestType:String(item.requestType||"registrasi").toLowerCase(),
 
         tokens:tokens,
 
