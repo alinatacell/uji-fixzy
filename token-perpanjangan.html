@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id"><head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FIXZY ADMIN - FINAL TOKEN TAMPIL</title>
+<style>*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#f1f5f9;color:#0f172a}
+.top{background:#0f172a;color:#fff;padding:12px 14px;position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center}
+.btn{border:0;border-radius:8px;padding:9px 12px;font-weight:900;cursor:pointer;font-size:11px}
+.btn-yellow{background:#facc15;color:#111} .btn-red{background:#ef4444;color:#fff} .btn-dark{background:#0f172a;color:#fff} .btn-white{background:#fff;border:1px solid #e2e8f0}
+.wrap{max-width:1100px;margin:auto;padding:12px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.stat{background:#fff;border-radius:12px;padding:12px;border:1px solid #e2e8f0}
+.stat small{display:block;font-size:10px;color:#64748b;font-weight:800;text-transform:uppercase} .stat b{font-size:20px;display:block;margin-top:2px}
+.stat.green{background:#f0fdf4;border-color:#bbf7d0} .stat.green b{color:#15803d}
+.stat.yellow{background:#fffbeb;border-color:#fde68a} .stat.yellow b{color:#b45309}
+.stat.blue{background:#eff6ff;border-color:#bfdbfe} .stat.blue b{color:#1d4ed8}
+.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;border:1px solid #e2e8f0}
+.card h3{margin:0 0 10px;font-size:13px;font-weight:900}
+input,select{padding:10px;border:1px solid #cbd5e1;border-radius:8px;font-size:12px;width:100%;background:#fff}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:10px;margin-top:10px}
+table{width:100%;border-collapse:collapse;min-width:750px;font-size:11px}
+th{background:#0f172a;color:#fff;padding:9px 8px;text-align:left;font-size:10px;text-transform:uppercase;white-space:nowrap}
+td{padding:8px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+.badge{padding:3px 7px;border-radius:999px;font-size:10px;font-weight:800}
+.badge.ok{background:#dcfce7;color:#15803d} .badge.off{background:#fee2e2;color:#991b1b} tr.token-used{background:#fff7f7} tr.token-used td{background:#fff7f7} tr.token-used td:first-child{border-left:3px solid #ef4444} tr.token-available{background:#fff} .btn-danger-soft{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca} .btn-danger-soft:hover{background:#fecaca}
+#loginBox{max-width:380px;margin:60px auto;background:#fff;padding:20px;border-radius:16px;box-shadow:0 10px 30px #0002}
+</style></head><body>
+<div id="loginBox"><h2 style="margin:0 0 8px">🔒 Login Owner</h2><input id="email" value="servicehpmaja@gmail.com" style="width:100%;margin-bottom:8px"><input id="pass" type="password" placeholder="Password" style="width:100%;margin-bottom:8px"><button class="btn btn-dark" style="width:100%" onclick="loginOwner()">Masuk</button><div id="loginErr" style="color:#dc2626;font-size:11px;margin-top:8px;display:none"></div></div>
+<div id="app" style="display:none">
+<div class="top"><div><h1 style="margin:0;font-size:14px">FIXZY ADMIN - OWNER ONLY</h1><small style="color:#94a3b8" id="ownerEmail"></small></div><div style="display:flex;gap:6px"><button class="btn btn-white" id="btnRefresh" onclick="loadAll()">↻ Refresh</button><button class="btn btn-red" onclick="logout()">Logout</button></div></div>
+<div class="wrap">
+<div class="stats"><div class="stat"><small>Total Token</small><b id="stTotal">0</b></div><div class="stat yellow"><small>Tersedia</small><b id="stSedia">0</b></div><div class="stat blue"><small>Terpakai</small><b id="stPakai">0</b></div><div class="stat green"><small>Pendapatan</small><b id="stUang">Rp 0</b></div></div>
+<div class="card"><h3>🎫 Buat Token - Masa Aktif Manual (Bebas Hari)</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<div><label style="font-size:10px;font-weight:800">MASA AKTIF HARI - KETIK BEBAS (contoh: 90, 120, 360)</label><input id="paket" type="number" min="1" value="90" style="font-weight:800"></div>
+<div><label style="font-size:10px;font-weight:800">JUMLAH TOKEN</label><input id="jml" type="number" value="1" min="1"></div>
+<div><label style="font-size:10px;font-weight:800">HARGA / TOKEN Rp</label><input id="harga" type="number" value="50000"></div>
+<div><label style="font-size:10px;font-weight:800">PREFIX OPSIONAL</label><input id="pref" placeholder="Kosong = random"></div>
+</div>
+<button class="btn btn-yellow" style="width:100%;margin-top:10px;height:46px;font-size:14px" onclick="buatToken()">Buat Token</button>
+<div id="msg" style="font-size:11px;margin-top:8px;font-weight:800;color:#15803d"></div>
+<div style="margin-top:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px">
+<div style="font-size:11px;font-weight:900;margin-bottom:8px">🔍 PENCARIAN - 2 KOLOM (Paket & Token)</div>
+<div style="display:grid;grid-template-columns:1fr 120px;gap:6px">
+<div><label style="font-size:9px;font-weight:800;color:#64748b">KOLOM 1: CARI PAKET (MASA AKTIF)</label><input id="cariPaket" type="number" placeholder="Ketik: 90, 120, 360..." oninput="renderTokens()" style="font-weight:800"></div>
+<div><label style="font-size:9px;font-weight:800;color:#64748b">STATUS</label><select id="filterStatus" onchange="renderTokens()"><option value="">Semua</option><option value="tersedia">Tersedia</option><option value="terpakai">Terpakai</option></select></div>
+</div>
+<div style="display:flex;gap:6px;margin-top:8px"><div style="flex:1"><label style="font-size:9px;font-weight:800;color:#64748b">KOLOM 2: CARI TOKEN / EMAIL (SPESIFIK)</label><input id="cariToken" placeholder="Ketik token atau email..." style="width:100%" oninput="renderTokens()"></div><button class="btn btn-white" style="align-self:flex-end" onclick="resetSearch()">Reset</button></div>
+<div style="margin-top:6px;font-size:10px;color:#64748b;line-height:1.4">💡 Kolom 1 = filter paket: ketik 90 muncul semua token 90 hari. Kolom 2 = filter spesifik token/email di dalam paket itu.</div>
+<div style="display:flex;gap:6px;align-items:center;margin-top:10px;flex-wrap:wrap">
+<label style="font-size:11px;font-weight:800"><input type="checkbox" id="checkAll" onchange="toggleAll(this)"> Ceklis Semua</label>
+<span id="filterInfo" style="font-size:10px;color:#64748b"></span>
+<div style="margin-left:auto;display:flex;gap:6px"><button class="btn btn-dark" onclick="copySelected()">📋 Salin (<span id="countSel">0</span>)</button><button id="btnHapusTerpakai" class="btn btn-red" style="background:#dc2626!important;color:#fff!important" onclick="hapusTerpakai()">🗑️ Hapus Token Terpakai</button><button class="btn btn-red" onclick="hapusSelected()">🗑️ Hapus</button></div>
+</div>
+</div>
+<div id="quickDeleteUsed" style="margin-top:8px;display:flex;justify-content:flex-end">
+<button class="btn btn-red" style="width:100%;height:40px;background:#dc2626!important;color:#fff!important"
+onclick="hapusTerpakai()">🗑️ HAPUS SEMUA TOKEN YANG SUDAH TERPAKAI</button>
+</div>
+<div class="table-wrap"><table><thead><tr><th><input type="checkbox" id="checkAllHead" onchange="document.getElementById('checkAll').checked=this.checked;toggleAll(this)"></th><th>TOKEN</th><th>PAKET</th><th>HARGA</th><th>STATUS</th><th>PEMAKAI</th><th>AKSI</th></tr></thead><tbody id="tokenBody"><tr><td colspan=7 style="text-align:center;padding:20px">Memuat...</td></tr></tbody></table></div>
+</div>
+<div class="card"><h3>👑 Daftar Owner - Tanpa Aksi</h3><div class="table-wrap" style="min-width:0"><table style="min-width:500px"><thead><tr><th>Konter</th><th>Email</th><th>Aktif Sampai</th><th>Sisa</th><th>Status</th></tr></thead><tbody id="userBody"></tbody></table></div></div>
+</div></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+const cfg={apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",authDomain:"fixzy-update.firebaseapp.com",projectId:"fixzy-update",storageBucket:"fixzy-update.firebasestorage.app",messagingSenderId:"995892519622",appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"};
+const app=initializeApp(cfg); const auth=getAuth(app); const db=getFirestore(app);
+let allTokens=[], selected=new Set();
+
+function getPaketMetadataFIXZY(hari){
+  const n=Number(hari)||0;
+
+  if(n===30) return {label:"1 Bulan",unit:"bulan",value:1,days:30};
+  if(n===60) return {label:"2 Bulan",unit:"bulan",value:2,days:60};
+  if(n===90) return {label:"3 Bulan",unit:"bulan",value:3,days:90};
+  if(n===180) return {label:"6 Bulan",unit:"bulan",value:6,days:180};
+  if(n===360) return {label:"1 Tahun",unit:"tahun",value:1,days:360};
+
+  return {label:n+" Hari",unit:"hari",value:n,days:n};
+}
+
+function parseExp(o){ let cands=[o.exp,o.expAt,o.expiredAt,o.aktifSampai,o.tanggalBerakhir]; for(let k in o){ let lk=k.toLowerCase(); if(lk.includes('exp')||lk.includes('akhir')) cands.push(o[k]); } for(let c of cands){ if(!c) continue; try{ if(c.toDate) return c.toDate(); if(c.seconds) return new Date(c.seconds*1000); let d=new Date(c); if(!isNaN(d)&&d.getFullYear()>2020) return d; }catch(e){} } return null; }
+window.loginOwner=async function(){ const e=document.getElementById('email').value.trim(); const p=document.getElementById('pass').value.trim(); const err=document.getElementById('loginErr'); err.style.display='none'; if(!e||!p){ err.style.display='block'; err.textContent='Isi email & password'; return; } try{ await signInWithEmailAndPassword(auth,e,p); }catch(ex){ err.style.display='block'; err.textContent='Gagal: '+ex.message; } }
+window.logout=async function(){ await signOut(auth); location.reload(); }
+onAuthStateChanged(auth,(u)=>{ if(!u){ document.getElementById('loginBox').style.display='block'; document.getElementById('app').style.display='none'; return; } document.getElementById('loginBox').style.display='none'; document.getElementById('app').style.display='block'; document.getElementById('ownerEmail').textContent=u.email; loadAll(); });
+window.resetSearch=function(){ document.getElementById('cariPaket').value=''; document.getElementById('filterStatus').value=''; document.getElementById('cariToken').value=''; renderTokens(); }
+window.loadAll=async function(){
+  const btn=document.getElementById('btnRefresh'); if(btn){ btn.textContent='⏳ Loading...'; btn.disabled=true; }
+  selected.clear(); allTokens=[]; document.getElementById('tokenBody').innerHTML='<tr><td colspan=7 style="text-align:center;padding:20px">Memuat ulang tokens...</td></tr>';
+  try{
+    const snapU=await getDocs(collection(db,"users"));
+    let users=[]; snapU.forEach(d=>users.push({id:d.id,...d.data()}));
+    users=users.filter(u=>{ const r=(u.role||'').toLowerCase(); return r!=='employee' && r!=='karyawan'; });
+    let htmlU=""; users.forEach(u=>{ const e=parseExp(u); const tgl=e?e.toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'}):'-'; const sisa=e?Math.ceil((e-new Date())/86400000):0; const sisaTxt=sisa>0?sisa+' hari':(sisa===0?'hari ini':'exp'); const st=sisa>7?'ok':(sisa>0?'wait':'off'); htmlU+=`<tr><td><b>${u.namaKonter||u.nama||'-'}</b></td><td>${u.email||'-'}</td><td>${tgl}</td><td>${sisaTxt}</td><td><span class="badge ${st}">${sisa>0?'Aktif':'Expired'}</span></td></tr>`; });
+    document.getElementById('userBody').innerHTML=htmlU||'<tr><td colspan=5>Tidak ada owner</td></tr>';
+  }catch(e){ document.getElementById('userBody').innerHTML='<tr><td colspan=5 style="color:red">Error users: '+e.message+'</td></tr>'; }
+  try{
+    // TANPA orderBy biar tidak butuh index dan token lama tetap kebaca
+    const snap=await getDocs(collection(db,"tokens"));
+    allTokens=[]; snap.forEach(d=>allTokens.push({id:d.id,...d.data()}));
+    // sort manual by createdAt terbaru
+    allTokens.sort((a,b)=>{ const da=a.createdAt?.toDate?a.createdAt.toDate(): (a.createdAt?.seconds?new Date(a.createdAt.seconds*1000): new Date(a.createdAt||0)); const db2=b.createdAt?.toDate?b.createdAt.toDate(): (b.createdAt?.seconds?new Date(b.createdAt.seconds*1000): new Date(b.createdAt||0)); return db2-da; });
+    renderTokens();
+  }catch(e){ document.getElementById('tokenBody').innerHTML='<tr><td colspan=7 style="color:red">Error tokens: '+e.message+'<br>Pastikan Firebase Rules mengizinkan read/write untuk pengguna yang sudah login.</td></tr>'; }
+  if(btn){ btn.textContent='↻ Refresh'; btn.disabled=false; }
+}
+window.renderTokens=function(){
+  const q=(document.getElementById('cariToken').value||'').toLowerCase().trim();
+  const fPaket=(document.getElementById('cariPaket').value||'').toString().trim();
+  const fStatus=document.getElementById('filterStatus').value;
+  let filtered=allTokens.filter(t=>{
+    const paketVal=Number(t.paketHari||0) || Number(String(t.paket||'').replace(/[^0-9]/g,'')) || 0;
+    const paketStr=String(t.paket||t.paketHari||'');
+    if(fPaket){ if(String(paketVal)!==fPaket) return false; }
+    if(fStatus==='tersedia' && t.used) return false;
+    if(fStatus==='terpakai' && !t.used) return false;
+    if(q){ const hay=(t.token||'')+' '+(t.usedByEmail||'')+' '+(t.usedBy||'')+' '+paketStr; if(!hay.toLowerCase().includes(q)) return false; }
+    return true;
+  });
+  let total=filtered.length, sedia=filtered.filter(t=>!t.used).length, pakai=filtered.filter(t=>t.used).length;
+  let uang=filtered.filter(t=>t.used).reduce((a,b)=>a+(Number(b.harga)||0),0);
+  // stats global kalau tidak filter, kalau filter tampil filter
+  const showStats = !fPaket && !fStatus && !q;
+  let gTotal=allTokens.length, gSedia=allTokens.filter(t=>!t.used).length, gPakai=allTokens.filter(t=>t.used).length, gUang=allTokens.filter(t=>t.used).reduce((a,b)=>a+(Number(b.harga)||0),0);
+  document.getElementById('stTotal').textContent=showStats?gTotal:total;
+  document.getElementById('stSedia').textContent=showStats?gSedia:sedia;
+  document.getElementById('stPakai').textContent=showStats?gPakai:pakai;
+  document.getElementById('stUang').textContent='Rp '+(showStats?gUang:uang).toLocaleString('id-ID');
+  document.getElementById('filterInfo').textContent=fPaket?`Paket ${fPaket} Hari: ${filtered.length} token`:(q?`Hasil "${q}": ${filtered.length}`:`${filtered.length} token`);
+  let html=""; filtered.forEach(t=>{
+    const isUsed=!!t.used;
+    const usedAt=t.usedAt? (t.usedAt.toDate? t.usedAt.toDate(): new Date(t.usedAt.seconds? t.usedAt.seconds*1000: t.usedAt)) : null;
+    const tglPakai=usedAt? usedAt.toLocaleDateString('id-ID')+' '+usedAt.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}):'-';
+    const checked=selected.has(t.id)?'checked':'';
+    const paketLabel=t.paketHari? (t.paketHari+' Hari') : (t.paket||'-');
+    html+=`<tr class="${isUsed?'token-used':'token-available'}">
+<td><input type="checkbox" value="${t.id}" ${checked} onchange="toggleOne('${t.id}',this)"></td>
+<td><b style="letter-spacing:.5px">${t.token||'-'}</b></td>
+<td><b>${paketLabel}</b></td>
+<td>Rp ${Number(t.harga||0).toLocaleString()}</td>
+<td>${isUsed?'<span class="badge off">🔴 Terpakai</span>':'<span class="badge ok">🟢 Tersedia</span>'}</td>
+<td>${isUsed?`<div><b>${t.usedByEmail||t.usedBy||'-'}</b></div><small style="color:#64748b">${tglPakai}</small>`:'<small style="color:#94a3b8">Belum dipakai</small>'}</td>
+<td><button class="btn btn-white" onclick="copyText('${t.token}')">Copy</button></td>
+</tr>`;
+  });
+  document.getElementById('tokenBody').innerHTML=html||'<tr><td colspan=7 style="text-align:center;padding:20px">Tidak ada token. Buat token baru di atas.</td></tr>';
+  updateBulk();
+}
+window.toggleAll=function(el){ const on=el.checked; document.querySelectorAll('#tokenBody input[type=checkbox]').forEach(cb=>{ cb.checked=on; if(on) selected.add(cb.value); else selected.delete(cb.value); }); document.getElementById('checkAllHead').checked=on; document.getElementById('checkAll').checked=on; updateBulk(); }
+window.toggleOne=function(id,el){ if(el.checked) selected.add(id); else selected.delete(id); updateBulk(); }
+function updateBulk(){ const n=selected.size; document.getElementById('countSel').textContent=n; }
+window.copyText=function(txt){ navigator.clipboard.writeText(txt); alert('Disalin: '+txt); }
+window.copySelected=function(){ if(selected.size===0){ alert('Pilih token dulu'); return; } let teks=[]; allTokens.forEach(t=>{ if(selected.has(t.id)) teks.push(t.token); }); navigator.clipboard.writeText(teks.join('\n')); alert(teks.length+' token disalin!'); }
+window.hapusTerpakai=async function(){
+  const usedTokens=allTokens.filter(t=>!!t.used);
+  if(usedTokens.length===0){ alert('Tidak ada token terpakai yang bisa dihapus.'); return; }
+  if(!confirm('Hapus semua '+usedTokens.length+' token yang sudah terpakai? Token yang tersedia tidak akan dihapus.')) return;
+  const btns=document.querySelectorAll('button');
+  let target=null;
+  btns.forEach(b=>{ if((b.textContent||'').includes('Hapus yang Terpakai')) target=b; });
+  if(target){ target.disabled=true; target.textContent='⏳ Menghapus...'; }
+  let berhasil=0;
+  for(const t of usedTokens){
+    try{
+      await deleteDoc(doc(db,'tokens',t.id));
+      berhasil++;
+    }catch(e){}
+  }
+  selected.clear();
+  await loadAll();
+  if(target){ target.disabled=false; target.textContent='🗑️ Hapus yang Terpakai'; }
+  alert(berhasil+' token terpakai berhasil dihapus.');
+}
+window.hapusSelected=async function(){ if(selected.size===0){ alert('Pilih token dulu'); return; } if(!confirm('Hapus '+selected.size+' token terpilih?')) return; for(let id of Array.from(selected)){ try{ await deleteDoc(doc(db,'tokens',id)); }catch(e){} } selected.clear(); await loadAll(); }
+function genToken(){ const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let t=""; for(let i=0;i<12;i++) t+=chars[Math.floor(Math.random()*chars.length)]; return t.match(/.{1,4}/g).join("-"); }
+window.buatToken=async function(){
+  let paketHari=parseInt(document.getElementById('paket').value||"0"); if(!paketHari||paketHari<1){ alert('Isi masa aktif manual, contoh: 90, 120, 360'); return; }
+  const jml=parseInt(document.getElementById('jml').value||"1"); const harga=parseInt(document.getElementById('harga').value||"0"); const pref=(document.getElementById('pref').value||"").toUpperCase().trim(); const msg=document.getElementById('msg');
+  msg.textContent="Membuat "+jml+" token paket "+paketHari+" hari...";
+  try{ for(let i=0;i<jml;i++){ let token=genToken(); if(pref) token=pref+"-"+token; await addDoc(collection(db,"tokens"),{token:token,paket:getPaketMetadataFIXZY(paketHari).label,paketTerakhir:getPaketMetadataFIXZY(paketHari).label,paketHari:paketHari,durasiHari:paketHari,masaAktifHari:paketHari,durasiUnit:getPaketMetadataFIXZY(paketHari).unit,durasiNilai:getPaketMetadataFIXZY(paketHari).value,harga:harga,used:false,usedBy:"",usedByEmail:"",usedAt:null,createdAt:new Date(),status:"tersedia"}); } msg.textContent=jml+" token paket "+paketHari+" hari berhasil dibuat!"; document.getElementById("paket").value=""; document.getElementById("jml").value="1"; document.getElementById("harga").value=""; document.getElementById("pref").value=""; await loadAll(); setTimeout(()=>{ msg.textContent=""; },3000); }catch(e){ msg.textContent="Gagal: "+e.message; alert(e.message); }
+}
+</script><script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script><script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body></html>
