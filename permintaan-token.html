@@ -52,6 +52,7 @@ textarea{min-height:110px;resize:vertical}
 .green{background:#16a34a;color:#fff;flex:1}.danger{background:#fee2e2;color:#991b1b;flex:1}.secondary{background:#e5e7eb;color:#111827}
 .price-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .tokens-hint{font-size:11px;color:#64748b;margin-top:5px}
+.free-label{display:inline-block;font-size:10px;font-weight:900;color:#166534;background:#dcfce7;border:1px solid #86efac;border-radius:999px;padding:4px 7px;margin-left:5px}
 .token-picker{position:relative;width:100%}
 .token-select{
   width:100%;min-height:64px;border:2px solid #111827;border-radius:12px;
@@ -171,6 +172,7 @@ body.dark .modal-box{background:#151b23;color:#f3f4f6}
       <h2>Request Token Masuk</h2>
       <div class="sub">
         Semua request dibaca dari collection <b>registrationTokens</b>.
+        <b>Token registrasi = GRATIS</b>. Token perpanjangan memakai harga paket/token.
         Admin dapat menyetujui atau menolak request setelah login Firebase berhasil.
       </div>
 
@@ -451,8 +453,19 @@ function updateSelectedUI(id){
 
   if(qty)qty.value=set.size;
   if(count)count.textContent=`${set.size} token dipilih`;
-  if(price)price.value=unit>0?unit:(selected.length?'Harga mengikuti token':'');
-  if(total)total.textContent=rupiah(sum);
+  if(price){
+    const request=allRequests.find(x=>x.id===id);
+    const type=request?.requestType==='perpanjangan'?'perpanjangan':'registrasi';
+    price.value=type==='registrasi'
+      ?'GRATIS'
+      :(unit>0?unit:(selected.length?'Harga mengikuti token':''));
+  }
+  if(total){
+    const request=allRequests.find(x=>x.id===id);
+    total.textContent=request?.requestType==='registrasi'
+      ?'GRATIS — Rp 0'
+      :rupiah(sum);
+  }
 
   const panel=$('token-panel-'+id);
   if(panel){
@@ -603,7 +616,7 @@ function render(){
       <article class="req">
         <div class="req-head">
           <div>
-            <div class="req-title">🔑 ${esc(jenis)}</div>
+            <div class="req-title">🔑 ${esc(jenis)} ${x.requestType==='registrasi'?'<span class="free-label">GRATIS</span>':''}</div>
             <div class="req-meta">
               ${esc(x.resellerNama||"-")} • ${esc(x.resellerEmail||"-")}
             </div>
@@ -630,7 +643,7 @@ function render(){
           </div>
           <div class="info">
             <span>TAGIHAN</span>
-            <b>${rupiah(total)}</b>
+            <b>${x.requestType==='registrasi'?'GRATIS — Rp 0':rupiah(total)}</b>
           </div>
           <div class="info">
             <span>CATATAN RESELLER</span>
@@ -645,7 +658,8 @@ function render(){
               <div class="form-row">
                 <label>Harga Token (otomatis)</label>
                 <input id="price-${esc(x.id)}" type="text" readonly
-                  value="" placeholder="Pilih token terlebih dahulu">
+                  value="${x.requestType==='registrasi'?'GRATIS':''}"
+                  placeholder="${x.requestType==='registrasi'?'Registrasi gratis':'Pilih token terlebih dahulu'}">
               </div>
               <div class="form-row">
                 <label>Jumlah Disetujui</label>
@@ -656,7 +670,7 @@ function render(){
 
             <div class="info" style="margin-bottom:12px">
               <span>TAGIHAN BERJALAN</span>
-              <b id="live-total-${esc(x.id)}">Rp 0</b>
+              <b id="live-total-${esc(x.id)}">${x.requestType==='registrasi'?'GRATIS — Rp 0':'Rp 0'}</b>
             </div>
 
             <div class="form-row">
@@ -688,7 +702,7 @@ function render(){
                 </div>
               </div>
               <div class="tokens-hint">
-                Klik kolom di atas → pilih token sesuai jenis request. Harga dan tagihan mengikuti token yang diceklis.
+                Klik kolom di atas → pilih token sesuai jenis request. Registrasi gratis; perpanjangan mengikuti harga paket/token.
               </div>
             </div>
 
@@ -806,15 +820,24 @@ window.approveRequest=async id=>{
     return;
   }
 
-  // Tagihan dihitung dari token yang benar-benar diceklis.
+  const requestType=item.requestType==='perpanjangan'?'perpanjangan':'registrasi';
+
+  // REGISTRASI = GRATIS. Tidak perlu harga token.
   const prices=selectedDocs.map(t=>Number(t.price)||0);
-  if(prices.some(p=>p<=0)){
-    showModal('Harga Token Belum Ada','Semua token yang dipilih harus memiliki harga agar tagihan dapat dihitung otomatis.');
-    return;
+  let total=0;
+  let price=0;
+
+  if(requestType==='perpanjangan'){
+    // Perpanjangan tetap wajib mempunyai harga.
+    if(prices.some(p=>p<=0)){
+      showModal('Harga Token Belum Ada','Semua token perpanjangan yang dipilih harus memiliki harga agar tagihan dapat dihitung otomatis.');
+      return;
+    }
+    total=prices.reduce((sum,p)=>sum+p,0);
+    const uniquePrices=[...new Set(prices)];
+    price=uniquePrices.length===1?uniquePrices[0]:0;
   }
-  const total=prices.reduce((sum,p)=>sum+p,0);
-  const uniquePrices=[...new Set(prices)];
-  const price=uniquePrices.length===1?uniquePrices[0]:0;
+
   const tokens=selectedDocs.map(t=>t.token);
   const note=$('note-'+id)?.value.trim()||'';
 
@@ -848,7 +871,8 @@ window.approveRequest=async id=>{
         totalTagihan:total,
         hargaToken:price,
         hargaPerToken:price,
-        hargaTokens:prices,
+        hargaTokens:requestType==='registrasi'?[]:prices,
+         gratisRegistrasi:requestType==='registrasi',
         tokens,
         token:tokens.length===1?tokens[0]:'',
         kodeToken:tokens.length===1?tokens[0]:'',
@@ -865,7 +889,12 @@ window.approveRequest=async id=>{
 
     await loadAvailableTokens(item.requestType==='perpanjangan'?'perpanjangan':'registrasi',Number(item.hargaToken||0));
     await loadRequests();
-    showModal('Berhasil Disetujui',`${qty} token telah disetujui. Tagihan otomatis ${rupiah(total)}.`);
+    showModal(
+      'Berhasil Disetujui',
+      requestType==='registrasi'
+        ? `${qty} token registrasi telah disetujui GRATIS. Tagihan Rp 0.`
+        : `${qty} token perpanjangan telah disetujui. Tagihan otomatis ${rupiah(total)}.`
+    );
   }catch(e){
     console.error('approve:',e);
     showModal('Gagal Menyetujui',e?.code==='permission-denied'?'Firebase menolak perubahan stok/request. Pastikan Rules mengizinkan admin update pada collection token dan registrationTokens.':(e?.message||String(e)));
