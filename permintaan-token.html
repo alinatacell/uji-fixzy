@@ -424,13 +424,18 @@ function durationFromText(raw){
 
 function requestedDurationMonths(request){
   const x=request||{};
-  // Semua nama field yang pernah dipakai pada request paket.
+
+  // REQUEST DARI HALAMAN RESELLER MENYIMPAN PAKET DI FIELD INI.
+  // Jangan mengandalkan nama field generik saja karena sebelumnya
+  // menyebabkan request 3/6/12 bulan tercampur.
   const textFields=[
+    x.masaPerpanjangan,x.perpanjanganLabel,
+    x.perpanjanganHari,
     x.durasiBulan,x.masaAktifBulan,x.jumlahBulan,x.bulan,
     x.paketBulan,x.lamaBulan,x.durasi,x.masaAktif,
     x.paket,x.paketLabel,x.paketTerakhir,x.jenisPaket,
     x.paketDurasi,x.durasiToken,x.masaAktifToken,x.periode,
-    x.lamaAktif,x.masaPerpanjangan,x.masaAktifLabel,
+    x.lamaAktif,x.masaPerpanjanganLabel,x.masaAktifLabel,
     x.paketLabelText,x.requestPackage,x.packageLabel
   ];
 
@@ -439,14 +444,25 @@ function requestedDurationMonths(request){
     if(d)return d;
   }
 
-  // Jika request menyimpan harga paket tetapi tidak menyimpan durasi,
-  // gunakan mapping paket resmi FIXZY.
+  // Harga paket yang disimpan pada request.
   const priceFields=[
-    x.hargaToken,x.hargaPerpanjangan,x.hargaTokenPerpanjangan,
-    x.hargaPaket,x.paketHarga,x.price,x.amount,x.nominal
+    x.hargaPerpanjangan,x.hargaTokenPerpanjangan,
+    x.hargaToken,x.hargaPaket,x.paketHarga,x.price,x.amount,x.nominal
   ];
   for(const raw of priceFields){
     const d=durationFromPrice(raw);
+    if(d)return d;
+  }
+
+  // PENGAMAN TERAKHIR: request lama dapat tidak menyimpan field paket,
+  // tetapi jumlahTagihan/totalTagihan tetap tersimpan. Karena harga paket
+  // adalah harga per token, bagi total tagihan dengan jumlah token diminta.
+  // 50.000 => 3 bulan, 80.000 => 6 bulan, 120.000 => 12 bulan.
+  const qty=Number(x.jumlahRequest??x.jumlahTokenDiminta??0)||0;
+  const total=Number(x.jumlahTagihan??x.totalTagihan??0)||0;
+  if(qty>0&&total>0){
+    const unit=total/qty;
+    const d=durationFromPrice(unit);
     if(d)return d;
   }
 
@@ -460,7 +476,9 @@ function tokenDurationMonths(d){
     x.paketBulan,x.lamaBulan,x.durasi,x.masaAktif,
     x.paket,x.paketLabel,x.paketTerakhir,x.jenisPaket,
     x.paketDurasi,x.durasiToken,x.masaAktifToken,x.periode,
-    x.lamaAktif,x.masaAktifLabel,x.paketLabelText
+    x.lamaAktif,x.masaPerpanjangan,x.masaAktifLabel,x.paketLabelText,
+    x.perpanjanganLabel,x.masaPerpanjanganLabel,
+    x.paketHari,x.durasiHari,x.masaAktifHari
   ];
 
   for(const raw of textFields){
@@ -468,7 +486,7 @@ function tokenDurationMonths(d){
     if(d)return d;
   }
 
-  // Fallback paling penting: token lama kadang hanya menyimpan harga.
+  // Token yang hanya menyimpan harga tetap bisa difilter dengan tepat.
   const priceFields=[
     x.hargaPerpanjangan,x.hargaTokenPerpanjangan,
     x.hargaToken,x.harga,x.price,x.amount,
@@ -484,14 +502,18 @@ function tokenDurationMonths(d){
 
 function tokenMatchesRequestedDuration(tokenDoc,request){
   const requested=requestedDurationMonths(request);
-  if(!requested)return true;
+  if(!requested){
+    // Untuk request perpanjangan, jangan pernah menampilkan token campuran
+    // jika paket request tidak berhasil dibaca. Lebih aman kosong daripada
+    // memberi admin pilihan token yang salah paket.
+    if(String(request?.requestType||'').toLowerCase()==='perpanjangan')return false;
+    return true;
+  }
 
   const tokenDuration=tokenDurationMonths(tokenDoc);
 
-  // Jika request punya paket tetapi token tidak mempunyai metadata durasi
-  // maupun harga yang bisa dipetakan, JANGAN tampilkan token tersebut.
-  // Lebih aman kosong daripada mencampur token paket lain.
-  return tokenDuration===requested;
+  // Token tanpa durasi/harga yang bisa dipetakan tidak boleh lolos filter.
+  return tokenDuration>0 && tokenDuration===requested;
 }
 
 function tokenValidForRequest(d,type,colName,request=null){
@@ -650,8 +672,10 @@ function renderTokenOptions(id){
 
   if(!list.length){
     box.innerHTML=duration
-      ?`<div class="token-empty">Token ${duration} bulan yang tersedia belum mencukupi.</div>`
-      :'<div class="token-empty">Tidak ada token tersedia untuk jenis request ini.</div>';
+      ?`<div class="token-empty">Tidak ada token ${duration} bulan yang tersedia untuk request ini.</div>`
+      :request.requestType==="perpanjangan"
+        ?'<div class="token-empty">Paket request tidak terbaca. Tidak ada token yang ditampilkan agar token 3/6/12 bulan tidak tercampur.</div>'
+        :'<div class="token-empty">Tidak ada token tersedia untuk jenis request ini.</div>';
     updateSelectedUI(id);
     return;
   }
@@ -834,6 +858,11 @@ function render(){
             <span>CATATAN RESELLER</span>
             <b>${esc(x.catatan||"-")}</b>
           </div>
+          ${x.requestType==="perpanjangan"?`
+          <div class="info" style="grid-column:1/-1;background:#fff7d6;border-color:#f2c94c">
+            <span>PAKET REQUEST</span>
+            <b>${duration?`${duration} bulan`:'PAKET TIDAK TERBACA'}</b>
+          </div>`:""}
         </div>
 
         ${canProcess?`
@@ -878,7 +907,7 @@ function render(){
               <div class="token-picker">
                 <button id="token-select-${esc(x.id)}" class="token-select" type="button"
                   onclick="toggleTokenPicker('${esc(x.id)}')">
-                  ${duration?`🔑 Pilih Token ${duration} Bulan`:"🔑 Pilih Token dari Daftar"}
+                  ${duration?`🔑 Pilih Token ${duration} Bulan`:"🔑 Pilih Token sesuai Paket"}
                   <span id="token-preview-${esc(x.id)}" class="token-selected-preview">
                     Klik kolom ini untuk membuka daftar token
                   </span>
@@ -906,8 +935,10 @@ function render(){
 
               <div class="tokens-hint">
                 ${duration
-                  ?`Request ${duration} bulan + ${requested} token → daftar hanya token ${duration} bulan dan otomatis mengambil maksimal ${requested} token.`
-                  :"Token ditampilkan sesuai jenis request."}
+                  ?`REQUEST ${duration} BULAN → hanya token ${duration} bulan yang boleh dipilih. Maksimal ${requested} token.`
+                  :x.requestType==="perpanjangan"
+                    ?"Paket request tidak terbaca. Token perpanjangan sengaja tidak ditampilkan agar tidak salah paket."
+                    :"Token ditampilkan sesuai jenis request."}
                 ${x.requestType==="perpanjangan"
                   ?"<br><b>Tagihan reseller dihitung otomatis: harga token dikurangi Rp20.000 untuk setiap token.</b>"
                   :"<br><b>Registrasi gratis — tagihan Rp0.</b>"}
@@ -1036,6 +1067,14 @@ window.approveRequest=async id=>{
      Masa aktif token yang diberikan harus sama dengan request.
      Ini menjadi pengaman kedua sebelum transaksi Firebase. */
   const requestedDuration=requestedDurationMonths(item);
+
+  if(requestType==="perpanjangan"&&!requestedDuration){
+    showModal(
+      "Paket Request Tidak Terbaca",
+      "Data request tidak menyimpan paket 3/6/12 bulan yang bisa dikenali. Request tidak boleh disetujui sampai paketnya terbaca dengan benar."
+    );
+    return;
+  }
 
   if(requestedDuration){
     const invalid=selectedDocs.find(t=>tokenDurationMonths(t.data)!==requestedDuration);
