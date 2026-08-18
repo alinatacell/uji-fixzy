@@ -364,6 +364,14 @@ function tokenPrice(d,type,requestPrice=0){
   return Number.isFinite(n)&&n>0?n:Number(requestPrice)||0;
 }
 
+// Potongan reseller untuk setiap token perpanjangan.
+const RESELLER_DISCOUNT=20000;
+function resellerTokenPrice(price,type){
+  const n=Number(price)||0;
+  if(type!=='perpanjangan'||n<=0)return Math.max(0,n);
+  return Math.max(0,n-RESELLER_DISCOUNT);
+}
+
 function isRequestDocument(colName,d){
   if(colName!=='registrationTokens')return false;
   return !!(d.resellerUid||d.requestStatus||d.jumlahRequest||d.jumlahTokenDiminta||d.notificationAdmin||d.requestType==='registrasi'||d.requestType==='perpanjangan');
@@ -472,7 +480,9 @@ function selectedTokenDocs(id){
 }
 
 function selectedTotal(id){
-  return selectedTokenDocs(id).reduce((sum,t)=>sum+(Number(t.price)||0),0);
+  const request=allRequests.find(x=>x.id===id);
+  const type=request?.requestType==='perpanjangan'?'perpanjangan':'registrasi';
+  return selectedTokenDocs(id).reduce((sum,t)=>sum+resellerTokenPrice(t.price,type),0);
 }
 
 function selectedUnitPrice(id){
@@ -489,8 +499,11 @@ function updateSelectedUI(id){
   const count=$('token-count-'+id);
   const total=$('live-total-'+id);
   const selected=selectedTokenDocs(id);
-  const sum=selected.reduce((n,t)=>n+(Number(t.price)||0),0);
-  const unit=selectedUnitPrice(id);
+  const request=allRequests.find(x=>x.id===id);
+  const type=request?.requestType==='perpanjangan'?'perpanjangan':'registrasi';
+  const sum=selected.reduce((n,t)=>n+resellerTokenPrice(t.price,type),0);
+  const originalUnit=selectedUnitPrice(id);
+  const unit=resellerTokenPrice(originalUnit,type);
 
   if(qty)qty.value=set.size;
   if(count)count.textContent=`${set.size} token dipilih`;
@@ -499,7 +512,7 @@ function updateSelectedUI(id){
     const type=request?.requestType==='perpanjangan'?'perpanjangan':'registrasi';
     price.value=type==='registrasi'
       ?'GRATIS'
-      :(unit>0?unit:(selected.length?'Harga mengikuti token':''));
+      :(unit>0?`${rupiah(unit)} / token`:(selected.length?'Harga mengikuti token':''));
   }
   if(total){
     const request=allRequests.find(x=>x.id===id);
@@ -559,7 +572,7 @@ function renderTokenOptions(id){
       <input type="checkbox" data-token-id="${esc(t.id)}" ${alreadySelected.has(t.id)?'checked':''}
         onchange="selectToken('${esc(id)}','${esc(t.id)}',this.checked)">
       <span class="token-value">${esc(t.token)}</span>
-      <span class="token-status">${t.price>0?esc(rupiah(t.price)):'GRATIS'}</span>
+      <span class="token-status">${t.price>0?`${esc(rupiah(t.price))} → ${esc(rupiah(resellerTokenPrice(t.price, request?.requestType==='perpanjangan'?'perpanjangan':'registrasi')))} / token`:'GRATIS'}</span>
     </label>
   `).join('');
 
@@ -780,6 +793,7 @@ function render(){
                 ${requestedDurationMonths(x)
                   ? 'Request '+requestedDurationMonths(x)+' bulan → otomatis dipilih '+requestedDurationMonths(x)+' bulan sesuai jumlah request. Tinggal cek lalu Setujui.'
                   : 'Token ditampilkan sesuai jenis request. Registrasi gratis; perpanjangan mengikuti harga paket/token.'}
+                ${x.requestType==='perpanjangan' ? '<br><b>Harga reseller = harga token − Rp 20.000 per token.</b>' : ''}
               </div>
             </div>
 
@@ -900,16 +914,20 @@ window.approveRequest=async id=>{
   const requestType=item.requestType==='perpanjangan'?'perpanjangan':'registrasi';
 
   // REGISTRASI = GRATIS. Tidak perlu harga token.
-  const prices=selectedDocs.map(t=>Number(t.price)||0);
+  const originalPrices=selectedDocs.map(t=>Number(t.price)||0);
+  const prices=requestType==='perpanjangan'
+    ?originalPrices.map(p=>resellerTokenPrice(p,requestType))
+    :originalPrices.map(()=>0);
   let total=0;
   let price=0;
+  let originalTotal=0;
 
   if(requestType==='perpanjangan'){
-    // Perpanjangan tetap wajib mempunyai harga.
-    if(prices.some(p=>p<=0)){
+    if(originalPrices.some(p=>p<=0)){
       showModal('Harga Token Belum Ada','Semua token perpanjangan yang dipilih harus memiliki harga agar tagihan dapat dihitung otomatis.');
       return;
     }
+    originalTotal=originalPrices.reduce((sum,p)=>sum+p,0);
     total=prices.reduce((sum,p)=>sum+p,0);
     const uniquePrices=[...new Set(prices)];
     price=uniquePrices.length===1?uniquePrices[0]:0;
@@ -949,7 +967,11 @@ window.approveRequest=async id=>{
         hargaToken:price,
         hargaPerToken:price,
         hargaTokens:requestType==='registrasi'?[]:prices,
-         gratisRegistrasi:requestType==='registrasi',
+        hargaTokenAsli:requestType==='registrasi'?0:(originalPrices.length===1?originalPrices[0]:0),
+        hargaTokensAsli:requestType==='registrasi'?[]:originalPrices,
+        diskonPerToken:requestType==='perpanjangan'?RESELLER_DISCOUNT:0,
+        totalHargaAsli:requestType==='perpanjangan'?originalTotal:0,
+        gratisRegistrasi:requestType==='registrasi',
         tokens,
         token:tokens.length===1?tokens[0]:'',
         kodeToken:tokens.length===1?tokens[0]:'',
@@ -974,7 +996,7 @@ window.approveRequest=async id=>{
       'Berhasil Disetujui',
       requestType==='registrasi'
         ? `${qty} token registrasi telah disetujui GRATIS. Tagihan Rp 0.`
-        : `${qty} token perpanjangan telah disetujui. Tagihan otomatis ${rupiah(total)}.`
+        : `${qty} token perpanjangan telah disetujui. Harga asli ${rupiah(originalTotal)}, diskon ${rupiah(RESELLER_DISCOUNT)} per token, tagihan reseller ${rupiah(total)}.`
     );
   }catch(e){
     console.error('approve:',e);
