@@ -4,522 +4,810 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#081326">
-<title>FIXZY | Admin Request Token</title>
+<title>FIXZY | Approval Token Reseller</title>
 <style>
 *{box-sizing:border-box}
 :root{
- --navy:#081326;--navy2:#101d33;--yellow:#ffc107;--bg:#f2f5f9;
- --card:#fff;--text:#111827;--muted:#64748b;--green:#16a34a;
- --red:#dc2626;--blue:#2563eb;--border:#111827
+  --navy:#081326;--navy2:#101d33;--yellow:#ffc107;
+  --bg:#f2f5f9;--card:#fff;--text:#111827;--muted:#64748b;
+  --green:#16a34a;--red:#dc2626;--border:#111827;
 }
 body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
 header{
- min-height:72px;background:var(--navy);color:#fff;padding:9px 14px;
- display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;
- border-bottom:2px solid #000;box-shadow:0 3px 0 #000
+  min-height:72px;background:var(--navy);color:#fff;padding:9px 14px;
+  display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;
+  border-bottom:2px solid #000;box-shadow:0 3px 0 #000
 }
 .logo{width:52px;height:52px;flex:0 0 52px;border-radius:13px;background:#000;border:1px solid #334155;padding:4px;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .logo img{width:100%;height:100%;object-fit:contain}
 .head-title{min-width:0;flex:1}.head-title b{font-size:18px;display:block}.head-title small{font-size:11px;color:#cbd5e1}
-.head-actions{display:flex;gap:8px}.head-actions button{width:44px;height:44px;padding:0}
-button{border:0;border-radius:10px;padding:11px 13px;font-weight:900;cursor:pointer;box-shadow:3px 3px 0 #111827}
-button:disabled{opacity:.5;cursor:not-allowed}
-.refresh{background:var(--yellow);color:#111827}.dark{background:#f3f4f6;color:#111827}
-.wrap{width:min(1000px,100%);margin:auto;padding:14px}
+.head-actions{display:flex;align-items:center;gap:8px}
+.refresh,.logout{height:44px;border-radius:10px;border:1px solid #334155;font-weight:900;box-shadow:2px 2px 0 #000}
+.refresh{width:100px;background:#17263b;color:#fff}.logout{width:70px;background:#fee2e2;color:#991b1b}
+.wrap{width:min(900px,100%);margin:auto;padding:14px}
 .card{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:4px 4px 0 #111827}
-h2{margin:0 0 5px;font-size:19px}.sub{font-size:12px;color:var(--muted);line-height:1.5}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
-.stat{border:1px solid #dbe2ea;border-radius:10px;padding:12px;background:#f8fafc}
-.stat span{display:block;font-size:10px;color:var(--muted)}.stat b{font-size:22px}
-.toolbar{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-.toolbar input,.toolbar select{flex:1;min-width:160px}
-input,select,textarea{width:100%;min-height:42px;border:2px solid #111827;border-radius:9px;padding:9px 10px;background:#fff;color:#111827;font:inherit}
-textarea{min-height:85px;resize:vertical}
-.request{border:2px solid #dbe2ea;border-radius:12px;padding:14px;margin-top:12px;background:#fff}
-.request.pending{border-color:#f2c94c}.request.approved{border-color:#86efac}.request.rejected{border-color:#fecaca}
-.req-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.req-title{font-size:16px;font-weight:900}.req-meta{font-size:11px;color:var(--muted);margin-top:3px}
+h2{margin:0 0 5px;font-size:20px}.sub{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5}
+.login-card{max-width:500px;margin:30px auto}
+label{display:block;font-size:12px;font-weight:900;margin:0 0 5px}
+input,textarea,select{width:100%;min-height:44px;border:2px solid #111827;border-radius:9px;padding:10px;background:#fff;color:#111827;font:inherit}
+textarea{min-height:110px;resize:vertical}
+.form-row{margin-bottom:12px}
+.primary{width:100%;background:#111827;color:#fff;border:0;border-radius:10px;padding:13px;font-weight:900;box-shadow:3px 3px 0 #000}
+.primary:disabled,.green:disabled,.danger:disabled{opacity:.5}
+.account{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#f8fafc;border:1px solid #dbe2ea;border-radius:10px;padding:10px;margin-bottom:14px}
+.account small{display:block;color:var(--muted)}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.list{margin-top:14px}
+.req{border:2px solid #f0b000;border-radius:14px;padding:14px;margin-top:12px;background:#fffdf2;box-shadow:3px 3px 0 #111827}
+.req-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.req-title{font-size:17px;font-weight:900}.req-meta{font-size:12px;color:var(--muted);margin-top:3px}
 .badge{font-size:10px;font-weight:900;padding:6px 9px;border-radius:999px;white-space:nowrap}
-.badge.pending{background:#fef3c7;color:#92400e}.badge.approved{background:#dcfce7;color:#166534}.badge.rejected{background:#fee2e2;color:#991b1b}
-.detail{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-.detail-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:9px}
-.detail-box span{display:block;font-size:9px;color:var(--muted);margin-bottom:3px}.detail-box b{font-size:12px;word-break:break-word}
-.admin-box{margin-top:12px;padding:12px;border-radius:10px;background:#f8fafc;border:1px solid #dbe2ea}
-.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.admin-grid .full{grid-column:1/-1}
-.label{display:block;font-size:11px;font-weight:900;margin-bottom:5px}
-.actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-.approve{background:var(--green);color:#fff}.reject{background:var(--red);color:#fff}.save{background:var(--blue);color:#fff}.neutral{background:#e5e7eb;color:#111827}
-.token-preview{margin-top:9px;background:#ecfdf5;border:1px solid #86efac;border-radius:9px;padding:9px}
-.token-preview code{display:block;font-weight:900;font-size:13px;padding:4px 0;word-break:break-all}
-.empty{text-align:center;color:#94a3b8;padding:25px;font-size:12px}
-.loading{text-align:center;color:#64748b;padding:25px;font-size:12px}
+.pending{background:#fef3c7;color:#92400e}.approved{background:#dcfce7;color:#166534}.rejected{background:#fee2e2;color:#991b1b}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.info{border:1px solid #dbe2ea;border-radius:10px;padding:10px;background:#f8fafc}
+.info span{display:block;font-size:10px;color:var(--muted);margin-bottom:4px}.info b{font-size:14px;word-break:break-word}
+.admin-box{margin-top:12px;border-top:2px dashed #d9b000;padding-top:12px}
+.actions{display:flex;gap:8px;margin-top:12px}
+.green,.danger,.secondary{border:0;border-radius:10px;padding:12px;font-weight:900;box-shadow:3px 3px 0 #111827}
+.green{background:#16a34a;color:#fff;flex:1}.danger{background:#fee2e2;color:#991b1b;flex:1}.secondary{background:#e5e7eb;color:#111827}
+.price-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tokens-hint{font-size:11px;color:#64748b;margin-top:5px}
+.empty{text-align:center;color:#94a3b8;padding:25px;font-size:13px}
+.loading{text-align:center;color:#64748b;padding:25px;font-size:13px}
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:100;align-items:center;justify-content:center;padding:14px}
-.modal.show{display:flex}.modal-box{width:min(460px,100%);background:#fff;border:2px solid #111827;border-radius:14px;padding:18px;box-shadow:6px 6px 0 #111827}
-.modal-box h3{margin:0 0 8px}.modal-box p{font-size:13px;line-height:1.55}.ok{width:100%;background:#111827;color:#fff}
-body.dark{background:#0b0f14;color:#f3f4f6}
-body.dark .card,body.dark .request,body.dark .modal-box{background:#151b23;color:#f3f4f6;border-color:#000}
-body.dark .stat,body.dark .detail-box,body.dark .admin-box{background:#10161e;border-color:#334155}
-body.dark input,body.dark select,body.dark textarea{background:#0f141b;color:#f3f4f6;border-color:#334155}
-@media(max-width:700px){
- .stats{grid-template-columns:1fr 1fr}.detail{grid-template-columns:1fr 1fr}.admin-grid{grid-template-columns:1fr}
- .admin-grid .full{grid-column:auto}
+.modal.show{display:flex}.modal-box{width:min(450px,100%);background:#fff;border:2px solid #111827;border-radius:14px;padding:18px;box-shadow:6px 6px 0 #111827}
+.modal-box h3{margin:0 0 8px}.modal-box p{font-size:13px;line-height:1.5}.ok{width:100%;background:#111827;color:#fff;border:0;border-radius:10px;padding:13px;font-weight:900}
+.hidden{display:none!important}
+.error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;border-radius:9px;padding:10px;font-size:12px;margin-bottom:10px}
+@media(max-width:600px){
+ .head-actions .logout{display:none}
+ .head-title b{font-size:17px}
+ .grid,.price-row,.filters{grid-template-columns:1fr}
+ .wrap{padding:12px}.card{padding:14px}
+ .req-head{display:block}.badge{display:inline-block;margin-top:8px}
 }
-@media(max-width:460px){.detail{grid-template-columns:1fr}.wrap{padding:10px}.card{padding:13px}}
+body.dark{background:#0b0f14;color:#f3f4f6}
+body.dark .card,body.dark .req{background:#151b23;color:#f3f4f6;border-color:#000}
+body.dark .info,body.dark .account{background:#10161e;border-color:#334155}
+body.dark input,body.dark textarea,body.dark select{background:#0f141b;color:#f3f4f6;border-color:#334155}
+body.dark .modal-box{background:#151b23;color:#f3f4f6}
 </style>
 </head>
 <body>
 
 <header>
- <div class="logo"><img src="logo.png" alt="FIXZY" onerror="this.style.display='none'"></div>
- <div class="head-title">
-  <b>Admin Request Token</b>
-  <small>Menerima, memproses & menyetujui request reseller</small>
- </div>
- <div class="head-actions">
-  <button id="refreshBtn" class="refresh" type="button">↻</button>
-  <button id="darkBtn" class="dark" type="button">☾</button>
- </div>
+  <div class="logo"><img src="logo.png" alt="FIXZY" onerror="this.style.display='none'"></div>
+  <div class="head-title">
+    <b>Approval Token Reseller</b>
+    <small>Persetujuan request token registrasi & perpanjangan</small>
+  </div>
+  <div class="head-actions">
+    <button id="refreshBtn" class="refresh" type="button">↻ Refresh</button>
+    <button id="logoutBtn" class="logout hidden" type="button">Keluar</button>
+  </div>
 </header>
 
 <main class="wrap">
 
-<section class="card">
- <h2>Request Token Reseller</h2>
- <div class="sub">
-  Halaman admin membaca collection <b>registrationTokens</b>. Request dicari berdasarkan status dan dapat diproses langsung dari sini.
- </div>
+  <section id="loginCard" class="card login-card">
+    <h2>Login Admin Firebase</h2>
+    <div class="sub">
+      Halaman admin login langsung ke Firebase Auth project FIXZY.
+      Setelah login, UID akan dicek ke <b>users/{UID}</b>.
+    </div>
 
- <div class="stats">
-  <div class="stat"><span>Semua Request</span><b id="statAll">0</b></div>
-  <div class="stat"><span>Menunggu</span><b id="statPending">0</b></div>
-  <div class="stat"><span>Disetujui</span><b id="statApproved">0</b></div>
-  <div class="stat"><span>Ditolak</span><b id="statRejected">0</b></div>
- </div>
+    <div id="loginError" class="error hidden"></div>
 
- <div class="toolbar">
-  <input id="search" placeholder="Cari nama, email, UID...">
-  <select id="filter">
-   <option value="all">Semua Status</option>
-   <option value="pending">Menunggu Admin</option>
-   <option value="approved">Disetujui</option>
-   <option value="rejected">Ditolak</option>
-  </select>
- </div>
-</section>
+    <div class="form-row">
+      <label>Email Admin</label>
+      <input id="loginEmail" type="email" autocomplete="username" placeholder="email admin">
+    </div>
 
-<section class="card">
- <div id="requestList"><div class="loading">Memuat request dari Firebase...</div></div>
-</section>
+    <div class="form-row">
+      <label>Password</label>
+      <input id="loginPassword" type="password" autocomplete="current-password" placeholder="password">
+    </div>
 
+    <button id="loginBtn" class="primary" type="button">🔐 Login Firebase</button>
+  </section>
+
+  <section id="adminArea" class="hidden">
+
+    <section class="card">
+      <div class="account">
+        <div>
+          <small>ADMIN LOGIN</small>
+          <b id="adminName">-</b>
+          <small id="adminEmail">-</small>
+        </div>
+        <div>
+          <small>ROLE</small>
+          <b id="adminRole">-</b>
+        </div>
+      </div>
+
+      <h2>Request Token Masuk</h2>
+      <div class="sub">
+        Semua request dibaca dari collection <b>registrationTokens</b>.
+        Admin dapat menyetujui atau menolak request setelah login Firebase berhasil.
+      </div>
+
+      <div class="filters">
+        <select id="statusFilter">
+          <option value="all">Semua Status</option>
+          <option value="pending">Menunggu</option>
+          <option value="approved">Disetujui</option>
+          <option value="rejected">Ditolak</option>
+        </select>
+        <input id="searchInput" type="search" placeholder="Cari nama, email, UID...">
+      </div>
+
+      <div id="requestList" class="list">
+        <div class="loading">Memuat request...</div>
+      </div>
+    </section>
+  </section>
 </main>
 
-<div class="modal" id="infoModal">
- <div class="modal-box">
-  <h3 id="modalTitle">Info</h3>
-  <p id="modalText"></p>
-  <button class="ok" type="button" onclick="closeInfo()">OK</button>
- </div>
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Info</h3>
+    <p id="modalText"></p>
+    <button class="ok" type="button" onclick="closeModal()">OK</button>
+  </div>
 </div>
 
 <script type="module">
-import {initializeApp,getApps,getApp}
- from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import {getAuth,onAuthStateChanged}
- from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import {
- getFirestore,collection,query,orderBy,onSnapshot,getDocs,
- doc,getDoc,updateDoc,serverTimestamp
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  query,
+  orderBy,
+  getDocs,
+  updateDoc,
+  doc,
+  getDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const firebaseConfig={
- apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",
- authDomain:"fixzy-update.firebaseapp.com",
- projectId:"fixzy-update",
- storageBucket:"fixzy-update.firebasestorage.app",
- messagingSenderId:"995892519622",
- appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"
+  apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",
+  authDomain:"fixzy-update.firebaseapp.com",
+  projectId:"fixzy-update",
+  storageBucket:"fixzy-update.firebasestorage.app",
+  messagingSenderId:"995892519622",
+  appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"
 };
 
-const app=getApps().length?getApp():initializeApp(firebaseConfig);
+const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getFirestore(app);
 
-let currentUser=null;
-let sessionProfile={};
+let adminUser=null;
+let adminProfile={};
 let allRequests=[];
-let unsub=null;
 
 const $=id=>document.getElementById(id);
 
 function esc(v){
- return String(v??"").replace(/[&<>"']/g,m=>({
-  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
- }[m]));
+  return String(v??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[m]));
 }
 
 function rupiah(v){
- const n=Number(v||0);
- return n>0?"Rp "+n.toLocaleString("id-ID"):"Rp 0";
+  const n=Number(v||0);
+  return "Rp "+n.toLocaleString("id-ID");
 }
 
-function showInfo(title,text){
- $("modalTitle").textContent=title;
- $("modalText").textContent=text;
- $("infoModal").classList.add("show");
+function showModal(title,text){
+  $("modalTitle").textContent=title;
+  $("modalText").textContent=text;
+  $("modal").classList.add("show");
 }
-window.closeInfo=()=>$("infoModal").classList.remove("show");
+window.closeModal=()=>$("modal").classList.remove("show");
 
-function formatDate(v){
- try{
-  if(v?.toDate)return v.toDate().toLocaleString("id-ID");
-  if(v?.seconds)return new Date(Number(v.seconds)*1000).toLocaleString("id-ID");
-  if(v)return new Date(v).toLocaleString("id-ID");
- }catch(e){}
- return "-";
-}
-
-function statusOf(x){
- return String(x.requestStatus||x.status||"pending").toLowerCase();
+function roleIsAdmin(role){
+  const r=String(role||"").toLowerCase().trim();
+  return [
+    "owner","admin","superadmin",
+    "administrator","super_admin"
+  ].includes(r);
 }
 
-function statusClass(x){
- const s=statusOf(x);
- if(s.includes("approve")||s==="disetujui")return "approved";
- if(s.includes("tolak")||s==="rejected")return "rejected";
- return "pending";
+async function loadAdminProfile(user){
+  const snap=await getDoc(doc(db,"users",user.uid));
+
+  if(!snap.exists()){
+    throw new Error("Profil users/{UID} admin tidak ditemukan.");
+  }
+
+  const data=snap.data()||{};
+
+  if(!roleIsAdmin(data.role)){
+    throw new Error(
+      "Akun berhasil login, tetapi role akun bukan owner/admin/superadmin."
+    );
+  }
+
+  adminProfile=data;
+
+  $("adminName").textContent=
+    data.namaToko||
+    data.nama||
+    data.displayName||
+    data.name||
+    user.email||
+    "-";
+
+  $("adminEmail").textContent=user.email||"-";
+  $("adminRole").textContent=String(data.role||"-").toUpperCase();
+
+  $("loginCard").classList.add("hidden");
+  $("adminArea").classList.remove("hidden");
+  $("logoutBtn").classList.remove("hidden");
+
+  await loadRequests();
 }
 
-function statusLabel(x){
- const c=statusClass(x);
- return c==="approved"?"DISETUJUI":c==="rejected"?"DITOLAK":"MENUNGGU ADMIN";
+function requestStatus(x){
+  const s=String(x.requestStatus||x.status||"pending").toLowerCase();
+  if(s.includes("approve")||s==="disetujui")return "approved";
+  if(s.includes("tolak")||s==="rejected"||s==="ditolak")return "rejected";
+  return "pending";
+}
+
+function requestDate(x){
+  try{
+    if(x.createdAt?.toDate){
+      return x.createdAt.toDate().toLocaleString("id-ID");
+    }
+  }catch(e){}
+  return x.createdAtText||"-";
 }
 
 function getTokens(x){
- let arr=[];
- if(Array.isArray(x.tokens))arr.push(...x.tokens);
- [x.token,x.kodeToken,x.registrationToken].forEach(v=>{
-  if(Array.isArray(v))arr.push(...v);
-  else if(v)String(v).split(/\r?\n|[,;]+/).forEach(t=>arr.push(t.trim()));
- });
- return [...new Set(arr.map(v=>String(v||"").trim()).filter(Boolean))];
-}
+  if(Array.isArray(x.tokens)){
+    return x.tokens.map(v=>String(v||"").trim()).filter(Boolean);
+  }
 
-function updateStats(){
- let p=0,a=0,r=0;
- allRequests.forEach(x=>{
-  const c=statusClass(x);
-  if(c==="pending")p++;
-  else if(c==="approved")a++;
-  else r++;
- });
- $("statAll").textContent=allRequests.length;
- $("statPending").textContent=p;
- $("statApproved").textContent=a;
- $("statRejected").textContent=r;
-}
+  const vals=[];
+  [x.token,x.kodeToken,x.registrationToken].forEach(v=>{
+    if(Array.isArray(v)){
+      v.forEach(t=>vals.push(t));
+    }else if(v){
+      String(v).split(/\r?\n|[,;]+/).forEach(t=>vals.push(t));
+    }
+  });
 
-function filteredRequests(){
- const f=$("filter").value;
- const q=$("search").value.trim().toLowerCase();
-
- return allRequests.filter(x=>{
-  const c=statusClass(x);
-  if(f!=="all"&&c!==f)return false;
-  if(!q)return true;
-
-  const hay=[
-   x.resellerNama,x.resellerEmail,x.resellerUid,
-   x.requestType,x.catatan,x.adminNote
-  ].join(" ").toLowerCase();
-
-  return hay.includes(q);
- });
+  return [...new Set(vals.map(v=>String(v||"").trim()).filter(Boolean))];
 }
 
 function render(){
- updateStats();
- const list=filteredRequests();
- const el=$("requestList");
+  const status=$("statusFilter").value;
+  const search=$("searchInput").value.trim().toLowerCase();
 
- if(!list.length){
-  el.innerHTML='<div class="empty">Tidak ada request sesuai filter.</div>';
-  return;
- }
+  let list=allRequests.filter(x=>{
+    const st=requestStatus(x);
+    if(status!=="all"&&st!==status)return false;
 
- el.innerHTML=list.map(x=>{
-  const id=esc(x.id);
-  const jenis=x.requestType==="perpanjangan"?"Perpanjangan":"Registrasi";
-  const jumlah=Number(x.jumlahRequest??x.jumlahTokenDiminta??1)||1;
-  const harga=Number(x.hargaToken||0);
-  const tagihan=Number(x.jumlahTagihan??x.totalTagihan??0)||0;
-  const tokens=getTokens(x);
-  const approved=statusClass(x)==="approved";
-  const rejected=statusClass(x)==="rejected";
+    if(search){
+      const hay=[
+        x.resellerNama,
+        x.resellerEmail,
+        x.resellerUid,
+        x.requestType,
+        x.catatan
+      ].join(" ").toLowerCase();
 
-  return `
-  <article class="request ${statusClass(x)}" data-id="${id}">
-   <div class="req-head">
-    <div>
-     <div class="req-title">Request Token ${esc(jenis)}</div>
-     <div class="req-meta">${esc(formatDate(x.createdAt))}</div>
-    </div>
-    <span class="badge ${statusClass(x)}">${statusLabel(x)}</span>
-   </div>
-
-   <div class="detail">
-    <div class="detail-box"><span>Nama / Toko</span><b>${esc(x.resellerNama||"-")}</b></div>
-    <div class="detail-box"><span>Email</span><b>${esc(x.resellerEmail||"-")}</b></div>
-    <div class="detail-box"><span>Jumlah</span><b>${jumlah} Token</b></div>
-    <div class="detail-box"><span>UID Reseller</span><b>${esc(x.resellerUid||"-")}</b></div>
-    <div class="detail-box"><span>Harga / Token</span><b>${rupiah(harga)}</b></div>
-    <div class="detail-box"><span>Tagihan</span><b>${rupiah(tagihan)}</b></div>
-   </div>
-
-   ${x.catatan?`<div class="admin-box" style="font-size:12px"><b>Catatan reseller:</b><br>${esc(x.catatan)}</div>`:""}
-
-   <div class="admin-box">
-    <div class="admin-grid">
-     <div>
-      <label class="label">Harga per Token</label>
-      <input id="price-${id}" type="number" min="0" step="1" value="${harga||""}" placeholder="Contoh: 5000">
-     </div>
-     <div>
-      <label class="label">Total Tagihan</label>
-      <input id="total-${id}" type="number" min="0" step="1" value="${tagihan||""}" placeholder="Otomatis dari harga × jumlah">
-     </div>
-     <div class="full">
-      <label class="label">Token</label>
-      <textarea id="tokens-${id}" placeholder="Masukkan token, satu token per baris">${esc(tokens.join("\n"))}</textarea>
-     </div>
-     <div class="full">
-      <label class="label">Catatan Admin</label>
-      <textarea id="note-${id}" placeholder="Catatan untuk reseller">${esc(x.adminNote||"")}</textarea>
-     </div>
-    </div>
-
-    <div class="actions">
-      <button class="save" type="button" onclick="simpanRequest('${id}')">💾 Simpan</button>
-      ${!approved&&!rejected?`
-       <button class="approve" type="button" onclick="setujuiRequest('${id}')">✅ Setujui Request</button>
-       <button class="reject" type="button" onclick="tolakRequest('${id}')">❌ Tolak Request</button>
-      `:""}
-     ${approved?`<button class="neutral" type="button" onclick="setPending('${id}')">↩ Kembalikan Pending</button>`:""}
-    </div>
-
-    ${tokens.length?`
-     <div class="token-preview">
-      <div style="font-size:10px;color:#166534;font-weight:900;margin-bottom:4px">TOKEN YANG TERSIMPAN</div>
-      ${tokens.map(t=>`<code>${esc(t)}</code>`).join("")}
-     </div>`:""}
-   </div>
-  </article>`;
- }).join("");
-}
-
-/*
-  Admin membaca seluruh registrationTokens.
-  Tidak menggunakan where(status) agar request lama/berbagai status
-  tetap bisa terlihat tanpa membutuhkan composite index.
-*/
-function listen(){
- if(unsub){try{unsub()}catch(e){}unsub=null}
-
- const q=query(collection(db,"registrationTokens"));
-
- unsub=onSnapshot(q,snap=>{
-  allRequests=[];
-  snap.forEach(d=>allRequests.push({id:d.id,...d.data()}));
-  allRequests.sort((a,b)=>{
-   const ta=a.createdAt?.seconds||0;
-   const tb=b.createdAt?.seconds||0;
-   return tb-ta;
-  });
-  render();
- },err=>{
-  console.error("Admin request listener:",err);
-  showInfo("Gagal Membaca Request",err.message||String(err));
- });
-}
-
-async function getRequest(id){
- const snap=await getDoc(doc(db,"registrationTokens",id));
- if(!snap.exists())throw new Error("Request tidak ditemukan.");
- return {id,snap:snap.data()};
-}
-
-function readEditor(id){
- const harga=Number(document.getElementById("price-"+id)?.value||0);
- const totalInput=Number(document.getElementById("total-"+id)?.value||0);
- const tokens=String(document.getElementById("tokens-"+id)?.value||"")
-  .split(/\r?\n|[,;]+/)
-  .map(x=>x.trim())
-  .filter(Boolean);
-
- const req=allRequests.find(x=>x.id===id);
- const jumlah=Number(req?.jumlahRequest??req?.jumlahTokenDiminta??1)||1;
- const total=totalInput>0?totalInput:(harga>0?harga*jumlah:0);
- const note=document.getElementById("note-"+id)?.value.trim()||"";
-
- return {harga,total,tokens,note,jumlah};
-}
-
-async function saveFields(id,status){
- const data=readEditor(id);
-
- await updateDoc(doc(db,"registrationTokens",id),{
-  hargaToken:data.harga,
-  jumlahTagihan:data.total,
-  totalTagihan:data.total,
-  tokens:data.tokens,
-  token:data.tokens[0]||"",
-  kodeToken:data.tokens[0]||"",
-  registrationToken:data.tokens[0]||"",
-  adminNote:data.note,
-  updatedAt:serverTimestamp(),
-  ...(status?{
-   requestStatus:status,
-   status:status,
-   notificationReseller:status==="approved"
-  }:{})
- });
-
- return data;
-}
-
-window.simpanRequest=async id=>{
- try{
-  await saveFields(id,null);
-  showInfo("Tersimpan","Data harga, tagihan, token dan catatan admin sudah disimpan.");
- }catch(e){
-  console.error(e);
-  showInfo("Gagal Menyimpan",e.message||String(e));
- }
-};
-
-window.setujuiRequest=async id=>{
- const req=allRequests.find(x=>x.id===id);
- if(!req)return;
-
- const data=readEditor(id);
-
- if(data.harga<=0){
-  showInfo("Harga Belum Diisi","Masukkan harga per token terlebih dahulu.");
-  return;
- }
-
- if(data.total<=0){
-  showInfo("Tagihan Belum Diisi","Masukkan total tagihan atau isi harga per token.");
-  return;
- }
-
- if(data.tokens.length!==data.jumlah){
-  showInfo(
-   "Jumlah Token Tidak Sesuai",
-   `Reseller meminta ${data.jumlah} token. Masukkan tepat ${data.jumlah} token sebelum menyetujui.`
-  );
-  return;
- }
-
- try{
-  await saveFields(id,"approved");
-
-  /*
-    approvedAt / approvedBy dicatat agar admin bisa diketahui.
-  */
-  await updateDoc(doc(db,"registrationTokens",id),{
-   approvedAt:serverTimestamp(),
-   approvedBy:currentUser?.uid||"",
-   notificationReseller:true,
-   notificationAdmin:false,
-   notificationText:`Request token Anda telah disetujui admin.`
+      if(!hay.includes(search))return false;
+    }
+    return true;
   });
 
-  showInfo("Request Disetujui","Request berhasil disetujui. Token dan tagihan sekarang akan tampil di halaman reseller.");
- }catch(e){
-  console.error(e);
-  showInfo("Gagal Menyetujui",e.message||String(e));
- }
-};
-
-window.tolakRequest=async id=>{
- const note=document.getElementById("note-"+id)?.value.trim()||"Request ditolak admin.";
-
- try{
-  await updateDoc(doc(db,"registrationTokens",id),{
-   requestStatus:"rejected",
-   status:"rejected",
-   adminNote:note,
-   rejectedAt:serverTimestamp(),
-   rejectedBy:currentUser?.uid||"",
-   notificationReseller:true,
-   notificationAdmin:false,
-   notificationText:"Request token ditolak oleh admin.",
-   updatedAt:serverTimestamp()
-  });
-
-  showInfo("Request Ditolak","Request sudah ditandai ditolak dan reseller akan melihat statusnya.");
- }catch(e){
-  console.error(e);
-  showInfo("Gagal Menolak",e.message||String(e));
- }
-};
-
-window.setPending=async id=>{
- try{
-  await updateDoc(doc(db,"registrationTokens",id),{
-   requestStatus:"pending",
-   status:"pending",
-   notificationReseller:false,
-   updatedAt:serverTimestamp()
-  });
-  showInfo("Dikembalikan","Request dikembalikan ke status menunggu admin.");
- }catch(e){
-  showInfo("Gagal",e.message||String(e));
- }
-};
-
-$("search").addEventListener("input",render);
-$("filter").addEventListener("change",render);
-
-$("refreshBtn").onclick=()=>{
- const b=$("refreshBtn");
- b.disabled=true;b.classList.add("loading");
- setTimeout(()=>{render();b.disabled=false;b.classList.remove("loading")},400);
-};
-
-$("darkBtn").onclick=()=>document.body.classList.toggle("dark");
-
-/*
-  Admin mengikuti Firebase Auth yang sama.
-  Tidak membuat login baru.
-  Pemeriksaan role dilakukan berdasarkan users/{UID}.
-*/
-onAuthStateChanged(auth,async user=>{
- if(!user){
-  showInfo("Belum Login","Silakan login melalui Index FIXZY terlebih dahulu.");
-  return;
- }
-
- currentUser=user;
-
- try{
-  const snap=await getDoc(doc(db,"users",user.uid));
-  sessionProfile=snap.exists()?snap.data()||{}:{};
-
-  const role=String(sessionProfile.role||"").toLowerCase();
-
-  if(!["owner","superadmin"].includes(role)){
-   showInfo("Akses Ditolak","Halaman ini khusus Owner / Superadmin.");
-   $("requestList").innerHTML='<div class="empty">Akses admin tidak tersedia untuk akun ini.</div>';
-   return;
+  if(!list.length){
+    $("requestList").innerHTML=
+      '<div class="empty">Tidak ada request sesuai filter.</div>';
+    return;
   }
 
-  listen();
- }catch(e){
-  console.error("Admin auth:",e);
-  showInfo("Gagal Memuat Admin",e.message||String(e));
- }
+  $("requestList").innerHTML=list.map(x=>{
+    const st=requestStatus(x);
+    const cls=st;
+    const label=
+      st==="approved"?"DISETUJUI":
+      st==="rejected"?"DITOLAK":
+      "MENUNGGU";
+
+    const jenis=
+      x.requestType==="perpanjangan"
+        ?"Perpanjangan":"Registrasi";
+
+    const requested=
+      Number(x.jumlahRequest??x.jumlahTokenDiminta??1)||1;
+
+    const approved=
+      Number(x.jumlahDisetujui??0)||0;
+
+    const total=
+      Number(x.jumlahTagihan??x.totalTagihan??0)||0;
+
+    const tokens=getTokens(x);
+
+    const canProcess=st==="pending";
+
+    return `
+      <article class="req">
+        <div class="req-head">
+          <div>
+            <div class="req-title">🔑 ${esc(jenis)}</div>
+            <div class="req-meta">
+              ${esc(x.resellerNama||"-")} • ${esc(x.resellerEmail||"-")}
+            </div>
+          </div>
+          <span class="badge ${cls}">${label}</span>
+        </div>
+
+        <div class="grid">
+          <div class="info">
+            <span>WAKTU REQUEST</span>
+            <b>${esc(requestDate(x))}</b>
+          </div>
+          <div class="info">
+            <span>RESELLER UID</span>
+            <b>${esc(x.resellerUid||"-")}</b>
+          </div>
+          <div class="info">
+            <span>JUMLAH REQUEST</span>
+            <b>${requested} Token</b>
+          </div>
+          <div class="info">
+            <span>JUMLAH DISETUJUI</span>
+            <b>${approved} Token</b>
+          </div>
+          <div class="info">
+            <span>TAGIHAN</span>
+            <b>${rupiah(total)}</b>
+          </div>
+          <div class="info">
+            <span>CATATAN RESELLER</span>
+            <b>${esc(x.catatan||"-")}</b>
+          </div>
+        </div>
+
+        ${
+          canProcess ? `
+          <div class="admin-box">
+            <div class="price-row">
+              <div class="form-row">
+                <label>Harga per Token</label>
+                <input id="price-${esc(x.id)}" type="number" min="0" inputmode="numeric"
+                  value="${Number(x.hargaToken||0)||""}"
+                  placeholder="Contoh: 5000">
+              </div>
+              <div class="form-row">
+                <label>Jumlah Disetujui</label>
+                <input id="qty-${esc(x.id)}" type="number" min="0" max="${requested}" inputmode="numeric"
+                  value="${approved||requested}">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>Token — 1 token per baris</label>
+              <textarea id="tokens-${esc(x.id)}"
+                placeholder="Masukkan token di sini, satu token setiap baris">${esc(tokens.join("\\n"))}</textarea>
+              <div class="tokens-hint">
+                Jumlah token yang dimasukkan harus sesuai dengan jumlah disetujui.
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>Catatan Admin</label>
+              <textarea id="note-${esc(x.id)}"
+                style="min-height:65px"
+                placeholder="Catatan untuk reseller...">${esc(x.adminNote||"")}</textarea>
+            </div>
+
+            <div class="actions">
+              <button class="green" type="button" onclick="approveRequest('${esc(x.id)}')">
+                ✅ Setujui
+              </button>
+              <button class="danger" type="button" onclick="rejectRequest('${esc(x.id)}')">
+                ❌ Tolak
+              </button>
+            </div>
+          </div>
+          ` : `
+          <div class="admin-box">
+            ${
+              tokens.length
+                ? `<div class="info">
+                    <span>TOKEN YANG DIBERIKAN</span>
+                    <b>${tokens.map(t=>esc(t)).join("<br>")}</b>
+                  </div>`
+                : ""
+            }
+            ${
+              x.adminNote
+                ? `<div class="info" style="margin-top:8px">
+                    <span>CATATAN ADMIN</span>
+                    <b>${esc(x.adminNote)}</b>
+                  </div>`
+                : ""
+            }
+            <div style="font-size:11px;color:#64748b;margin-top:8px">
+              Request ini sudah diproses.
+            </div>
+          </div>
+          `
+        }
+      </article>
+    `;
+  }).join("");
+}
+
+async function loadRequests(){
+  $("requestList").innerHTML='<div class="loading">Memuat request...</div>';
+
+  try{
+    const q=query(
+      collection(db,"registrationTokens"),
+      orderBy("createdAt","desc")
+    );
+
+    const snap=await getDocs(q);
+
+    allRequests=[];
+    snap.forEach(d=>{
+      allRequests.push({id:d.id,...d.data()});
+    });
+
+    render();
+
+  }catch(e){
+    console.error(e);
+
+    /*
+     * Fallback tanpa orderBy supaya tetap bisa membaca jika
+     * data lama belum mempunyai createdAt yang konsisten.
+     */
+    try{
+      const snap=await getDocs(collection(db,"registrationTokens"));
+
+      allRequests=[];
+      snap.forEach(d=>{
+        allRequests.push({id:d.id,...d.data()});
+      });
+
+      allRequests.sort((a,b)=>{
+        const ta=a.createdAt?.seconds||0;
+        const tb=b.createdAt?.seconds||0;
+        return tb-ta;
+      });
+
+      render();
+    }catch(e2){
+      $("requestList").innerHTML=
+        `<div class="error">Gagal membaca request: ${esc(e2.message)}</div>`;
+    }
+  }
+}
+
+window.approveRequest=async id=>{
+  if(!adminUser){
+    showModal("Belum Login","Silakan login Firebase sebagai admin.");
+    return;
+  }
+
+  const item=allRequests.find(x=>x.id===id);
+  if(!item)return;
+
+  const qtyRequested=
+    Number(item.jumlahRequest??item.jumlahTokenDiminta??1)||1;
+
+  let qty=Number($("qty-"+id)?.value||0);
+  let price=Number($("price-"+id)?.value||0);
+
+  if(!Number.isSafeInteger(qty)||qty<1){
+    showModal("Jumlah Tidak Valid","Jumlah disetujui minimal 1 token.");
+    return;
+  }
+
+  if(qty>qtyRequested){
+    showModal(
+      "Jumlah Melebihi Request",
+      `Reseller meminta ${qtyRequested} token. Jumlah disetujui tidak boleh lebih dari jumlah request.`
+    );
+    return;
+  }
+
+  if(!Number.isFinite(price)||price<0){
+    showModal("Harga Tidak Valid","Masukkan harga per token yang benar.");
+    return;
+  }
+
+  const tokenText=$("tokens-"+id)?.value||"";
+  const tokens=[...new Set(
+    tokenText
+      .split(/\r?\n/)
+      .map(v=>v.trim())
+      .filter(Boolean)
+  )];
+
+  if(tokens.length!==qty){
+    showModal(
+      "Jumlah Token Tidak Sesuai",
+      `Jumlah disetujui ${qty} token, tetapi token yang dimasukkan ${tokens.length}. Masukkan tepat ${qty} token, satu token per baris.`
+    );
+    return;
+  }
+
+  const note=$("note-"+id)?.value.trim()||"";
+
+  const btn=document.querySelector(
+    `button[onclick="approveRequest('${CSS.escape(id)}')"]`
+  );
+
+  if(btn){
+    btn.disabled=true;
+    btn.textContent="Menyimpan...";
+  }
+
+  try{
+    const total=price*qty;
+
+    await updateDoc(
+      doc(db,"registrationTokens",id),
+      {
+        requestStatus:"approved",
+        status:"approved",
+
+        jumlahDisetujui:qty,
+        jumlahTagihan:total,
+        totalTagihan:total,
+        hargaToken:price,
+
+        tokens:tokens,
+
+        /*
+         * Field lama tetap diisi agar kompatibel dengan halaman reseller.
+         */
+        token:tokens.length===1?tokens[0]:"",
+        kodeToken:tokens.length===1?tokens[0]:"",
+        registrationToken:tokens.length===1?tokens[0]:"",
+
+        adminUid:adminUser.uid,
+        adminEmail:adminUser.email||"",
+        adminNama:
+          adminProfile.namaToko||
+          adminProfile.nama||
+          adminProfile.displayName||
+          adminUser.email||
+          "",
+
+        adminNote:note,
+
+        notificationReseller:true,
+        notificationAdmin:false,
+
+        approvedAt:serverTimestamp(),
+        updatedAt:serverTimestamp()
+      }
+    );
+
+    await loadRequests();
+
+    showModal(
+      "Berhasil Disetujui",
+      `${qty} token telah disetujui dengan tagihan ${rupiah(total)}. Data akan terbaca oleh reseller dari Firebase.`
+    );
+
+  }catch(e){
+    console.error("approve:",e);
+    showModal(
+      "Gagal Menyetujui",
+      e?.code==="permission-denied"
+        ? "Firebase menolak update. Pastikan akun admin benar-benar login dan Rules registrationTokens mengizinkan update untuk user yang login."
+        : (e?.message||String(e))
+    );
+  }finally{
+    if(btn){
+      btn.disabled=false;
+      btn.textContent="✅ Setujui";
+    }
+  }
+};
+
+window.rejectRequest=async id=>{
+  if(!adminUser){
+    showModal("Belum Login","Silakan login Firebase sebagai admin.");
+    return;
+  }
+
+  const note=$("note-"+id)?.value.trim()||"";
+
+  if(!note){
+    showModal(
+      "Alasan Diperlukan",
+      "Isi Catatan Admin terlebih dahulu agar reseller mengetahui alasan request ditolak."
+    );
+    return;
+  }
+
+  const btn=document.querySelector(
+    `button[onclick="rejectRequest('${CSS.escape(id)}')"]`
+  );
+
+  if(btn){
+    btn.disabled=true;
+    btn.textContent="Menolak...";
+  }
+
+  try{
+    await updateDoc(
+      doc(db,"registrationTokens",id),
+      {
+        requestStatus:"rejected",
+        status:"rejected",
+
+        jumlahDisetujui:0,
+        jumlahTagihan:0,
+        totalTagihan:0,
+
+        tokens:[],
+        token:"",
+        kodeToken:"",
+        registrationToken:"",
+
+        adminUid:adminUser.uid,
+        adminEmail:adminUser.email||"",
+        adminNama:
+          adminProfile.namaToko||
+          adminProfile.nama||
+          adminProfile.displayName||
+          adminUser.email||
+          "",
+
+        adminNote:note,
+
+        notificationReseller:true,
+        notificationAdmin:false,
+
+        rejectedAt:serverTimestamp(),
+        updatedAt:serverTimestamp()
+      }
+    );
+
+    await loadRequests();
+
+    showModal(
+      "Request Ditolak",
+      "Request sudah ditolak dan catatan admin disimpan."
+    );
+
+  }catch(e){
+    console.error("reject:",e);
+    showModal(
+      "Gagal Menolak",
+      e?.code==="permission-denied"
+        ? "Firebase menolak update. Pastikan akun admin benar-benar login."
+        : (e?.message||String(e))
+    );
+  }finally{
+    if(btn){
+      btn.disabled=false;
+      btn.textContent="❌ Tolak";
+    }
+  }
+};
+
+$("loginBtn").onclick=async()=>{
+  const email=$("loginEmail").value.trim();
+  const password=$("loginPassword").value;
+
+  $("loginError").classList.add("hidden");
+
+  if(!email||!password){
+    $("loginError").textContent="Email dan password wajib diisi.";
+    $("loginError").classList.remove("hidden");
+    return;
+  }
+
+  const btn=$("loginBtn");
+  btn.disabled=true;
+  btn.textContent="⏳ Login...";
+
+  try{
+    await signInWithEmailAndPassword(auth,email,password);
+  }catch(e){
+    console.error(e);
+
+    let msg=e.message||"Login gagal.";
+
+    if(e.code==="auth/invalid-credential"){
+      msg="Email atau password Firebase salah.";
+    }else if(e.code==="auth/user-not-found"){
+      msg="Akun admin tidak ditemukan di Firebase Authentication.";
+    }else if(e.code==="auth/wrong-password"){
+      msg="Password Firebase salah.";
+    }else if(e.code==="auth/too-many-requests"){
+      msg="Terlalu banyak percobaan login. Coba lagi nanti.";
+    }
+
+    $("loginError").textContent=msg;
+    $("loginError").classList.remove("hidden");
+  }finally{
+    btn.disabled=false;
+    btn.textContent="🔐 Login Firebase";
+  }
+};
+
+$("logoutBtn").onclick=async()=>{
+  try{
+    await signOut(auth);
+  }catch(e){
+    showModal("Gagal Keluar",e.message||String(e));
+  }
+};
+
+$("refreshBtn").onclick=async()=>{
+  if(!adminUser){
+    showModal(
+      "Belum Login",
+      "Login Firebase admin terlebih dahulu."
+    );
+    return;
+  }
+
+  $("refreshBtn").disabled=true;
+  $("refreshBtn").textContent="↻ ...";
+
+  try{
+    await loadRequests();
+  }finally{
+    $("refreshBtn").disabled=false;
+    $("refreshBtn").textContent="↻ Refresh";
+  }
+};
+
+$("statusFilter").onchange=render;
+$("searchInput").oninput=render;
+
+$("loginPassword").addEventListener("keydown",e=>{
+  if(e.key==="Enter")$("loginBtn").click();
+});
+
+onAuthStateChanged(auth,async user=>{
+  adminUser=user;
+
+  if(!user){
+    adminProfile={};
+    $("loginCard").classList.remove("hidden");
+    $("adminArea").classList.add("hidden");
+    $("logoutBtn").classList.add("hidden");
+    return;
+  }
+
+  try{
+    await loadAdminProfile(user);
+  }catch(e){
+    console.error("Admin auth:",e);
+
+    await signOut(auth);
+
+    $("loginError").textContent=
+      e.message||
+      "Akun tidak mempunyai izin admin.";
+
+    $("loginError").classList.remove("hidden");
+  }
 });
 </script>
 </body>
