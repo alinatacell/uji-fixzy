@@ -369,30 +369,71 @@ function isRequestDocument(colName,d){
   return !!(d.resellerUid||d.requestStatus||d.jumlahRequest||d.jumlahTokenDiminta||d.notificationAdmin||d.requestType==='registrasi'||d.requestType==='perpanjangan');
 }
 
-function tokenValidForRequest(d,type,colName){
+
+function requestedDurationMonths(request){
+  const x=request||{};
+  const fields=[
+    x.durasiBulan,x.masaAktifBulan,x.jumlahBulan,x.bulan,
+    x.paketBulan,x.lamaBulan,x.durasi,x.masaAktif,
+    x.paket,x.paketLabel,x.paketTerakhir,
+    x.durasiHari,x.masaAktifHari,x.paketHari
+  ];
+  for(const raw of fields){
+    if(raw===undefined||raw===null||raw==='')continue;
+    const s=String(raw).toLowerCase().trim();
+    const m=s.match(/(\d+(?:[.,]\d+)?)\s*(?:bulan|bln|month|months)/i);
+    if(m){
+      const n=Number(m[1].replace(',','.'));
+      if(Number.isFinite(n)&&n>0)return Math.round(n);
+    }
+    const m2=s.match(/(?:^|\s)(3|6|12)\s*m(?:\s|$)/i);
+    if(m2)return Number(m2[1]);
+    if(/^(3|6|12)$/.test(s))return Number(s);
+    const n=Number(raw);
+    if(n===90)return 3;
+    if(n===180)return 6;
+    if(n===360||n===365)return 12;
+  }
+  return 0;
+}
+function tokenDurationMonths(d){
+  const x=d.data?d.data():(d||{});
+  return requestedDurationMonths({
+    durasiBulan:x.durasiBulan,masaAktifBulan:x.masaAktifBulan,
+    jumlahBulan:x.jumlahBulan,bulan:x.bulan,paketBulan:x.paketBulan,
+    lamaBulan:x.lamaBulan,durasi:x.durasi,masaAktif:x.masaAktif,
+    paket:x.paket,paketLabel:x.paketLabel,paketTerakhir:x.paketTerakhir,
+    durasiHari:x.durasiHari,masaAktifHari:x.masaAktifHari,paketHari:x.paketHari
+  });
+}
+function tokenMatchesRequestedDuration(tokenDoc,request){
+  const requested=requestedDurationMonths(request);
+  if(!requested)return true;
+  return tokenDurationMonths(tokenDoc)===requested;
+}
+
+function tokenValidForRequest(d,type,colName,request=null){
   if(tokenUsed(d))return false;
   if(isRequestDocument(colName,d))return false;
+  if(request && !tokenMatchesRequestedDuration(d,request))return false;
 
   const tipe=tokenType(d);
   const hari=Number(d.paketHari??d.durasiHari??d.masaAktifHari??0);
   const paket=String(d.paketLabel??d.paketTerakhir??d.paket??d.durasi??d.masaAktif??'').trim();
 
   if(type==='registrasi'){
-    // Token registrasi baru: 90 hari + penanda registrasi baru.
     if(colName!=='registrationTokens')return false;
-    if(hari && hari!==90)return false;
     if(tipe && !['registrasi_baru','aktivasi_baru','registrasi','registration'].includes(tipe))return false;
     if(d.hanyaRegistrasiBaru!==undefined && d.hanyaRegistrasiBaru!==true)return false;
     return true;
   }
 
-  // Perpanjangan hanya dari collection tokens dan bukan token registrasi baru.
   if(colName!=='tokens')return false;
   if(tipe==='registrasi_baru'||tipe==='aktivasi_baru'||d.hanyaRegistrasiBaru===true)return false;
   return hari>0||!!paket||!!d.hargaPerpanjangan||!!d.hargaTokenPerpanjangan||!!d.hargaToken||!!d.harga||!!d.price;
 }
 
-async function loadAvailableTokens(requestType,requestPrice=0){
+async function loadAvailableTokens(requestType,requestPrice=0,request=null){
   availableTokens=[];
   const seen=new Set();
   const collections=requestType==='registrasi'?['registrationTokens']:['tokens'];
@@ -405,7 +446,7 @@ async function loadAvailableTokens(requestType,requestPrice=0){
       const data=d.data()||{};
       const token=tokenValueFromDoc(data,d.id);
       if(!token||seen.has(token.toLowerCase()))return;
-      if(!tokenValidForRequest(data,requestType,colName))return;
+      if(!tokenValidForRequest(data,requestType,colName,request))return;
 
       const price=tokenPrice(data,requestType,requestPrice);
       // Perpanjangan wajib punya harga agar tagihan benar-benar mengikuti token.
@@ -485,24 +526,50 @@ function updateSelectedUI(id){
 function renderTokenOptions(id){
   const box=$('token-options-'+id);
   if(!box)return;
+
   const search=($('token-search-'+id)?.value||'').trim().toLowerCase();
-  const set=selectedFor(id);
-  const list=availableTokens.filter(t=>!search||t.token.toLowerCase().includes(search));
+  const request=allRequests.find(x=>x.id===id)||{};
+  const max=Number(request.jumlahRequest??request.jumlahTokenDiminta??1)||1;
+  const duration=requestedDurationMonths(request);
+
+  // availableTokens sudah difilter berdasarkan jenis request + masa aktif.
+  // Untuk request baru, tampilkan maksimal sebanyak jumlah yang diminta.
+  let list=availableTokens.filter(t=>!search||t.token.toLowerCase().includes(search));
 
   if(!list.length){
-    box.innerHTML='<div class="token-empty">Tidak ada token tersedia untuk jenis request ini.</div>';
+    box.innerHTML=duration
+      ? `<div class="token-empty">Token ${duration} bulan yang tersedia belum mencukupi.</div>`
+      : '<div class="token-empty">Tidak ada token tersedia untuk jenis request ini.</div>';
     updateSelectedUI(id);
     return;
   }
 
-  box.innerHTML=list.map(t=>`
+  // Otomatis pilih token pertama sesuai jumlah request.
+  // Jika sebelumnya sudah ada pilihan admin, pilihan tersebut dipertahankan.
+  const alreadySelected=selectedFor(id);
+  if(!alreadySelected.size){
+    list.slice(0,max).forEach(t=>alreadySelected.add(t.id));
+  }
+
+  // Dropdown hanya menampilkan sebanyak jumlah request.
+  const displayList=list.slice(0,max);
+
+  box.innerHTML=displayList.map(t=>`
     <label class="token-option">
-      <input type="checkbox" data-token-id="${esc(t.id)}" ${set.has(t.id)?'checked':''}
+      <input type="checkbox" data-token-id="${esc(t.id)}" ${alreadySelected.has(t.id)?'checked':''}
         onchange="selectToken('${esc(id)}','${esc(t.id)}',this.checked)">
       <span class="token-value">${esc(t.token)}</span>
-      <span class="token-status">${t.price>0?esc(rupiah(t.price)):'Harga belum ada'}</span>
+      <span class="token-status">${t.price>0?esc(rupiah(t.price)):'GRATIS'}</span>
     </label>
   `).join('');
+
+  const countText=alreadySelected.size>=max
+    ? `${max} token siap disetujui`
+    : `${alreadySelected.size} dari ${max} token tersedia`;
+
+  const countEl=$('token-count-'+id);
+  if(countEl)countEl.textContent=countText;
+
   updateSelectedUI(id);
 }
 
@@ -518,7 +585,15 @@ window.toggleTokenPicker=async id=>{
       const request=allRequests.find(x=>x.id===id)||{};
       const type=request.requestType==='perpanjangan'?'perpanjangan':'registrasi';
       const requestPrice=Number(request.hargaToken||0)||0;
-      await loadAvailableTokens(type,requestPrice);
+      await loadAvailableTokens(type,requestPrice,request);
+
+      // Buang pilihan lama yang sudah tidak tersedia / tidak sesuai durasi.
+      const selected=selectedFor(id);
+      const validIds=new Set(availableTokens.map(t=>t.id));
+      [...selected].forEach(tokenId=>{
+        if(!validIds.has(tokenId))selected.delete(tokenId);
+      });
+
       renderTokenOptions(id);
       setTimeout(()=>{
         const search=$('token-search-'+id);
@@ -678,7 +753,7 @@ function render(){
               <div class="token-picker">
                 <button id="token-select-${esc(x.id)}" class="token-select" type="button"
                   onclick="toggleTokenPicker('${esc(x.id)}')">
-                  🔑 Pilih Token dari Daftar
+                  ${requestedDurationMonths(x)?'🔑 Pilih Token '+requestedDurationMonths(x)+' Bulan':'🔑 Pilih Token dari Daftar'}
                   <span id="token-preview-${esc(x.id)}" class="token-selected-preview">
                     Klik kolom ini untuk membuka daftar token
                   </span>
@@ -687,7 +762,7 @@ function render(){
                 <div id="token-panel-${esc(x.id)}" class="token-panel">
                   <input id="token-search-${esc(x.id)}" class="token-search"
                     type="search" autocomplete="off"
-                    placeholder="🔎 Cari token..."
+                    placeholder="${requestedDurationMonths(x)?("🔎 Cari token "+requestedDurationMonths(x)+" bulan..."):"🔎 Cari token..."}"
                     oninput="filterTokenOptions('${esc(x.id)}')">
 
                   <div id="token-options-${esc(x.id)}" class="token-options-scroll">
@@ -702,7 +777,9 @@ function render(){
                 </div>
               </div>
               <div class="tokens-hint">
-                Klik kolom di atas → pilih token sesuai jenis request. Registrasi gratis; perpanjangan mengikuti harga paket/token.
+                ${requestedDurationMonths(x)
+                  ? 'Request '+requestedDurationMonths(x)+' bulan → otomatis dipilih '+requestedDurationMonths(x)+' bulan sesuai jumlah request. Tinggal cek lalu Setujui.'
+                  : 'Token ditampilkan sesuai jenis request. Registrasi gratis; perpanjangan mengikuti harga paket/token.'}
               </div>
             </div>
 
@@ -887,7 +964,11 @@ window.approveRequest=async id=>{
       });
     });
 
-    await loadAvailableTokens(item.requestType==='perpanjangan'?'perpanjangan':'registrasi',Number(item.hargaToken||0));
+    await loadAvailableTokens(
+      item.requestType==='perpanjangan'?'perpanjangan':'registrasi',
+      Number(item.hargaToken||0),
+      item
+    );
     await loadRequests();
     showModal(
       'Berhasil Disetujui',
