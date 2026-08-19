@@ -25,11 +25,10 @@ body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f7;color:#1
 
 <div class="top">
   <div style="flex:1">
-    <h1 style="margin:0;font-size:22px">FIXZY - Cek Aktivasi</h1>
+    <h1 style="margin:0;font-size:22px">Cek Aktivasi</h1>
     <p style="margin:4px 0 0;font-size:12px;opacity:.8">Cek dan perpanjang masa aktif akun</p>
   </div>
   <button class="btn btn-y" onclick="loadData()">&#8635;</button>
-  <button class="btn btn-r" onclick="tutupHalaman()">X</button>
 </div>
 
 <div class="wrap">
@@ -49,6 +48,43 @@ body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f7;color:#1
         <div class="val" id="aktifSampai">-</div>
         <div id="sisaHari" style="margin-top:6px"></div>
         <div id="sumberAktivasi" class="small-info"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REQUEST TOKEN -->
+  <div class="card white" style="padding:18px">
+    <button id="btnRequestToken" class="btn btn-y"
+      style="width:100%;padding:16px;font-size:20px"
+      onclick="toggleRequestToken()">🔑 Request Token</button>
+
+    <div id="requestTokenBox" style="display:none;margin-top:14px">
+      <div style="text-align:center;font-size:20px;font-weight:900;margin-bottom:12px">
+        Scan QRIS untuk pembayaran
+      </div>
+
+      <div style="background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:10px;overflow:hidden">
+        <img src="qris.jpg"
+          alt="QRIS Pembayaran FIXZY"
+          style="display:block;width:100%;max-width:520px;margin:auto;border-radius:12px"
+          onerror="this.style.display='none';document.getElementById('qrisError').style.display='block'">
+        <div id="qrisError"
+          style="display:none;padding:30px 12px;text-align:center;color:#dc2626;font-weight:800">
+          File <b>qris.jpg</b> belum ditemukan.<br>
+          Upload qris.jpg ke folder yang sama dengan file ini.
+        </div>
+      </div>
+
+      <a id="btnWhatsApp" class="btn"
+        href="#"
+        target="_blank"
+        rel="noopener"
+        style="display:block;text-align:center;text-decoration:none;background:#16a34a;color:#fff;width:100%;margin-top:12px;padding:16px;font-size:17px">
+        💬 Pesan via WhatsApp
+      </a>
+
+      <div style="font-size:11px;color:#64748b;text-align:center;margin-top:8px">
+        Setelah pembayaran, kirim bukti pembayaran melalui WhatsApp.
       </div>
     </div>
   </div>
@@ -666,6 +702,48 @@ window.pakaiToken=async function(){
 
   }finally{
     btn.disabled=false;
+  }
+};
+
+
+/* =========================================================
+   REQUEST TOKEN
+   Klik tombol -> tampilkan QRIS di bawahnya.
+   WhatsApp diarahkan ke 082319264646.
+   ========================================================= */
+window.toggleRequestToken=function(){
+  const box=document.getElementById("requestTokenBox");
+  const btn=document.getElementById("btnRequestToken");
+
+  const buka=box.style.display==="none" || box.style.display==="";
+
+  if(buka){
+    box.style.display="block";
+    btn.textContent="🔑 Tutup Request Token";
+
+    const nama=
+      currentUserData?.namaKonter||
+      currentUserData?.namaToko||
+      currentUserData?.tokoName||
+      currentUserData?.nama||
+      currentUserData?.name||
+      "Akun Fixzy";
+
+    const waText=
+      "Halo FIXZY, saya ingin request token.%0A"+
+      "Nama Konter: "+encodeURIComponent(nama)+"%0A"+
+      "UID: "+encodeURIComponent(currentUid||"-")+"%0A"+
+      "Mohon informasi token yang tersedia.";
+
+    document.getElementById("btnWhatsApp").href=
+      "https://wa.me/6282319264646?text="+waText;
+
+    setTimeout(()=>{
+      box.scrollIntoView({behavior:"smooth",block:"start"});
+    },80);
+  }else{
+    box.style.display="none";
+    btn.textContent="🔑 Request Token";
   }
 };
 
