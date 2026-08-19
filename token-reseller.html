@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#081326">
-<title>FIXZY | Token Reseller</title>
+<title>FIXZY | Token Reseller - FIXED</title>
 <style>
 *{box-sizing:border-box}
 :root{--navy:#081326;--yellow:#ffc107;--bg:#f2f5f9;--card:#fff;--text:#111827;--muted:#64748b;--green:#16a34a;--red:#dc2626;--line:#dbe2ea}
@@ -26,7 +26,6 @@ h2{margin:0 0 5px;font-size:19px}.sub{font-size:12px;color:var(--muted);line-hei
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .form-row{margin-bottom:11px}label{display:block;font-size:11px;font-weight:900;margin-bottom:5px}
 input,select{width:100%;min-height:44px;border:2px solid #111827;border-radius:9px;padding:10px;background:#fff;color:#111827;outline:none}
-input:focus,select:focus{border-color:#d39e00;box-shadow:0 0 0 2px #fde68a}
 .plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .plan{border:2px solid #cbd5e1;border-radius:10px;background:#fff;padding:11px;text-align:left;cursor:pointer;box-shadow:2px 2px 0 #cbd5e1}
 .plan.active{border-color:#111827;background:#fff7d6;box-shadow:2px 2px 0 #111827}
@@ -51,277 +50,103 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;border-radius:9px;padding:10px;font-size:11px;margin-bottom:10px}
 .success{background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:9px;padding:10px;font-size:11px;margin-bottom:10px}
 .hidden{display:none!important}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:100;align-items:center;justify-content:center;padding:14px}
-.modal.show{display:flex}.modal-box{width:min(440px,100%);max-height:90vh;overflow:auto;background:#fff;border:2px solid #111827;border-radius:14px;padding:18px;box-shadow:6px 6px 0 #111827}
-.modal-box h3{margin:0 0 8px}.modal-box p{font-size:13px;line-height:1.5;white-space:pre-line}.ok{width:100%;background:#111827;color:#fff;border:0;border-radius:10px;padding:13px;font-weight:900}
-.generated{margin-top:12px;background:#ecfdf5;border:2px solid #86efac;border-radius:11px;padding:12px}
-.generated h3{margin:0 0 8px;font-size:13px;color:#166534}
-.generated-list{display:grid;gap:6px}.generated-token{background:#fff;border:1px solid #bbf7d0;border-radius:8px;padding:8px;font-family:monospace;font-size:12px;font-weight:900;word-break:break-all}
-.generated-actions{display:flex;gap:8px;margin-top:9px}.generated-actions button{flex:1;border:0;border-radius:8px;padding:10px;font-weight:900;cursor:pointer}
-.copy-all{background:#166534;color:#fff}.close-generated{background:#e5e7eb;color:#111}
-body.dark{background:#0b0f14;color:#f3f4f6}
-body.dark .card,body.dark .token-card,body.dark .modal-box{background:#151b23;color:#f3f4f6;border-color:#000}
-body.dark .info,body.dark input,body.dark select,body.dark .stat{background:#10161e;color:#f3f4f6;border-color:#334155}
-body.dark .plan{background:#10161e;color:#f3f4f6;border-color:#334155}
-body.dark .plan.active{background:#302a10;border-color:#ffc107}
-body.dark .secondary{background:#334155;color:#fff}
-body.dark .generated{background:#0f2118;border-color:#166534}
-body.dark .generated-token{background:#10161e;color:#f3f4f6;border-color:#166534}
-body.dark .toolbar input{background:#10161e}
-@media(max-width:720px){
- .identity{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.plan-grid{grid-template-columns:repeat(3,1fr)}
-}
-@media(max-width:520px){
- header{padding:8px 10px;gap:8px}.logo{width:46px;height:46px;flex-basis:46px}.head-title b{font-size:16px}.head-title small{font-size:9px}.icon{width:40px;height:40px}
- .wrap{padding:10px}.card{padding:13px}.identity{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}
- .plan-grid{grid-template-columns:1fr}.plan{padding:10px}.actions{flex-direction:column}.toolbar{grid-template-columns:1fr}
- .token-top{flex-direction:column}.token-code{font-size:13px}
-}
 </style>
 </head>
 <body>
 <header>
-  <div class="logo"><img src="logo.png" alt="FIXZY" onerror="this.style.display='none'"></div>
-  <div class="head-title">
-    <b>Token Khusus Reseller</b>
-    <small>Buat token reseller terpisah dari token biasa</small>
-  </div>
-  <div class="head-actions">
-    <button id="refreshBtn" class="icon refresh" type="button">↻</button>
-    <button id="darkBtn" class="icon dark" type="button">☾</button>
-  </div>
+<div class="logo"><img src="logo.png"></div>
+<div class="head-title"><b>FIXZY - TOKEN RESELLER - FIXED</b><small id="adminInfo">Memuat...</small></div>
+<div class="head-actions"><button class="icon refresh" id="refreshBtn">↻</button><button class="icon dark" id="darkBtn">🌙</button></div>
 </header>
+<div class="wrap">
 
-<main class="wrap">
-<section class="card">
-  <h2>Akun Admin</h2>
-  <div class="sub">Halaman ini membuat token ke collection <b>resellerTokens</b>. Token reseller tidak ditulis ke collection <b>tokens</b>, sehingga tidak tercampur dengan stok token biasa.</div>
-  <div class="identity">
-    <div class="info"><span>EMAIL</span><b id="email">Memuat...</b></div>
-    <div class="info"><span>NAMA</span><b id="nama">Memuat...</b></div>
-    <div class="info"><span>ROLE</span><b id="role">-</b></div>
-    <div class="info"><span>STATUS</span><b id="status">Memuat...</b></div>
-  </div>
-</section>
+<div id="accessDenied" style="display:none;background:#fee2e2;color:#991b1b;padding:14px;border-radius:10px;margin-bottom:12px;font-size:12px;font-weight:800">⛔ Akses ditolak. Hanya Superadmin boleh buat token reseller.</div>
 
-<section class="card">
-  <h2>Buat Token Reseller</h2>
-  <div class="sub">Pilih masa aktif dan jumlah token. Token yang baru dibuat berstatus <b>TERSEDIA</b>, belum dimiliki reseller, dan belum terpakai.</div>
+<div class="card">
+<div class="identity"><div class="info"><span>Email</span><b id="email">-</b></div><div class="info"><span>Nama</span><b id="nama">-</b></div><div class="info"><span>Role</span><b id="role">-</b></div><div class="info"><span>Status</span><b id="status">-</b></div></div>
+</div>
 
-  <div class="form-row">
-    <label>PAKET TOKEN</label>
-    <div class="plan-grid">
-      <button type="button" class="plan active" data-month="3" data-days="90"><b>3 Bulan</b><small>90 Hari</small><span>Token Reseller</span></button>
-      <button type="button" class="plan" data-month="6" data-days="180"><b>6 Bulan</b><small>180 Hari</small><span>Token Reseller</span></button>
-      <button type="button" class="plan" data-month="12" data-days="360"><b>12 Bulan</b><small>360 Hari</small><span>Token Reseller</span></button>
-    </div>
-  </div>
+<div class="card">
+<h2>🎫 Buat Token Reseller (Superadmin Only)</h2><p class="sub">Hanya servicehpmaja@gmail.com / superadmin yang boleh membuat token. Owner biasa tidak bisa.</p>
+<div class="plan-grid">
+<button class="plan active" data-month="1" data-days="30"><b>1 Bulan</b><small>30 Hari</small><span>Rp 25.000</span></button>
+<button class="plan" data-month="3" data-days="90"><b>3 Bulan</b><small>90 Hari</small><span>Rp 60.000</span></button>
+<button class="plan" data-month="12" data-days="365"><b>12 Bulan</b><small>365 Hari</small><span>Rp 200.000</span></button>
+</div>
+<div class="form-grid" style="margin-top:12px">
+<div class="form-row"><label>JUMLAH TOKEN (1-500)</label><input id="quantity" type="number" value="10" min="1" max="500"></div>
+<div class="form-row"><label>PREFIX (opsional)</label><input id="prefix" value="RSL" placeholder="RSL"></div>
+</div>
+<div class="actions"><button class="primary" id="createBtn">🔑 Buat Token Reseller</button></div>
+<div id="formError" class="error hidden"></div>
+<div id="formSuccess" class="success hidden"></div>
+<div id="generatedBox" class="hidden" style="margin-top:12px;background:#ecfdf5;border:2px solid #86efac;border-radius:11px;padding:12px"><h3 style="margin:0 0 8px;font-size:13px;color:#166534">✅ Token Berhasil Dibuat</h3><div id="generatedList" style="display:grid;gap:6px"></div><div style="display:flex;gap:8px;margin-top:9px"><button id="copyAllBtn" style="flex:1;background:#166534;color:#fff;border:0;border-radius:8px;padding:10px;font-weight:900">📋 Salin Semua</button><button id="closeGeneratedBtn" style="flex:1;background:#e5e7eb;border:0;border-radius:8px;padding:10px;font-weight:900">Tutup</button></div></div>
+</div>
 
-  <div class="form-grid">
-    <div class="form-row">
-      <label>JUMLAH TOKEN</label>
-      <input id="quantity" type="number" min="1" max="500" step="1" value="10" inputmode="numeric">
-    </div>
-    <div class="form-row">
-      <label>AWALAN TOKEN</label>
-      <input id="prefix" type="text" value="RSL" maxlength="6" placeholder="Contoh: RSL">
-    </div>
-  </div>
+<div class="card">
+<div class="toolbar"><input id="search" placeholder="Cari token, paket, email reseller..."><select id="filter"><option value="">Semua</option><option value="tersedia">Tersedia</option><option value="terpakai">Terpakai</option></select></div>
+<div class="token-table" id="tokenList"><div class="loading">Memuat token reseller...</div></div>
+</div>
 
-  <div id="formError" class="error hidden"></div>
-  <div id="formSuccess" class="success hidden"></div>
-
-  <button id="createBtn" class="primary" type="button">🔑 Buat Token Reseller</button>
-
-  <div class="notice">
-    <b>Logika baru:</b> token yang dibuat di sini bukan token biasa. Saat dibeli reseller, token hanya diberi identitas pemilik reseller dan tetap <b>used:false</b>. Token baru menjadi terpakai ketika benar-benar digunakan pada proses aktivasi/perpanjangan.
-  </div>
-
-  <div id="generatedBox" class="generated hidden">
-    <h3>Token Baru Dibuat</h3>
-    <div id="generatedList" class="generated-list"></div>
-    <div class="generated-actions">
-      <button id="copyAllBtn" class="copy-all" type="button">📋 Salin Semua</button>
-      <button id="closeGeneratedBtn" class="close-generated" type="button">Tutup</button>
-    </div>
-  </div>
-</section>
-
-<section class="card">
-  <h2>Stok Token Reseller</h2>
-  <div class="sub">Semua token khusus reseller dari collection <b>resellerTokens</b>.</div>
-
-  <div class="stats">
-    <div class="stat"><small>TERSEDIA</small><b id="statAvailable">0</b></div>
-    <div class="stat"><small>DIBELI RESELLER</small><b id="statOwned">0</b></div>
-    <div class="stat"><small>SUDAH DIPAKAI</small><b id="statUsed">0</b></div>
-  </div>
-
-  <div class="toolbar">
-    <input id="search" type="search" placeholder="Cari token / reseller / paket...">
-    <select id="filter">
-      <option value="all">Semua Status</option>
-      <option value="available">Tersedia</option>
-      <option value="owned">Dibeli Reseller</option>
-      <option value="used">Sudah Dipakai</option>
-    </select>
-  </div>
-
-  <div id="tokenList" class="token-table"><div class="loading">Memuat token reseller...</div></div>
-</section>
-</main>
-
-<div id="modal" class="modal">
-  <div class="modal-box">
-    <h3 id="modalTitle">Info</h3>
-    <p id="modalText"></p>
-    <button id="modalOk" class="ok" type="button">OK</button>
-  </div>
 </div>
 
 <script type="module">
-import {initializeApp,getApps,getApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import {
-  getFirestore,collection,addDoc,getDocs,query,orderBy,limit,
-  doc,getDoc,serverTimestamp,where
-} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, query, where, orderBy, limit, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-const firebaseConfig={
-  apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",
-  authDomain:"fixzy-update.firebaseapp.com",
-  projectId:"fixzy-update",
-  storageBucket:"fixzy-update.firebasestorage.app",
-  messagingSenderId:"995892519622",
-  appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"
-};
+const cfg={apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",authDomain:"fixzy-update.firebaseapp.com",projectId:"fixzy-update",storageBucket:"fixzy-update.firebasestorage.app",messagingSenderId:"995892519622",appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"};
+const app=initializeApp(cfg); const auth=getAuth(app); const db=getFirestore(app);
 
-const app=getApps().length?getApp():initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
-
-let currentUser=null;
-let currentProfile={};
-let selectedPlan={month:3,days:90};
-let allTokens=[];
-
+let currentUser=null; let allTokens=[]; let selectedPlan={month:1,days:30};
 const $=id=>document.getElementById(id);
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function packageLabel(x){return `${x.paketBulan||x.packageMonths||x.paketBulan||"-"} Bulan`;}
+function formatDate(x){const d=x.createdAt?.toDate?x.createdAt.toDate():new Date(x.createdAt?.seconds*1000||Date.now()); return d.toLocaleString("id-ID");}
 
-const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({
-  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-}[m]));
-
-function showModal(title,text){
-  $("modalTitle").textContent=title;
-  $("modalText").textContent=text;
-  $("modal").classList.add("show");
-}
-$("modalOk").onclick=()=>$("modal").classList.remove("show");
-
-function getName(p,u){
-  return p.namaToko||p.namaKonter||p.namaPemilik||p.nama||p.displayName||p.name||u?.email||"-";
-}
-
-function applyUser(u,p){
-  currentUser=u;
-  currentProfile=p||{};
-  $("email").textContent=u?.email||"-";
-  $("nama").textContent=getName(currentProfile,u);
-  $("role").textContent=String(currentProfile.role||"-").toUpperCase();
-  $("status").textContent=currentProfile.status||"aktif";
+async function isSuperAdmin(user){
+  if(!user) return false;
+  if((user.email||"").toLowerCase()==="servicehpmaja@gmail.com") return true;
+  try{const snap=await getDoc(doc(db,"users",user.uid)); if(!snap.exists()) return false; const r=String(snap.data().role||"").toLowerCase(); return ["superadmin","admin"].includes(r);}catch{return false;}
 }
 
 async function loadUser(){
-  const u=auth.currentUser;
-  if(!u)return false;
-  let p={};
+  const u=auth.currentUser; if(!u){$("status").textContent="Belum login"; return;}
+  currentUser=u;
   try{
-    const s=await getDoc(doc(db,"users",u.uid));
-    if(s.exists())p=s.data()||{};
-  }catch(e){console.error(e)}
-  applyUser(u,p);
-  return true;
-}
-
-function normalizeStatus(x){
-  if(x.used===true||x.terpakai===true||x.dipakai===true||x.isUsed===true)return "used";
-  const s=String(x.status||x.tokenStatus||"tersedia").toLowerCase();
-  if(["used","terpakai","dipakai"].includes(s))return "used";
-  if(["dibeli_reseller","dimiliki_reseller","owned","sold"].includes(s))return "owned";
-  return "available";
-}
-
-function statusLabel(s){
-  return s==="available"?"TERSEDIA":s==="owned"?"DIBELI RESELLER":"SUDAH DIPAKAI";
-}
-
-function packageLabel(x){
-  const m=Number(x.paketBulan||x.packageMonths||x.durasiBulan||0);
-  const d=Number(x.paketHari||x.packageDays||x.durasiHari||0);
-  if(m)return `${m} Bulan / ${d||m*30} Hari`;
-  return x.packageLabel||"Paket Reseller";
-}
-
-function formatDate(x){
-  try{
-    if(x.createdAt?.toDate)return x.createdAt.toDate().toLocaleString("id-ID");
-    if(x.purchasedAt?.toDate)return x.purchasedAt.toDate().toLocaleString("id-ID");
-  }catch(e){}
-  return "-";
+    const snap=await getDoc(doc(db,"users",u.uid));
+    const data=snap.exists()?snap.data():{};
+    const role=String(data.role||"").toLowerCase();
+    const isSuper=await isSuperAdmin(u);
+    $("email").textContent=u.email||"-";
+    $("nama").textContent=data.nama||data.namaKonter||u.displayName||"-";
+    $("role").textContent=isSuper?role+" (SUPERADMIN ✅)":role+" (bukan superadmin ❌)";
+    $("status").textContent=isSuper?"Superadmin - boleh buat token":"Akses ditolak - hanya superadmin";
+    if(!isSuper){
+      $("accessDenied").style.display="block";
+      $("createBtn").disabled=true;
+    }else{
+      $("accessDenied").style.display="none";
+      $("createBtn").disabled=false;
+    }
+    $("adminInfo").textContent=(isSuper?"Superadmin: ":"")+ (u.email||"");
+  }catch(e){$("status").textContent="Error: "+e.message;}
 }
 
 function renderTokens(){
-  const search=String($("search").value||"").trim().toLowerCase();
-  const filter=$("filter").value;
-
-  const filtered=allTokens.filter(x=>{
-    const status=normalizeStatus(x);
-    if(filter!=="all"&&status!==filter)return false;
-    if(!search)return true;
-    const hay=[
-      x.token,x.resellerEmail,x.resellerNama,x.resellerUid,
-      packageLabel(x),x.status,x.tokenStatus
-    ].join(" ").toLowerCase();
-    return hay.includes(search);
+  const q=($("search").value||"").toLowerCase().trim();
+  const f=$("filter").value;
+  const filtered=allTokens.filter(t=>{
+    if(f==="tersedia"&&t.used) return false;
+    if(f==="terpakai"&&!t.used) return false;
+    if(q){const hay=[t.token||"",t.packageLabel||"",t.resellerEmail||""].join(" ").toLowerCase(); if(!hay.includes(q)) return false;}
+    return true;
   });
-
-  $("statAvailable").textContent=allTokens.filter(x=>normalizeStatus(x)==="available").length;
-  $("statOwned").textContent=allTokens.filter(x=>normalizeStatus(x)==="owned").length;
-  $("statUsed").textContent=allTokens.filter(x=>normalizeStatus(x)==="used").length;
-
-  if(!filtered.length){
-    $("tokenList").innerHTML='<div class="empty">Belum ada token yang sesuai.</div>';
-    return;
-  }
-
-  $("tokenList").innerHTML=filtered.map(x=>{
-    const s=normalizeStatus(x);
-    const owner=x.resellerNama||x.resellerEmail||x.assignedEmail||x.assignedTo||"Belum dimiliki reseller";
-    return `<div class="token-card">
-      <div class="token-top">
-        <div class="token-code">${esc(x.token||x.id)}</div>
-        <span class="badge ${s}">${statusLabel(s)}</span>
-      </div>
-      <div class="token-meta">
-        Paket: <b>${esc(packageLabel(x))}</b><br>
-        Pemilik reseller: <b>${esc(owner)}</b><br>
-        Dibuat: ${esc(formatDate(x))}
-      </div>
-      <button class="copy" type="button" data-copy="${esc(x.token||"")}">📋 Salin Token</button>
-    </div>`;
-  }).join("");
-
+  if(!filtered.length){$("tokenList").innerHTML='<div class="empty">Belum ada token reseller.</div>'; return;}
+  $("tokenList").innerHTML=filtered.map(x=>`<div class="token-card"><div class="token-top"><div class="token-code">${esc(x.token||"")}</div><span class="badge ${x.used?"used":"available"}">${x.used?"Terpakai":"Tersedia"}</span></div><div class="token-meta">Paket: <b>${esc(packageLabel(x))}</b><br>Pemilik: <b>${esc(x.resellerEmail||"Belum ada")}</b><br>Dibuat: ${esc(formatDate(x))}</div><button class="copy" type="button" data-copy="${esc(x.token||"")}">📋 Salin Token</button></div>`).join("");
   document.querySelectorAll("[data-copy]").forEach(btn=>{
     btn.onclick=async()=>{
-      const token=btn.dataset.copy||"";
-      try{
-        await navigator.clipboard.writeText(token);
-        const old=btn.textContent;
-        btn.textContent="✓ Tersalin";
-        setTimeout(()=>btn.textContent=old,1200);
-      }catch(e){
-        showModal("Gagal Menyalin","Clipboard tidak tersedia. Tekan lama token lalu pilih Salin.");
-      }
+      try{await navigator.clipboard.writeText(btn.dataset.copy||""); const old=btn.textContent; btn.textContent="✓ Tersalin"; setTimeout(()=>btn.textContent=old,1200);}catch{}
     };
   });
 }
@@ -330,171 +155,66 @@ async function loadTokens(){
   $("tokenList").innerHTML='<div class="loading">Memuat token reseller...</div>';
   try{
     const snap=await getDocs(query(collection(db,"resellerTokens"),orderBy("createdAt","desc"),limit(500)));
-    allTokens=[];
-    snap.forEach(d=>allTokens.push({id:d.id,...d.data()}));
-    renderTokens();
+    allTokens=[]; snap.forEach(d=>allTokens.push({id:d.id,...d.data()})); renderTokens();
   }catch(e){
-    console.error(e);
-    // Fallback tanpa orderBy bila index Firestore belum tersedia.
-    try{
-      const snap=await getDocs(collection(db,"resellerTokens"));
-      allTokens=[];
-      snap.forEach(d=>allTokens.push({id:d.id,...d.data()}));
-      allTokens.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-      renderTokens();
-    }catch(err){
-      $("tokenList").innerHTML=`<div class="error">Gagal membaca resellerTokens: ${esc(err?.message||String(err))}</div>`;
-    }
+    try{const snap=await getDocs(collection(db,"resellerTokens")); allTokens=[]; snap.forEach(d=>allTokens.push({id:d.id,...d.data()})); allTokens.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); renderTokens();}
+    catch(err){$("tokenList").innerHTML=`<div class="error">Gagal: ${esc(err?.message||String(err))}</div>`;}
   }
 }
 
 function randomPart(len=8){
   const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  const arr=new Uint32Array(len);
-  crypto.getRandomValues(arr);
+  const arr=new Uint32Array(len); crypto.getRandomValues(arr);
   return [...arr].map(n=>chars[n%chars.length]).join("");
 }
-
 async function tokenExists(token){
   const snap=await getDocs(query(collection(db,"resellerTokens"),where("token","==",token),limit(1)));
   return !snap.empty;
 }
-
 async function createTokens(){
-  if(!currentUser){
-    showModal("Belum Login","Login Firebase admin belum ditemukan.");
-    return;
-  }
-
+  if(!currentUser){alert("Belum login"); return;}
+  if(!(await isSuperAdmin(currentUser))){$("formError").textContent="⛔ Hanya superadmin boleh buat token"; $("formError").classList.remove("hidden"); return;}
   const qty=Number($("quantity").value||0);
   const prefix=(String($("prefix").value||"RSL").trim().toUpperCase().replace(/[^A-Z0-9]/g,"")||"RSL").slice(0,6);
-
-  if(!Number.isSafeInteger(qty)||qty<1||qty>500){
-    showModal("Jumlah Tidak Valid","Jumlah token harus 1 sampai 500.");
-    return;
-  }
-
-  const btn=$("createBtn");
-  btn.disabled=true;
-  btn.textContent="Membuat Token...";
-
-  $("formError").classList.add("hidden");
-  $("formSuccess").classList.add("hidden");
-
+  if(!Number.isSafeInteger(qty)||qty<1||qty>500){$("formError").textContent="Jumlah 1-500"; $("formError").classList.remove("hidden"); return;}
+  const btn=$("createBtn"); btn.disabled=true; btn.textContent="Membuat Token...";
+  $("formError").classList.add("hidden"); $("formSuccess").classList.add("hidden");
   try{
     const created=[];
-    const batchSize=20;
-
     for(let i=0;i<qty;i++){
-      let token="";
-      let unique=false;
-      for(let attempt=0;attempt<10&&!unique;attempt++){
-        token=`${prefix}-${selectedPlan.month}M-${randomPart(4)}-${randomPart(4)}`;
-        unique=!(await tokenExists(token));
-      }
-      if(!unique)throw new Error("Gagal membuat token unik. Coba lagi.");
-
+      let token=""; let unique=false;
+      for(let attempt=0;attempt<10&&!unique;attempt++){token=`${prefix}-${selectedPlan.month}M-${randomPart(4)}-${randomPart(4)}`; unique=!(await tokenExists(token));}
+      if(!unique) throw new Error("Gagal token unik");
       const ref=await addDoc(collection(db,"resellerTokens"),{
-        token,
-        tokenType:"reseller",
-        source:"admin_reseller_generator",
-
-        paketBulan:selectedPlan.month,
-        paketHari:selectedPlan.days,
-        packageMonths:selectedPlan.month,
-        packageDays:selectedPlan.days,
-        packageLabel:`${selectedPlan.month} Bulan / ${selectedPlan.days} Hari`,
-
-        status:"tersedia",
-        tokenStatus:"tersedia",
-
-        used:false,
-        terpakai:false,
-        dipakai:false,
-        isUsed:false,
-
-        purchasedByReseller:false,
-        soldToReseller:false,
-        assigned:false,
-
-        resellerUid:"",
-        resellerEmail:"",
-        resellerNama:"",
-        assignedTo:"",
-        assignedEmail:"",
-
-        createdBy:currentUser.uid,
-        createdByEmail:currentUser.email||"",
-        createdAt:serverTimestamp(),
-        updatedAt:serverTimestamp()
+        token, tokenType:"reseller", source:"admin_reseller_generator",
+        paketBulan:selectedPlan.month, paketHari:selectedPlan.days, packageMonths:selectedPlan.month, packageDays:selectedPlan.days, packageLabel:`${selectedPlan.month} Bulan / ${selectedPlan.days} Hari`,
+        status:"tersedia", used:false, purchasedByReseller:false, resellerUid:"", resellerEmail:"",
+        createdBy:currentUser.uid, createdByEmail:currentUser.email||"", createdAt:serverTimestamp(), updatedAt:serverTimestamp()
       });
-
       created.push({id:ref.id,token});
     }
-
-    $("formSuccess").textContent=`Berhasil membuat ${created.length} token ${selectedPlan.month} bulan. Token masih TERSEDIA dan belum terpakai.`;
+    $("formSuccess").textContent=`Berhasil membuat ${created.length} token ${selectedPlan.month} bulan.`;
     $("formSuccess").classList.remove("hidden");
-
-    $("generatedList").innerHTML=created.map((x,i)=>`<div class="generated-token">${i+1}. ${esc(x.token)}</div>`).join("");
+    $("generatedList").innerHTML=created.map((x,i)=>`<div style="background:#fff;border:1px solid #bbf7d0;border-radius:8px;padding:8px;font-family:monospace;font-size:12px;font-weight:900">${i+1}. ${esc(x.token)}</div>`).join("");
     $("generatedBox").classList.remove("hidden");
-
     await loadTokens();
-  }catch(e){
-    console.error(e);
-    $("formError").textContent=e?.message||String(e);
-    $("formError").classList.remove("hidden");
-  }finally{
-    btn.disabled=false;
-    btn.textContent="🔑 Buat Token Reseller";
-  }
+  }catch(e){$("formError").textContent=e?.message||String(e); $("formError").classList.remove("hidden");}
+  finally{btn.disabled=false; btn.textContent="🔑 Buat Token Reseller";}
 }
 
 document.querySelectorAll(".plan").forEach(btn=>{
-  btn.onclick=()=>{
-    document.querySelectorAll(".plan").forEach(x=>x.classList.remove("active"));
-    btn.classList.add("active");
-    selectedPlan={
-      month:Number(btn.dataset.month),
-      days:Number(btn.dataset.days)
-    };
-  };
+  btn.onclick=()=>{document.querySelectorAll(".plan").forEach(x=>x.classList.remove("active")); btn.classList.add("active"); selectedPlan={month:Number(btn.dataset.month), days:Number(btn.dataset.days)};};
 });
-
 $("createBtn").onclick=createTokens;
 $("search").oninput=renderTokens;
 $("filter").onchange=renderTokens;
-$("refreshBtn").onclick=async()=>{
-  const b=$("refreshBtn");
-  b.disabled=true;
-  try{
-    await loadUser();
-    await loadTokens();
-  }catch(e){showModal("Refresh Gagal",e?.message||String(e))}
-  finally{b.disabled=false}
-};
-$("darkBtn").onclick=()=>document.body.classList.toggle("dark");
-
-$("copyAllBtn").onclick=async()=>{
-  const tokens=[...document.querySelectorAll(".generated-token")].map(x=>x.textContent.replace(/^\d+\.\s*/,""));
-  try{
-    await navigator.clipboard.writeText(tokens.join("\n"));
-    $("copyAllBtn").textContent="✓ Semua Tersalin";
-    setTimeout(()=>$("copyAllBtn").textContent="📋 Salin Semua",1400);
-  }catch(e){showModal("Gagal Menyalin","Clipboard tidak tersedia.")}
-};
+$("refreshBtn").onclick=async()=>{await loadUser(); await loadTokens();};
+$("copyAllBtn").onclick=async()=>{const tokens=[...document.querySelectorAll("#generatedList div")].map(x=>x.textContent.replace(/^\d+\.\s*/,"")); try{await navigator.clipboard.writeText(tokens.join("\n")); $("copyAllBtn").textContent="✓ Tersalin"; setTimeout(()=>$("copyAllBtn").textContent="📋 Salin Semua",1400);}catch{}};
 $("closeGeneratedBtn").onclick=()=>$("generatedBox").classList.add("hidden");
 
 onAuthStateChanged(auth,async u=>{
-  if(!u){
-    $("email").textContent="-";
-    $("nama").textContent="Belum login";
-    $("role").textContent="-";
-    $("status").textContent="Belum login";
-    $("tokenList").innerHTML='<div class="empty">Silakan login Firebase terlebih dahulu.</div>';
-    return;
-  }
-  await loadUser();
-  await loadTokens();
+  if(!u){$("email").textContent="-"; $("nama").textContent="Belum login"; $("role").textContent="-"; $("status").textContent="Belum login"; return;}
+  await loadUser(); await loadTokens();
 });
 </script>
 </body>
