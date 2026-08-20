@@ -87,8 +87,8 @@ body{background:#0d0d0d;background-image:radial-gradient(circle at top, rgba(255
 <div class="forgot"><button type="button" id="btnLupa">Lupa Password?</button></div>
 <button id="btnLogin" type="submit">LOGIN</button>
 <div id="loading">Memeriksa akun...</div>
-<div class="badge">✅ Trial 3 Bulan AUTO AKTIF</div>
-<div class="link-area">Belum punya akun? <a href="register.html">Daftar Trial Gratis</a></div>
+<div class="badge">✅ GRATIS AUTO AKTIF</div>
+<div class="link-area">Belum punya akun? <a href="register.html">Daftar Gratis Di sini</a></div>
 </form>
 </div>
 </div>
@@ -105,6 +105,7 @@ body{background:#0d0d0d;background-image:radial-gradient(circle at top, rgba(255
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import {
   getAuth,
+  onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
@@ -128,6 +129,46 @@ const form=document.getElementById("loginForm");
 const btn=document.getElementById("btnLogin");
 const loading=document.getElementById("loading");
 
+let authStateReady=false;
+let loginInProgress=false;
+
+/*
+ * FIXZY AUTH HANDOFF
+ * Firebase Auth fixzy-update adalah satu-satunya sumber sesi.
+ * Tidak menggunakan localStorage/sessionStorage untuk menyimpan login.
+ *
+ * Jika sesi Firebase sudah aktif, jangan paksa login ulang.
+ * Arahkan langsung ke index.html setelah state Firebase selesai dipulihkan.
+ */
+onAuthStateChanged(auth, async user=>{
+  authStateReady=true;
+
+  if(!user || loginInProgress) return;
+
+  try{
+    const snap=await getDoc(doc(db,"users",user.uid));
+    if(!snap.exists()) return;
+
+    const data=snap.data()||{};
+    const role=String(data.role||"").toLowerCase();
+    const status=String(data.status||"").toLowerCase();
+
+    const allowedRoles=[
+      "owner","employee","karyawan","kasir","kurir",
+      "reseller","superadmin","admin","iprem"
+    ];
+
+    if(!allowedRoles.includes(role)) return;
+    if(status==="blocked" || status==="rejected") return;
+    if(status && status!=="aktif") return;
+
+    // Sesi Firebase sudah valid. Jangan login ulang.
+    window.location.replace("index.html");
+  }catch(err){
+    console.error("FIXZY restore session:",err);
+  }
+});
+
 document.getElementById("lihatPassword").addEventListener("click",()=>{
   const p=document.getElementById("password");
   p.type=p.type==="password" ? "text" : "password";
@@ -136,6 +177,8 @@ document.getElementById("lihatPassword").addEventListener("click",()=>{
 form.addEventListener("submit",async(e)=>{
   e.preventDefault();
 
+  if(loginInProgress) return;
+  loginInProgress=true;
   btn.disabled=true;
   loading.style.display="block";
 
@@ -216,9 +259,8 @@ form.addEventListener("submit",async(e)=>{
       }`
     );
 
-    // Beri waktu popup tampil, lalu kembali ke index.
-    // ?auth=1 adalah handoff sementara; index tetap verifikasi
-    // auth.currentUser + users/{uid} sebelum menampilkan aplikasi.
+    // Firebase Auth sudah menyimpan sesi di fixzy-update.
+    // Index akan membaca auth.currentUser.uid yang sama.
     setTimeout(()=>{
       window.location.replace("index.html");
     },700);
@@ -246,6 +288,7 @@ form.addEventListener("submit",async(e)=>{
     tampilPopup("Fixzy",msg);
 
   }finally{
+    loginInProgress=false;
     btn.disabled=false;
     loading.style.display="none";
   }
