@@ -195,6 +195,10 @@ const auth=getAuth(app);
 const db=getFirestore(app);
 
 let authReady=false;
+let authValidationRunning=false;
+let redirectingToLogin=false;
+let logoutInProgress=false;
+let activeFrame=null;
 
 const FIXZY_PERMISSION_BY_PAGE={
   "servisan.html":"servis",
@@ -319,6 +323,10 @@ function bukaHalaman(btn){
   }
   const area=document.getElementById("contentArea");
   area.innerHTML="";
+  if(activeFrame){
+    try{ activeFrame.src="about:blank"; activeFrame.remove(); }catch(e){}
+    activeFrame=null;
+  }
   const frame=document.createElement("iframe");
   frame.title="Halaman FIXZY";
   // Kalau file FIXED ada, prioritaskan FIXED
@@ -347,6 +355,7 @@ function bukaHalaman(btn){
   frame.style.cssText="width:100%;height:100%;border:0;display:block;background:#fff;position:relative;z-index:1";
   frame.onerror=()=>{ if(fixedMap[page]) frame.src=fixedMap[page]; };
   area.appendChild(frame);
+  activeFrame=frame;
 
   frame.addEventListener("load",()=>{
     try{
@@ -409,12 +418,41 @@ window.addEventListener("message", e=>{
   }
 });
 
+function bersihkanSesiLokal(){
+  authReady=false;
+  window.fixzySession=null;
+  window.fixzySessionReady=false;
+
+  if(activeFrame){
+    try{ activeFrame.src="about:blank"; activeFrame.remove(); }catch(e){}
+    activeFrame=null;
+  }
+
+  const area=document.getElementById("contentArea");
+  if(area) area.innerHTML="";
+  tutupMenu();
+
+  document.getElementById("accountName").textContent="Memuat...";
+  document.getElementById("accountExp").textContent="-";
+}
+
+function keLogin(){
+  if(redirectingToLogin) return;
+  redirectingToLogin=true;
+  bersihkanSesiLokal();
+  // Ganti halaman, bukan membuka login di iframe.
+  window.location.replace("login.html");
+}
+
 function popupLogout(){
+  if(logoutInProgress) return;
+
   const old=document.getElementById("fixzyLogoutPopup");
   if(old)old.remove();
+
   const wrap=document.createElement("div");
   wrap.id="fixzyLogoutPopup";
-  wrap.style.cssText="position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:18px";
+  wrap.style.cssText="position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:18px";
   wrap.innerHTML=`<div style="width:min(420px,100%);background:#fff;border-radius:15px;padding:18px;box-shadow:0 15px 40px #0004">
     <h3 style="margin:0 0 8px;color:#111827">🚪 Keluar dari FIXZY?</h3>
     <div style="font-size:13px;line-height:1.6;color:#667085">Sesi akun akan ditutup dan Anda akan kembali ke halaman login.</div>
@@ -423,62 +461,101 @@ function popupLogout(){
       <button id="fixzyLogoutOk" style="border:0;border-radius:8px;padding:10px 13px;background:#dc2626;color:#fff;font-weight:900;cursor:pointer">Logout</button>
     </div>
   </div>`;
+
   document.body.appendChild(wrap);
-  document.getElementById("fixzyLogoutCancel").onclick=()=>wrap.remove();
+
+  document.getElementById("fixzyLogoutCancel").onclick=()=>{
+    if(!logoutInProgress) wrap.remove();
+  };
+
   document.getElementById("fixzyLogoutOk").onclick=async()=>{
+    if(logoutInProgress) return;
+    logoutInProgress=true;
+
     const ok=document.getElementById("fixzyLogoutOk");
-    ok.disabled=true; ok.textContent="Keluar...";
-    try{await signOut(auth)}catch(e){}
-    window.location.replace("login.html");
+    const cancel=document.getElementById("fixzyLogoutCancel");
+    ok.disabled=true;
+    cancel.disabled=true;
+    ok.textContent="Keluar...";
+
+    // Bersihkan iframe/session SEBELUM signOut supaya halaman anak
+    // tidak sempat berjalan lagi ketika status Auth berubah.
+    bersihkanSesiLokal();
+
+    try{
+      await signOut(auth);
+    }catch(e){
+      console.error("FIXZY logout:",e);
+    }
+
+    // signOut Firebase selesai atau gagal: jangan biarkan index macet.
+    keLogin();
   };
 }
 window.logoutFixzy=popupLogout;
 
 async function validasiDanTampilkan(user){
+  if(redirectingToLogin || logoutInProgress) return;
+
   if(!user){
-    authReady=false;
-    document.getElementById("accountName").textContent="Memuat...";
-    document.getElementById("accountExp").textContent="-";
-    window.location.replace("login.html");
+    keLogin();
     return;
   }
+
+  if(authValidationRunning) return;
+  authValidationRunning=true;
+
   try{
-    const snap=await getDoc(doc(db,"users",user.uid));
+    // Timeout hanya sebagai pengaman agar index tidak blank selamanya
+    // jika pembacaan profil Firebase benar-benar macet.
+    const snap=await Promise.race([
+      getDoc(doc(db,"users",user.uid)),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error("TIMEOUT_PROFILE")),12000))
+    ]);
+
     if(!snap.exists()){
-      await signOut(auth);
-      window.location.replace("login.html");
+      await signOut(auth).catch(()=>{});
+      keLogin();
       return;
     }
+
     const data=snap.data()||{};
     const role=String(data.role||"").toLowerCase();
     const status=String(data.status||"").toLowerCase();
     const ownerUid=role==="owner"?user.uid:(data.ownerUid||data.ownerId||"");
+
     if(!ownerUid&&role!=="superadmin"&&role!=="admin"){
-      await signOut(auth);
-      window.location.replace("login.html");
+      await signOut(auth).catch(()=>{});
+      keLogin();
       return;
     }
+
     const allowedRoles=["owner","employee","karyawan","kasir","kurir","reseller","superadmin","admin"];
     if(!allowedRoles.includes(role)){
-      await signOut(auth);
-      window.location.replace("login.html");
+      await signOut(auth).catch(()=>{});
+      keLogin();
       return;
     }
+
     if(status==="blocked"||status==="rejected"){
-      await signOut(auth);
-      window.location.replace("login.html");
+      await signOut(auth).catch(()=>{});
+      keLogin();
       return;
     }
+
     const exp=data.exp||data.expAt||data.expiredAt||data.tanggalBerakhir||null;
     let expDate=null;
-    if(exp&&typeof exp.toDate==="function")expDate=exp.toDate();
-    else if(exp&&typeof exp==="object"&&exp.seconds!==undefined)expDate=new Date(Number(exp.seconds)*1000);
-    else if(exp)expDate=new Date(exp);
+
+    if(exp&&typeof exp.toDate==="function") expDate=exp.toDate();
+    else if(exp&&typeof exp==="object"&&exp.seconds!==undefined) expDate=new Date(Number(exp.seconds)*1000);
+    else if(exp) expDate=new Date(exp);
+
     if(expDate&&!Number.isNaN(expDate.getTime())&&new Date()>expDate){
-      await signOut(auth);
-      window.location.replace("login.html");
+      await signOut(auth).catch(()=>{});
+      keLogin();
       return;
     }
+
     window.fixzySession={
       uid:user.uid,
       role,
@@ -486,20 +563,28 @@ async function validasiDanTampilkan(user){
       profile:data,
       permissions:normalisasiIzin(data.izin??data.permissions??data.hakAkses??data.access)
     };
+
     document.getElementById("accountName").textContent=data.namaKonter||data.namaPemilik||data.nama||user.email||"Akun";
     document.getElementById("accountExp").textContent=formatExpFIXZY(exp);
+
     authReady=true;
     publishFixzySession();
     terapkanHakAksesMenu();
     tampilkanBeranda();
+
   }catch(err){
-    console.error(err);
+    console.error("FIXZY validasi sesi:",err);
     await signOut(auth).catch(()=>{});
-    window.location.replace("login.html");
+    keLogin();
+  }finally{
+    authValidationRunning=false;
   }
 }
 
-onAuthStateChanged(auth,user=>{validasiDanTampilkan(user)});
+onAuthStateChanged(auth,user=>{
+  if(logoutInProgress) return;
+  validasiDanTampilkan(user);
+});
 </script>
 </body>
 </html>
