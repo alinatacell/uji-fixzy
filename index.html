@@ -186,7 +186,7 @@ body{overflow:hidden}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const cfg={apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",authDomain:"fixzy-update.firebaseapp.com",projectId:"fixzy-update",storageBucket:"fixzy-update.firebasestorage.app",messagingSenderId:"995892519622",appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"};
@@ -304,6 +304,15 @@ function tampilkanBeranda(){
   frame.src="page.html";
   frame.style.cssText="width:100%;height:100%;border:0;display:block;background:#fff;position:relative;z-index:1";
   area.appendChild(frame);
+  activeFrame=frame;
+  frame.addEventListener("load",()=>{
+    try{
+      frame.contentWindow?.postMessage({
+        type:"FIXZY_SESSION",
+        session:window.fixzySession||null
+      },"*");
+    }catch(e){}
+  });
   document.querySelectorAll(".menu-link").forEach(x=>x.classList.remove("active"));
   const pageBtn=document.querySelector('[data-page="page.html"]');
   if(pageBtn) pageBtn.classList.add("active");
@@ -494,43 +503,72 @@ function popupLogout(){
 }
 window.logoutFixzy=popupLogout;
 
+function tampilkanStatusSesi(title,message,canRetry=true){
+  const area=document.getElementById("contentArea");
+  if(!area) return;
+  area.innerHTML=`<div style="height:100%;display:flex;align-items:center;justify-content:center;padding:20px;background:#f3f4f6">
+    <div style="width:min(480px,100%);background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:24px;text-align:center;box-shadow:0 8px 30px #0001">
+      <div style="font-size:40px">🔐</div>
+      <h2 style="margin:10px 0 8px;font-size:20px;color:#111827">${title}</h2>
+      <p style="margin:0;color:#667085;font-size:13px;line-height:1.6;white-space:pre-line">${message}</p>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:16px">
+        ${canRetry?'<button id="fixzyRetrySession" style="border:0;border-radius:10px;padding:11px 16px;background:#ffc107;color:#111827;font-weight:900;cursor:pointer">↻ Coba Lagi</button>':''}
+        <button id="fixzyGoLogin" style="border:0;border-radius:10px;padding:11px 16px;background:#111827;color:#fff;font-weight:900;cursor:pointer">Login</button>
+      </div>
+    </div>
+  </div>`;
+  const retry=document.getElementById("fixzyRetrySession");
+  if(retry) retry.onclick=()=>{ authValidationRunning=false; validasiSesiSekarang(); };
+  const login=document.getElementById("fixzyGoLogin");
+  if(login) login.onclick=()=>keLogin();
+}
+
+async function bacaProfilDenganTimeout(user){
+  const timeout=15000;
+  let timer;
+  try{
+    return await Promise.race([
+      getDoc(doc(db,"users",user.uid)),
+      new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error("TIMEOUT_PROFILE")),timeout)})
+    ]);
+  }finally{
+    if(timer) clearTimeout(timer);
+  }
+}
+
 async function validasiDanTampilkan(user){
   if(redirectingToLogin || logoutInProgress) return;
-
   if(!user){
+    authReady=false;
     keLogin();
     return;
   }
-
   if(authValidationRunning) return;
   authValidationRunning=true;
 
+  // Tampilkan identitas Firebase lebih dulu agar index tidak terlihat macet.
+  document.getElementById("accountName").textContent=user.email||"Memverifikasi akun...";
+  document.getElementById("accountExp").textContent="...";
+
   try{
-    // Timeout hanya sebagai pengaman agar index tidak blank selamanya
-    // jika pembacaan profil Firebase benar-benar macet.
-    const snap=await Promise.race([
-      getDoc(doc(db,"users",user.uid)),
-      new Promise((_,reject)=>setTimeout(()=>reject(new Error("TIMEOUT_PROFILE")),12000))
-    ]);
+    const snap=await bacaProfilDenganTimeout(user);
 
     if(!snap.exists()){
-      await signOut(auth).catch(()=>{});
-      keLogin();
+      authValidationRunning=false;
+      tampilkanStatusSesi(
+        "Profil Akun Tidak Ditemukan",
+        "Login Firebase berhasil, tetapi dokumen users/UID akun ini tidak ditemukan.\n\nSilakan periksa dokumen users/{UID} sebelum login kembali.",
+        false
+      );
       return;
     }
 
     const data=snap.data()||{};
-    const role=String(data.role||"").toLowerCase();
-    const status=String(data.status||"").toLowerCase();
-    const ownerUid=role==="owner"?user.uid:(data.ownerUid||data.ownerId||"");
-
-    if(!ownerUid&&role!=="superadmin"&&role!=="admin"){
-      await signOut(auth).catch(()=>{});
-      keLogin();
-      return;
-    }
-
+    const role=String(data.role||"").trim().toLowerCase();
+    const status=String(data.status||"").trim().toLowerCase();
+    const ownerUid=role==="owner"?user.uid:String(data.ownerUid||data.ownerId||"");
     const allowedRoles=["owner","employee","karyawan","kasir","kurir","reseller","superadmin","admin"];
+
     if(!allowedRoles.includes(role)){
       await signOut(auth).catch(()=>{});
       keLogin();
@@ -543,9 +581,18 @@ async function validasiDanTampilkan(user){
       return;
     }
 
+    if(!ownerUid&&role!=="superadmin"&&role!=="admin"){
+      tampilkanStatusSesi(
+        "Owner Akun Belum Terhubung",
+        "Akun berhasil login, tetapi ownerUid/ownerId belum tersedia pada users/{UID}.\n\nAkun tidak akan dikeluarkan dari Firebase. Perbaiki ownerUid lalu tekan Coba Lagi.",
+        true
+      );
+      authValidationRunning=false;
+      return;
+    }
+
     const exp=data.exp||data.expAt||data.expiredAt||data.tanggalBerakhir||null;
     let expDate=null;
-
     if(exp&&typeof exp.toDate==="function") expDate=exp.toDate();
     else if(exp&&typeof exp==="object"&&exp.seconds!==undefined) expDate=new Date(Number(exp.seconds)*1000);
     else if(exp) expDate=new Date(exp);
@@ -560,31 +607,72 @@ async function validasiDanTampilkan(user){
       uid:user.uid,
       role,
       ownerUid:ownerUid||user.uid,
-      profile:data,
+      profile:{...data,email:data.email||user.email||""},
       permissions:normalisasiIzin(data.izin??data.permissions??data.hakAkses??data.access)
     };
 
     document.getElementById("accountName").textContent=data.namaKonter||data.namaPemilik||data.nama||user.email||"Akun";
     document.getElementById("accountExp").textContent=formatExpFIXZY(exp);
-
     authReady=true;
+    authValidationRunning=false;
     publishFixzySession();
     terapkanHakAksesMenu();
     tampilkanBeranda();
-
   }catch(err){
     console.error("FIXZY validasi sesi:",err);
-    await signOut(auth).catch(()=>{});
-    keLogin();
-  }finally{
     authValidationRunning=false;
+
+    // JANGAN signOut pada error jaringan/Firestore. Ini yang mencegah
+    // pengguna dipaksa login berulang kali ketika rules/network bermasalah.
+    const code=String(err?.code||"").toLowerCase();
+    const detail=err?.message||String(err);
+    let title="Gagal Membaca Profil Firebase";
+    let message="Sesi login Firebase terdeteksi, tetapi index belum bisa membaca users/{UID}.\n\n"+detail;
+
+    if(code.includes("permission-denied")){
+      title="Izin Firestore Ditolak";
+      message="Login Firebase berhasil, tetapi Rules Firestore menolak pembacaan users/{UID}.\n\nAkun tidak di-logout. Periksa Rules koleksi users lalu tekan Coba Lagi.";
+    }else if(detail==="TIMEOUT_PROFILE"){
+      title="Firebase Belum Merespons";
+      message="Login Firebase berhasil, tetapi pembacaan users/{UID} terlalu lama.\n\nAkun tidak di-logout. Periksa koneksi internet dan Firebase Rules, lalu tekan Coba Lagi.";
+    }
+
+    tampilkanStatusSesi(title,message,true);
   }
 }
 
-onAuthStateChanged(auth,user=>{
-  if(logoutInProgress) return;
-  validasiDanTampilkan(user);
-});
+async function validasiSesiSekarang(){
+  if(redirectingToLogin||logoutInProgress) return;
+  const user=auth.currentUser;
+  if(user){
+    await validasiDanTampilkan(user);
+    return;
+  }
+  // currentUser bisa masih null beberapa saat ketika Firebase baru inisialisasi.
+  // Listener di bawah akan menangani hasil akhirnya.
+  document.getElementById("accountName").textContent="Memuat...";
+  document.getElementById("accountExp").textContent="-";
+}
+
+let authListenerReady=false;
+function mulaiPemulihanAuth(){
+  if(authListenerReady) return;
+  authListenerReady=true;
+
+  onAuthStateChanged(auth,user=>{
+    if(logoutInProgress||redirectingToLogin) return;
+    validasiDanTampilkan(user);
+  });
+
+  // Jika currentUser sudah tersedia lebih cepat daripada callback listener,
+  // langsung validasi tanpa menunggu callback berikutnya.
+  if(auth.currentUser) validasiDanTampilkan(auth.currentUser);
+}
+
+// Pertahankan sesi Firebase secara eksplisit di browser.
+setPersistence(auth,browserLocalPersistence)
+  .catch(e=>console.warn("Persistence Firebase:",e))
+  .finally(()=>mulaiPemulihanAuth());
 </script>
 </body>
 </html>
