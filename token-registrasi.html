@@ -39,7 +39,19 @@ tr.token-used{background:#fff1f2}
 .msg{font-size:11px;margin-top:8px;font-weight:800}
 </style>
 </head>
-<body>
+<body><script>
+/* FIXZY SESSION CENTER: halaman dibuka dari index.html memakai sesi pusat.
+   Tidak mengubah tampilan/fungsi halaman; hanya menyediakan referensi sesi parent. */
+(function(){
+  try{
+    if(window.parent&&window.parent!==window){
+      Object.defineProperty(window,"fixzySession",{configurable:true,get:function(){return window.parent.fixzySession||null}});
+      window.fixzySessionReady=function(){return !!(window.parent&&window.parent.fixzySession&&window.parent.fixzySession.uid)};
+    }
+  }catch(e){}
+})();
+</script>
+
 
 <div id="loginBox">
   <h2 style="margin:0 0 8px">🔒 Login Superadmin</h2>

@@ -39,7 +39,19 @@ body.dark{background:#0b0f14;color:#f3f4f6}body.dark .card,body.dark .request,bo
 @media(max-width:600px){.identity,.qty-row{grid-template-columns:1fr}.plan-grid{grid-template-columns:1fr}.wrap{padding:12px}.card{padding:14px}.head-title b{font-size:17px}.owned-token-row{grid-template-columns:34px 1fr 58px}.owned-token-code{font-size:12px}.owned-token-copy{font-size:11px;padding:7px 4px}}
 </style>
 </head>
-<body>
+<body><script>
+/* FIXZY SESSION CENTER: halaman dibuka dari index.html memakai sesi pusat.
+   Tidak mengubah tampilan/fungsi halaman; hanya menyediakan referensi sesi parent. */
+(function(){
+  try{
+    if(window.parent&&window.parent!==window){
+      Object.defineProperty(window,"fixzySession",{configurable:true,get:function(){return window.parent.fixzySession||null}});
+      window.fixzySessionReady=function(){return !!(window.parent&&window.parent.fixzySession&&window.parent.fixzySession.uid)};
+    }
+  }catch(e){}
+})();
+</script>
+
 <header>
  <div class="logo"><img src="logo.png" alt="FIXZY" onerror="this.style.display='none'"></div>
  <div class="head-title"><b>Pembelian Token Tunai</b><small>Deposit saldo • pembelian paket • tanpa tempo</small></div>

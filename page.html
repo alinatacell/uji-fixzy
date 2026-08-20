@@ -148,7 +148,19 @@ footer{text-align:center;padding:25px;color:#888}
 }
 </style>
 </head>
-<body>
+<body><script>
+/* FIXZY SESSION CENTER: halaman dibuka dari index.html memakai sesi pusat.
+   Tidak mengubah tampilan/fungsi halaman; hanya menyediakan referensi sesi parent. */
+(function(){
+  try{
+    if(window.parent&&window.parent!==window){
+      Object.defineProperty(window,"fixzySession",{configurable:true,get:function(){return window.parent.fixzySession||null}});
+      window.fixzySessionReady=function(){return !!(window.parent&&window.parent.fixzySession&&window.parent.fixzySession.uid)};
+    }
+  }catch(e){}
+})();
+</script>
+
 
 <div class="page-controls" aria-label="Kontrol halaman">
   <button class="page-control-btn" type="button" onclick="location.reload()" title="Refresh halaman">🔄</button>
@@ -163,7 +175,7 @@ footer{text-align:center;padding:25px;color:#888}
   <div class="tagline">
     Pembukuan Cerdas, <span class="yellow">Bikin Usaha Makin Berkelas</span>
   </div>
-
+<p>FIXZY membantu pemilik usaha mengelola servis, penjualan, stok, keuangan, karyawan, dan<br> laporan dalam satu sistem yang lebih rapi dan mudah dipantau.</p>
   <div class="welcome-badge">SELAMAT DATANG DI FIXZY</div>
 </header>
 

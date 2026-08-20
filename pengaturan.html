@@ -2,775 +2,153 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#081326">
-<title>FIXZY | Request Token Reseller</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fixzy - Input Penjualan - REF SERVISAN</title>
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
-*{box-sizing:border-box}
-:root{
-  --navy:#081326;--yellow:#ffc107;--bg:#f2f5f9;--card:#fff;
-  --text:#111827;--muted:#64748b;--green:#16a34a;--border:#111827;
-  --soft:#f8fafc;--line:#dbe2ea
-}
-html{font-size:16px;scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;overflow-x:hidden}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-
-/* HEADER RESPONSIVE */
-header{
-  min-height:72px;background:var(--navy);color:#fff;padding:9px 14px;
-  display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;
-  border-bottom:2px solid #000;box-shadow:0 3px 0 #000
-}
-.logo{
-  width:52px;height:52px;flex:0 0 52px;border-radius:13px;background:#000;
-  border:1px solid #334155;padding:4px;display:flex;align-items:center;
-  justify-content:center;overflow:hidden
-}
-.logo img{width:100%;height:100%;object-fit:contain}
-.head-title{min-width:0;flex:1}
-.head-title b{
-  font-size:18px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-}
-.head-title small{
-  font-size:11px;color:#cbd5e1;display:block;line-height:1.4;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-}
-.head-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
-.refresh-btn,.dark-btn{
-  width:44px;height:44px;padding:0;border:0;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;font-size:20px;
-  box-shadow:2px 2px 0 #000
-}
-.refresh-btn{background:#ffc107;color:#111827}.dark-btn{background:#f3f4f6;color:#111827}
-.refresh-btn.loading{animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* LAYOUT */
-.wrap{width:min(760px,100%);margin:auto;padding:14px}
-.card{
-  background:var(--card);border:2px solid var(--border);border-radius:14px;
-  padding:16px;margin-bottom:16px;box-shadow:4px 4px 0 #111827;
-  min-width:0
-}
-h2{margin:0 0 5px;font-size:18px;line-height:1.25}
-.sub{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5}
-.identity{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.info{
-  border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--soft);
-  min-width:0
-}
-.info span{display:block;font-size:10px;color:var(--muted);margin-bottom:3px}
-.info b{font-size:13px;word-break:break-word;overflow-wrap:anywhere}
-
-/* ACTION BUTTONS */
-.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-button{
-  border:0;border-radius:10px;padding:13px 12px;font-weight:900;
-  cursor:pointer;box-shadow:3px 3px 0 #111827
-}
-.btn-reg{background:#111827;color:#fff}.btn-ext{background:var(--yellow);color:#111827}
-button:disabled{opacity:.5;cursor:not-allowed}
-
-/* REQUEST FORM */
-.request-box{
-  display:none;margin-top:14px;border:2px solid #111827;border-radius:12px;
-  padding:14px;background:var(--soft);min-width:0
-}
-.request-box.show{display:block}
-.request-box h3{font-size:18px;line-height:1.3}
-label{display:block;font-size:12px;font-weight:800;margin:0 0 5px}
-input,select,textarea{
-  width:100%;min-height:42px;border:2px solid #111827;border-radius:9px;
-  padding:9px 10px;background:#fff;color:#111827;font:inherit;
-  max-width:100%
-}
-input{overflow:hidden;text-overflow:ellipsis}
-select{cursor:pointer}
-textarea{min-height:70px;resize:vertical}.form-row{margin-bottom:10px}
-.price{
-  font-size:18px;font-weight:900;background:#fff7d6;border:1px solid #f2c94c;
-  border-radius:9px;padding:10px;margin:10px 0;overflow-wrap:anywhere
-}
-.price small{display:block;font-size:10px;color:#92400e;margin-top:3px;line-height:1.4}
-.plan-info{
-  display:none;margin:6px 0 10px;padding:9px 10px;border-radius:9px;
-  background:#ecfdf5;border:1px solid #86efac;color:#166534;font-size:11px;
-  line-height:1.45;overflow-wrap:anywhere
-}
-.plan-info.show{display:block}
-.actions{display:grid;grid-template-columns:minmax(100px,.7fr) minmax(0,1.3fr);gap:8px}
-.send{background:var(--green);color:#fff}.cancel{background:#e5e7eb;color:#111827}
-.notice{font-size:11px;color:#64748b;margin-top:8px;line-height:1.5}
-
-/* REQUEST HISTORY */
-.req{
-  border:1px solid var(--line);border-radius:11px;padding:12px;
-  margin-top:10px;background:#fff;min-width:0
-}
-.req-top{
-  display:flex;justify-content:space-between;gap:10px;align-items:flex-start;
-  min-width:0
-}
-.req-top>div{min-width:0;overflow-wrap:anywhere}
-.badge{
-  font-size:10px;font-weight:900;padding:5px 8px;border-radius:999px;
-  white-space:nowrap;flex:0 0 auto
-}
-.pending{background:#fef3c7;color:#92400e}
-.approved{background:#dcfce7;color:#166534}
-.rejected{background:#fee2e2;color:#991b1b}
-.req small{color:#64748b}
-.req-detail{margin-top:8px;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
-
-/* TOKEN BOX RESPONSIVE */
-.token{
-  margin-top:9px;padding:10px;border-radius:9px;
-  background:#ecfdf5;border:1px solid #86efac;min-width:0
-}
-.token-head{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:8px;margin-bottom:6px;min-width:0
-}
-.token-head-title{
-  font-size:10px;color:#166534;font-weight:800;min-width:0;
-  overflow-wrap:anywhere
-}
-.copy-selected{
-  background:#111827;color:#fff;border-radius:7px;padding:7px 9px;
-  box-shadow:2px 2px 0 #000;font-size:10px;white-space:nowrap;
-  flex:0 0 auto
-}
-.copy-selected.copied{background:#16a34a}
-.token-row{
-  display:grid;grid-template-columns:24px minmax(0,1fr) auto;
-  align-items:center;gap:8px;padding:7px 0;min-width:0
-}
-.token-row+.token-row{border-top:1px solid #bbf7d0}
-.token-check{
-  width:21px!important;height:21px!important;min-height:21px!important;
-  flex:0 0 21px;margin:0;padding:0;accent-color:#16a34a;
-  box-shadow:none;cursor:pointer;justify-self:center
-}
-.token-code{
-  min-width:0;font-size:16px;font-weight:900;word-break:break-all;
-  overflow-wrap:anywhere;font-family:monospace;line-height:1.35
-}
-.copy-one{
-  flex:0 0 auto;background:#fff;color:#111827;border:1px solid #111827;
-  border-radius:7px;padding:6px 8px;box-shadow:2px 2px 0 #111827;
-  font-size:10px;white-space:nowrap
-}
-.copy-one.copied{background:#dcfce7;color:#166534}
-
-/* TOKEN RESELLER: LOGIKA SAMA DENGAN SALDO-TOKEN */
-.token.reseller-owned{
-  background:#fff9db;
-  border:2px solid #f2c94c;
-}
-.token.reseller-owned .token-head-title{color:#92400e}
-.reseller-token-badge{
-  display:inline-block;
-  margin:0 0 8px;
-  padding:5px 8px;
-  border-radius:999px;
-  background:#ffc107;
-  color:#111827;
-  font-size:10px;
-  font-weight:900;
-}
-.reseller-token-note{
-  margin-top:8px;
-  padding:8px 9px;
-  border-radius:9px;
-  background:#fff3b0;
-  color:#7c4a03;
-  font-size:10px;
-  line-height:1.45;
-  font-weight:800;
-}
-body.dark .token.reseller-owned{
-  background:#332b0b;
-  border-color:#eab308;
-}
-body.dark .reseller-token-badge{background:#eab308;color:#111827}
-body.dark .reseller-token-note{background:#453a0b;color:#fde68a}
-
-.token-copy-info{
-  margin-top:7px;font-size:10px;color:#166534;font-weight:800;line-height:1.4
-}
-.empty,.loading{text-align:center;color:#64748b;font-size:12px;padding:18px}
-
-/* MODAL */
-.modal{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.62);
-  z-index:50;align-items:center;justify-content:center;padding:14px
-}
-.modal.show{display:flex}
-.modal-box{
-  width:min(430px,100%);max-height:90vh;overflow:auto;background:#fff;
-  border:2px solid #111827;border-radius:14px;padding:18px;
-  box-shadow:6px 6px 0 #111827
-}
-.modal-box h3{margin:0 0 8px}.modal-box p{font-size:13px;line-height:1.5;white-space:pre-line}
-.ok{width:100%;background:#111827;color:#fff}
-
-/* TABLET */
-@media(max-width:760px){
-  .wrap{width:100%;padding:12px}
-  .card{padding:14px}
-}
-
-/* HP */
-@media(max-width:600px){
-  header{min-height:64px;padding:8px 10px;gap:9px}
-  .logo{width:46px;height:46px;flex-basis:46px;border-radius:11px}
-  .head-title b{font-size:16px}
-  .head-title small{font-size:10px}
-  .head-actions{gap:6px}
-  .refresh-btn,.dark-btn{width:42px;height:42px;font-size:19px}
-  .identity,.buttons{grid-template-columns:1fr}
-  .buttons{gap:8px}
-  .request-box{padding:12px}
-  .actions{grid-template-columns:1fr 1.5fr}
-  .token-head{align-items:flex-start}
-  .token-head-title{font-size:9px}
-  .copy-selected{font-size:9px;padding:7px 8px}
-  .token-code{font-size:15px}
-  .copy-one{font-size:9px;padding:6px 7px}
-}
-
-/* HP KECIL */
-@media(max-width:400px){
-  header{padding:7px 8px;gap:7px}
-  .logo{width:42px;height:42px;flex-basis:42px}
-  .head-title b{font-size:14px}
-  .head-title small{font-size:9px}
-  .refresh-btn,.dark-btn{width:39px;height:39px;font-size:18px}
-  .wrap{padding:9px}
-  .card{padding:12px;border-radius:12px}
-  h2{font-size:17px}
-  .sub{font-size:11px}
-  .request-box{padding:10px}
-  .actions{grid-template-columns:1fr}
-  .cancel,.send{width:100%}
-  .req{padding:10px}
-  .req-top{gap:6px}
-  .badge{font-size:9px;padding:5px 6px}
-  .token{padding:8px}
-  .token-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
-  .token-code{font-size:13px}
-  .token-row{grid-template-columns:22px minmax(0,1fr);gap:7px}
-  .copy-one{
-    grid-column:2;justify-self:start;margin-top:2px;
-    padding:6px 9px;font-size:9px
-  }
-}
-
-/* HP SANGAT KECIL */
-@media(max-width:340px){
-  .head-title small{display:none}
-  .head-title b{font-size:13px}
-  .logo{width:40px;height:40px;flex-basis:40px}
-  .refresh-btn,.dark-btn{width:37px;height:37px}
-  .token-head{grid-template-columns:1fr}
-  .copy-selected{justify-self:start;margin-top:4px}
-}
-
-/* DARK MODE */
-body.dark{background:#0b0f14;color:#f3f4f6}
-body.dark .card,body.dark .req{background:#151b23;color:#f3f4f6;border-color:#000}
-body.dark .info,body.dark .request-box{background:#10161e;border-color:#334155}
-body.dark input,body.dark select,body.dark textarea{background:#0f141b;color:#f3f4f6;border-color:#334155}
-body.dark .modal-box{background:#151b23;color:#f3f4f6}
-body.dark .token{background:#0d3020;border-color:#22c55e}
-body.dark .token-row+.token-row{border-color:#166534}
-body.dark .copy-one{background:#151b23;color:#f3f4f6;border-color:#64748b}
+:root{--fx-bg:#eef2f6;--fx-card:#fff;--fx-border:#111827;--fx-radius:14px}
+*{box-sizing:border-box}body{margin:0;background:var(--fx-bg)!important;font-family:Arial,sans-serif}
+header{background:#111827;color:#fff;padding:10px 14px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;border-bottom:2px solid #000}
+.logo{width:52px;height:52px;background:#000;border-radius:14px;display:flex;align-items:center;justify-content:center;border:1px solid #334155}
+main{max-width:920px;margin:auto;padding:14px}
+.card{background:#fff;border:2px solid #111827;border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:4px 4px 0 #111827}
+.card-header{font-weight:900;border-bottom:2px solid #111827;padding-bottom:9px;margin-bottom:14px;display:flex;justify-content:space-between}
+label{font-size:12px;font-weight:800;color:#4b5563;margin-bottom:5px;display:block}
+input,select,textarea{width:100%;padding:11px;border:2px solid #111827;border-radius:9px;box-shadow:2px 2px 0 #111827}
+.produk-dropdown{position:absolute;left:0;right:0;top:100%;margin-top:5px;background:#fff;border:2px solid #111827;border-radius:10px;box-shadow:4px 4px 0 #111827;max-height:240px;overflow:auto;z-index:30;display:none}
+.produk-dropdown.show{display:block}
+.produk-item{padding:10px 12px;cursor:pointer;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between}
+.produk-item:hover{background:#f1f5f9}
+.rincian-table{width:100%;border-collapse:collapse;margin-top:8px;border:2px solid #111827;border-radius:10px;overflow:hidden;box-shadow:3px 3px 0 #111827}
+.rincian-table th{background:#f8fafc;font-size:10px;font-weight:900;text-align:left;padding:9px;border-bottom:1px solid #e5e7eb}
+.rincian-table td{padding:9px;border-bottom:1px solid #e5e7eb;font-size:12px}
+#manualToggle{width:18px;height:18px}
+#manualCheckboxRow{display:none}
+#manualCheckboxRow.show{display:flex}
+#manualSection{display:none}
+#manualSection.show{display:block}
+.info-box{border:2px solid #111827;border-radius:12px;overflow:hidden;background:#fff;box-shadow:3px 3px 0 #111827}
+.info-row{display:grid;grid-template-columns:150px 1fr;gap:10px;padding:10px 12px;border-bottom:1px solid #e5e7eb;align-items:center}
+.info-row span{color:#64748b;font-weight:800;font-size:12px}
+.info-row b{text-align:right;font-size:12px}
 </style>
-</head>
-<body>
-
-<header>
-  <div class="logo"><img src="logo.png" alt="FIXZY" onerror="this.style.display='none'"></div>
-  <div class="head-title">
-    <b>Request Token Reseller</b>
-    <small>Pengajuan token registrasi & perpanjangan</small>
-  </div>
-  <div class="head-actions">
-    <button id="refreshBtn" class="refresh-btn" type="button">↻</button>
-    <button id="darkBtn" class="dark-btn" type="button">☾</button>
-  </div>
-</header>
-
-<main class="wrap">
-<section class="card">
-  <h2>Akun Reseller</h2>
-  <div class="sub">Akun dibaca langsung dari sesi Firebase yang sama dengan Index. UID akun login dipakai sebagai identitas request.</div>
-
-  <div class="identity">
-    <div class="info"><span>Email</span><b id="email">Memuat...</b></div>
-    <div class="info"><span>Nama / Toko</span><b id="nama">Memuat...</b></div>
-    <div class="info"><span>Role</span><b id="role">RESELLER</b></div>
-    <div class="info"><span>Status Akun</span><b id="statusAkun">Memuat...</b></div>
-  </div>
-
-  <div class="buttons">
-    <button class="btn-reg" onclick="openRequest('registrasi')">🔑 Request Token Registrasi</button>
-    <button class="btn-ext" onclick="openRequest('perpanjangan')">♻️ Request Token Perpanjangan</button>
-  </div>
-
-  <div id="requestBox" class="request-box">
-    <h3 id="requestTitle" style="margin:0 0 10px">Request</h3>
-
-    <div class="form-row">
-      <label>Jenis Request</label>
-      <input id="jenisView" readonly>
-    </div>
-
-    <div id="planRow" class="form-row" style="display:none">
-      <label>PILIH MASA PERPANJANGAN</label>
-      <select id="planSelect">
-        <option value="">-- Pilih masa perpanjangan --</option>
-        <option value="3_bulan" data-days="90" data-price="50000">3 Bulan / 90 Hari — Rp 50.000</option>
-        <option value="6_bulan" data-days="180" data-price="80000">6 Bulan / 180 Hari — Rp 80.000</option>
-        <option value="12_bulan" data-days="360" data-price="120000">12 Bulan / 360 Hari — Rp 120.000</option>
-      </select>
-    </div>
-
-    <div id="planInfo" class="plan-info"></div>
-
-    <div class="form-row">
-      <label>JUMLAH TOKEN YANG DIMINTA</label>
-      <input id="jumlahRequest" type="number" min="1" step="1" value="" inputmode="numeric" placeholder="Masukkan jumlah token">
-    </div>
-
-    <div class="form-row">
-      <label>Catatan untuk Admin (opsional)</label>
-      <textarea id="catatan" placeholder="Contoh: mohon diproses..."></textarea>
-    </div>
-
-    <div class="price">
-      Tagihan perkiraan:
-      <span id="hargaView">Menunggu penetapan / persetujuan admin</span>
-      <small id="hargaInfo">Harga final ditetapkan berdasarkan data admin.</small>
-    </div>
-
-    <div class="actions">
-      <button class="cancel" type="button" onclick="closeRequest()">Batal</button>
-      <button class="send" type="button" onclick="kirimRequest()">📨 Kirim Request</button>
-    </div>
-
-    <div class="notice">Request menggunakan UID akun Firebase yang sedang login. Token tidak dibuat oleh halaman reseller. Token yang sudah diberikan ke reseller tetap berstatus belum terpakai sampai benar-benar digunakan.</div>
-  </div>
-</section>
-
-<section class="card">
-  <h2>Request Saya</h2>
-  <div class="sub">Setelah admin menyetujui, token tampil di sini dengan tanda kuning. Token tetap belum terpakai dan masih bisa digunakan untuk perpanjangan.</div>
-  <div id="requestList"><div class="loading">Memuat data...</div></div>
-</section>
-</main>
-
-<div class="modal" id="infoModal">
-  <div class="modal-box">
-    <h3 id="modalTitle">Info</h3>
-    <p id="modalText"></p>
-    <button class="ok" type="button" onclick="closeInfo()">OK</button>
-  </div>
-</div>
-
 <script type="module">
-import {initializeApp,getApps,getApp}
-  from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import {getAuth,onAuthStateChanged}
-  from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import {
-  getFirestore,collection,query,where,getDocs,addDoc,doc,getDoc,onSnapshot
-} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-
-const firebaseConfig={
-  apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",
-  authDomain:"fixzy-update.firebaseapp.com",
-  projectId:"fixzy-update",
-  storageBucket:"fixzy-update.firebasestorage.app",
-  messagingSenderId:"995892519622",
-  appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"
-};
-
-const app=getApps().length?getApp():initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
-
-let currentUid="";
-let currentEmail="";
-let profile={};
-let selectedJenis="";
-let unsub=null;
-const selectedCopyTokens=new Map();
-
-const $=id=>document.getElementById(id);
-
-function esc(v){
-  return String(v??"").replace(/[&<>"']/g,m=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[m]));
-}
-function rupiah(v){
-  const n=Number(v||0);
-  return n>0?"Rp "+n.toLocaleString("id-ID"):"Belum ditetapkan";
-}
-function showInfo(title,text){
-  $("modalTitle").textContent=title;
-  $("modalText").textContent=text;
-  $("infoModal").classList.add("show");
-}
-window.closeInfo=()=>$("infoModal").classList.remove("show");
-
-function getParentSession(){
-  try{
-    if(window.parent&&window.parent!==window){
-      const s=window.parent.fixzySession;
-      if(s?.uid)return s;
-    }
-  }catch(e){}
-  return null;
-}
-function applySession(s){
-  currentUid=String(s.uid||"");
-  currentEmail=String(s.profile?.email||s.email||"");
-  profile={...(s.profile||{})};
-  $("email").textContent=currentEmail||"-";
-  $("nama").textContent=
-    profile.namaKonter||profile.namaPemilik||profile.namaToko||
-    profile.nama||profile.displayName||profile.name||
-    currentEmail.split("@")[0]||"-";
-  $("role").textContent=String(s.role||profile.role||"reseller").toUpperCase();
-  $("statusAkun").textContent=profile.status||"aktif";
-}
-async function loadAuthDirect(){
-  const u=auth.currentUser;
-  if(!u)return false;
-  currentUid=u.uid;
-  currentEmail=u.email||"";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, getDoc, addDoc, updateDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyC_PcarMTT5Un7qfSLzf92o5OGn5rginsI",authDomain:"fixzy-update.firebaseapp.com",projectId:"fixzy-update",storageBucket:"fixzy-update.firebasestorage.app",messagingSenderId:"995892519622",appId:"1:995892519622:web:fa41047944d8e5b35d6dc7"};
+const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFirestore(app);
+let currentUser=null,ownerUid=null,konterName="",allProduk=[],rincianItems=[],karyawanList=[];
+onAuthStateChanged(auth,async u=>{
+  if(!u){if(window.parent!==window && window.parent && window.parent.fixzySession){return;}location.replace("login.html");return;}
+  currentUser=u;
+  document.getElementById('akunSide').textContent=u.email;
+  document.getElementById('akunLoginField').value=u.email;
   try{
     const snap=await getDoc(doc(db,"users",u.uid));
-    profile=snap.exists()?snap.data()||{}:{};
-  }catch(e){console.error("users/{UID}:",e);profile={}}
-  applySession({uid:u.uid,email:u.email||"",role:profile.role||"reseller",profile});
-  return true;
-}
-async function waitForIndexSession(){
-  for(let i=0;i<30;i++){
-    const s=getParentSession();
-    if(s){applySession(s);await listenRequests();return true}
-    if(await loadAuthDirect()){await listenRequests();return true}
-    await new Promise(r=>setTimeout(r,250));
-  }
-  $("email").textContent="-";$("nama").textContent="Belum login di Firebase";
-  $("role").textContent="RESELLER";$("statusAkun").textContent="Belum login";
-  $("requestList").innerHTML='<div class="empty">Sesi Firebase belum ditemukan.</div>';
-  return false;
-}
-function getTokens(x){
-  const arr=[];
-  if(Array.isArray(x.tokens))x.tokens.forEach(t=>arr.push(t));
-  [x.token,x.kodeToken,x.registrationToken].forEach(v=>{
-    if(Array.isArray(v))v.forEach(t=>arr.push(t));
-    else if(v)String(v).split(/\r?\n|[,;]+/).forEach(t=>arr.push(t.trim()));
-  });
-  return [...new Set(arr.map(v=>String(v||"").trim()).filter(Boolean))];
-}
-
-function isResellerOwnedTokenRecord(x){
-  const s=String(x.tokenStatus||x.statusToken||x.tokenState||"").toLowerCase();
-  return x.purchasedByReseller===true ||
-    x.soldToReseller===true ||
-    s==="dibeli_reseller" ||
-    s==="sold_reseller" ||
-    (getTokens(x).length>0 && String(x.requestStatus||x.status||"").toLowerCase().includes("approve"));
-}
-
-function requestDate(x){
-  try{if(x.createdAt?.toDate)return x.createdAt.toDate().toLocaleString("id-ID")}catch(e){}
-  return x.createdAtText||"";
-}
-function getSelectedCopySet(requestId){
-  if(!selectedCopyTokens.has(requestId))selectedCopyTokens.set(requestId,new Set());
-  return selectedCopyTokens.get(requestId);
-}
-function updateCopyButton(requestId){
-  const set=getSelectedCopySet(requestId);
-  const btn=document.getElementById(`copy-selected-${requestId}`);
-  const info=document.getElementById(`copy-info-${requestId}`);
-  if(btn){btn.textContent=set.size?`📋 Salin ${set.size} Dipilih`:"📋 Salin";btn.disabled=set.size===0}
-  if(info)info.textContent=set.size?`${set.size} token dipilih untuk disalin.`:"Centang token yang ingin disalin.";
-}
-window.toggleCopyToken=(requestId,index,checked)=>{
-  const set=getSelectedCopySet(requestId);
-  if(checked)set.add(index);else set.delete(index);
-  updateCopyButton(requestId);
-};
-window.copyOneToken=async(requestId,index)=>{
-  const list=window.__requestTokens?.[requestId]||[],token=list[index];
-  if(!token)return;
+    let p=snap.exists()?snap.data():{};
+    ownerUid=p.role==="owner"||p.isOwner?u.uid:(p.ownerUid||p.ownerId||u.uid);
+    konterName=p.namaKonter||p.namaToko||"FIXZY";
+    document.getElementById('konterField').value=konterName;
+    document.getElementById('roleSide').textContent=(p.role||'owner').toUpperCase();
+  }catch(e){ownerUid=u.uid;konterName="FIXZY";}
+  document.getElementById('tanggalField').valueAsDate=new Date();
+  autoGenerateNotaBarcode();await loadKaryawan();await loadProdukREFSERVISAN();
+});
+async function loadKaryawan(){
   try{
-    await navigator.clipboard.writeText(token);
-    const btn=document.getElementById(`copy-one-${requestId}-${index}`);
-    if(btn){
-      const old=btn.textContent;btn.textContent="✓ Tersalin";btn.classList.add("copied");
-      setTimeout(()=>{btn.textContent=old;btn.classList.remove("copied")},1200);
-    }
-  }catch(e){
-    showInfo("Gagal Menyalin","Browser tidak mengizinkan akses clipboard. Silakan tekan lama pada token lalu pilih Salin.");
-  }
-};
-window.copySelectedTokens=async requestId=>{
-  const list=window.__requestTokens?.[requestId]||[];
-  const set=getSelectedCopySet(requestId);
-  const selected=[...set].sort((a,b)=>a-b).map(i=>list[i]).filter(Boolean);
-  if(!selected.length){showInfo("Token Belum Dipilih","Centang minimal satu token terlebih dahulu.");return}
-  try{
-    await navigator.clipboard.writeText(selected.join("\n"));
-    const btn=document.getElementById(`copy-selected-${requestId}`);
-    if(btn){
-      btn.textContent="✓ Berhasil Disalin";btn.classList.add("copied");
-      setTimeout(()=>{btn.textContent=`📋 Salin ${selected.length} Dipilih`;btn.classList.remove("copied")},1500);
-    }
-  }catch(e){showInfo("Gagal Menyalin","Browser tidak mengizinkan akses clipboard. Silakan salin token satu per satu.")}
-};
-window.__requestTokens=Object.create(null);
-
-function renderRequests(list){
-  const el=$("requestList");
-  if(!list.length){el.innerHTML='<div class="empty">Belum ada request token.</div>';return}
-
-  el.innerHTML=list.map(x=>{
-    const raw=String(x.requestStatus||x.status||"pending").toLowerCase();
-    const cls=raw.includes("approve")||raw==="disetujui"?"approved":
-      raw.includes("tolak")||raw==="rejected"||raw==="ditolak"?"rejected":"pending";
-    const label=cls==="approved"?"DISETUJUI":cls==="rejected"?"DITOLAK":"MENUNGGU ADMIN";
-    const jenis=x.requestType==="perpanjangan"?"Perpanjangan":"Registrasi";
-    const jumlah=Number(x.jumlahRequest??x.jumlahTokenDiminta??1)||1;
-    const tagihan=x.jumlahTagihan??x.totalTagihan??x.amount??0;
-    const tokens=getTokens(x);
-    window.__requestTokens[x.id]=tokens;
-    const set=getSelectedCopySet(x.id);
-    [...set].forEach(i=>{if(i<0||i>=tokens.length)set.delete(i)});
-    const planLabel=x.perpanjanganLabel||x.masaPerpanjangan||"";
-    const planHtml=jenis==="Perpanjangan"&&planLabel
-      ?`<div class="req-detail" style="color:#92400e">Masa perpanjangan: <b>${esc(planLabel)}</b></div>`:"";
-    const tokenHtml=tokens.length?`
-      <div class="token reseller-owned">
-        <div class="token-head">
-          <div class="token-head-title">TOKEN ANDA • ${tokens.length} TOKEN</div>
-          <button id="copy-selected-${esc(x.id)}" class="copy-selected" type="button"
-            onclick="copySelectedTokens('${esc(x.id)}')" disabled>📋 Salin</button>
-        </div>
-        <div class="reseller-token-badge">🟡 DIBELI / DIBERIKAN KE RESELLER • BELUM TERPAKAI</div>
-        ${tokens.map((t,i)=>`
-          <div class="token-row">
-            <input class="token-check" type="checkbox"
-              onchange="toggleCopyToken('${esc(x.id)}',${i},this.checked)"
-              ${set.has(i)?"checked":""} aria-label="Pilih token">
-            <code class="token-code">${esc(t)}</code>
-            <button id="copy-one-${esc(x.id)}-${i}" class="copy-one" type="button"
-              onclick="copyOneToken('${esc(x.id)}',${i})">Salin</button>
-          </div>
-        `).join("")}
-        <div id="copy-info-${esc(x.id)}" class="token-copy-info">
-          ${set.size?`${set.size} token dipilih untuk disalin.`:"Centang token yang ingin disalin."}
-        </div>
-        <div class="reseller-token-note">♻️ <b>TOKEN MASIH BISA DIPAKAI UNTUK PERPANJANGAN.</b> Status tetap belum terpakai sampai token benar-benar digunakan pada proses aktivasi/perpanjangan.</div>
-      </div>`:"";
-    return `<div class="req">
-      <div class="req-top">
-        <div><b>Request Token ${esc(jenis)}</b><br><small>${esc(requestDate(x))}</small></div>
-        <span class="badge ${cls}">${label}</span>
-      </div>
-      ${planHtml}
-      <div class="req-detail">Jumlah: <b>${jumlah} Token</b>
-        ${Number(tagihan)>0?` • Tagihan: <b>${rupiah(tagihan)}</b>`:""}
-      </div>
-      ${x.catatan?`<div class="req-detail" style="color:#64748b">Catatan: ${esc(x.catatan)}</div>`:""}
-      ${x.adminNote?`<div class="req-detail" style="color:#166534">Admin: ${esc(x.adminNote)}</div>`:""}
-      ${tokenHtml}
-    </div>`;
-  }).join("");
-  list.forEach(x=>updateCopyButton(x.id));
+    const q=await getDocs(query(collection(db,"users"),where("ownerUid","==",ownerUid)));
+    const list=[];q.forEach(d=>{const data=d.data();list.push({nama:data.nama||data.email||d.id});});
+    list.unshift({nama:currentUser.email.split('@')[0]});
+    const seen=new Set();karyawanList=list.filter(k=>{const key=k.nama.toLowerCase();if(seen.has(key)) return false;seen.add(key);return true;});
+    document.getElementById('teknisiSelect').innerHTML=karyawanList.map(k=>`<option value="${k.nama}">${k.nama}</option>`).join('');
+  }catch(e){}
 }
-
-async function getExistingRequests(){
-  if(!currentUid)return [];
-  const q=query(collection(db,"registrationTokens"),where("resellerUid","==",currentUid));
-  const snap=await getDocs(q),list=[];
-  snap.forEach(d=>list.push({id:d.id,...d.data()}));
-  list.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-  return list;
-}
-async function listenRequests(){
-  if(unsub){try{unsub()}catch(e){}unsub=null}
-  if(!currentUid)return;
+async function loadProdukREFSERVISAN(){
   try{
-    const q=query(collection(db,"registrationTokens"),where("resellerUid","==",currentUid));
-    unsub=onSnapshot(q,snap=>{
-      const list=[];snap.forEach(d=>list.push({id:d.id,...d.data()}));
-      list.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-      renderRequests(list);
-    },async err=>{
-      console.error("Listener:",err);
-      try{renderRequests(await getExistingRequests())}catch(e){renderRequests([])}
+    allProduk=[];
+    const snap=await getDocs(collection(db,"stok"));
+    const map=new Map();
+    snap.forEach(d=>{
+      const data=d.data()||{};
+      const stokVal=Number(data.sisa??data.sisaStok??data.stokTersedia??data.stok??0)||0;
+      const produk={id:d.id,_stok:stokVal,_col:"stok",...data};
+      const key=String(data.kode||data.barcode||data.nama||d.id).toLowerCase().trim();
+      const old=map.get(key);
+      if(!old||produk._stok>old._stok) map.set(key,produk);
     });
-  }catch(e){
-    console.error("Listener gagal:",e);
-    try{renderRequests(await getExistingRequests())}catch(x){renderRequests([])}
-  }
-}
-async function loadHarga(jenis){
-  const ids=jenis==="registrasi"?["tokenRegistrasi","registrasi","token"]:["tokenPerpanjangan","perpanjangan","token"];
-  for(const col of ["pengaturan","settings","tokenSettings"]){
-    for(const id of ids){
-      try{
-        const s=await getDoc(doc(db,col,id));if(!s.exists())continue;
-        const d=s.data()||{};
-        const v=jenis==="registrasi"
-          ?(d.hargaRegistrasi??d.hargaTokenRegistrasi??d.hargaToken??d.harga)
-          :(d.hargaPerpanjangan??d.hargaTokenPerpanjangan??d.hargaToken??d.harga);
-        if(Number(v)>0)return Number(v);
-      }catch(e){}
+    allProduk=Array.from(map.values());
+    const info=document.getElementById('produkInfo');
+    if(allProduk.length===0){
+      info.textContent='Tidak ada produk stok - centang manual';
+      document.getElementById('manualCheckboxRow').classList.add('show');
+      document.getElementById('manualToggle').checked=true;
+      document.getElementById('manualSection').classList.add('show');
+    }else{
+      info.textContent=`${allProduk.length} produk • Total stok ${allProduk.reduce((s,p)=>s+Number(p._stok||0),0)} • Ref Input Servisan`;
+      document.getElementById('manualCheckboxRow').classList.remove('show');
+      document.getElementById('manualSection').classList.remove('show');
+      document.getElementById('manualToggle').checked=false;
     }
-  }
-  return 0;
+  }catch(e){document.getElementById('produkInfo').textContent='Gagal baca produk: '+e.message;}
 }
-function getQuantity(forSubmit=false){
-  const raw=String($("jumlahRequest").value||"").trim();
-  if(raw==="")return forSubmit?0:null;
-  const n=Number(raw);
-  if(!Number.isSafeInteger(n)||n<1)return forSubmit?0:null;
-  return n;
+function filterProduk(keyword){
+  const kw=(keyword||'').toLowerCase().trim();
+  let filtered=allProduk;
+  if(kw){filtered=allProduk.filter(p=>{const nama=(p.nama||'').toLowerCase();const kode=(p.kode||'').toLowerCase();return nama.includes(kw)||kode.includes(kw);});}
+  showProdukDropdown(filtered);
 }
-function getSelectedPlan(){
-  if(selectedJenis!=="perpanjangan")return null;
-  const select=$("planSelect"),opt=select.options[select.selectedIndex];
-  if(!opt||!opt.value)return null;
-  return {value:opt.value,label:opt.textContent.trim(),days:Number(opt.dataset.days||0),price:Number(opt.dataset.price||0)};
+window.filterProduk=filterProduk;
+function showProdukDropdown(list){
+  const wrap=document.getElementById('produkSearch').parentElement;
+  let dd=wrap.querySelector('.produk-dropdown');
+  if(!dd){dd=document.createElement('div');dd.className='produk-dropdown';wrap.style.position='relative';wrap.appendChild(dd);}
+  if(list.length===0){dd.innerHTML=`<div style="padding:12px;color:#94a3b8;text-align:center">Tidak ada produk - centang manual</div>`;}
+  else{dd.innerHTML=list.slice(0,80).map(p=>{const nama=p.nama||'-';const harga=p.harga||0;const stok=Number(p._stok||0);return `<div class="produk-item" data-id="${p.id}"><div><b>${nama}</b><br><small style="color:${stok<=0?'#f59e0b':'#16a34a'}">Stok: ${stok}</small></div><div>Rp ${Number(harga).toLocaleString('id-ID')}</div></div>`;}).join('');}
+  dd.classList.add('show');
+  dd.querySelectorAll('.produk-item').forEach(el=>{el.addEventListener('click',()=>{const prod=allProduk.find(x=>x.id===el.dataset.id);if(prod) selectProdukAuto(prod);dd.classList.remove('show');});});
 }
-function updatePlanUI(){
-  if(selectedJenis!=="perpanjangan"){
-    $("planRow").style.display="none";$("planInfo").classList.remove("show");$("planInfo").innerHTML="";return;
-  }
-  $("planRow").style.display="block";
-  const plan=getSelectedPlan();
-  if(!plan){
-    $("planInfo").classList.remove("show");$("planInfo").innerHTML="";
-    $("hargaView").textContent="Pilih masa perpanjangan";
-    $("hargaInfo").textContent="Pilih 3, 6, atau 12 bulan sebelum menentukan tagihan.";return;
-  }
-  $("planInfo").classList.add("show");
-  $("planInfo").innerHTML=`Pilihan: <b>${esc(plan.label)}</b><br>Harga: <b>${rupiah(plan.price)}</b> per token • Masa aktif: <b>${plan.days} hari</b>`;
-  updateHargaView();
+function hideProdukDropdown(){const dd=document.querySelector('.produk-dropdown');if(dd) dd.classList.remove('show');}
+function selectProdukAuto(prod){
+  document.getElementById('produkSearch').value=prod.nama||'';
+  document.getElementById('produkNamaAuto').value=prod.nama||'';
+  document.getElementById('hargaAuto').value=prod.harga||prod.hargaJual||0;
+  document.getElementById('modalAuto').value=prod.modal||prod.hargaBeli||0;
+  document.getElementById('qtyAuto').value=1;
+  document.getElementById('produkNamaAuto').setAttribute('data-id',prod.id);
+  document.getElementById('produkNamaAuto').setAttribute('data-stok',prod._stok);
+  document.getElementById('barcodeField').value=prod.barcode||document.getElementById('barcodeField').value;
+  hitungSubtotalAuto();
 }
-async function updateHargaView(){
-  if(!selectedJenis)return;
-  const qty=getQuantity(false);
-  if(selectedJenis==="perpanjangan"){
-    const plan=getSelectedPlan();
-    if(!plan){$("hargaView").textContent="Pilih masa perpanjangan";$("hargaInfo").textContent="Tagihan dihitung dari paket yang dipilih × jumlah token.";return}
-    if(!qty){$("hargaView").textContent=rupiah(plan.price)+" per token";$("hargaInfo").textContent=`Paket ${plan.days} hari. Masukkan jumlah token untuk melihat total tagihan.`;return}
-    $("hargaView").textContent=rupiah(plan.price*qty);
-    $("hargaInfo").textContent=`${rupiah(plan.price)} × ${qty} token • masa aktif ${plan.days} hari.`;return;
-  }
-  if(!qty){$("hargaView").textContent="Masukkan jumlah token";$("hargaInfo").textContent="Jumlah token dapat dikosongkan dan diisi kembali.";return}
-  const harga=await loadHarga(selectedJenis);
-  if(harga>0){
-    $("hargaView").textContent=rupiah(harga*qty);
-    $("hargaInfo").textContent=`${rupiah(harga)} × ${qty} token. Tagihan final mengikuti persetujuan admin.`;
+function hitungSubtotalAuto(){document.getElementById('subtotalAuto').value=Number(document.getElementById('hargaAuto').value||0)*Number(document.getElementById('qtyAuto').value||0);}
+function hitungSubtotalManual(){document.getElementById('subtotalManual').value=Number(document.getElementById('hargaManual').value||0)*Number(document.getElementById('qtyManual').value||0);}
+window.toggleManual=()=>{
+  const chk=document.getElementById('manualToggle').checked;
+  document.getElementById('manualWrap').style.display=chk?'grid':'none';
+  document.getElementById('autoProdukWrap').style.display=chk?'none':'block';
+  if(chk) document.getElementById('manualSection').classList.add('show');
+}
+window.tambahProduk=()=>{
+  const isManual=document.getElementById('manualToggle').checked;
+  let item=null;
+  if(isManual){
+    const nama=document.getElementById('produkNamaManual').value.trim();
+    if(!nama){alert('Nama manual wajib');return;}
+    const harga=Number(document.getElementById('hargaManual').value||0);
+    const qty=Number(document.getElementById('qtyManual').value||0);
+    item={nama,barcode:document.getElementById('barcodeManual').value||'',harga,modal:harga,qty,subtotal:harga*qty,type:'manual'};
   }else{
-    $("hargaView").textContent="Menunggu penetapan / persetujuan admin";
-    $("hargaInfo").textContent="Harga final ditetapkan berdasarkan data admin.";
+    const nama=document.getElementById('produkNamaAuto').value||document.getElementById('produkSearch').value;
+    if(!nama){alert('Pilih produk');return;}
+    const harga=Number(document.getElementById('hargaAuto').value||0);
+    const qty=Number(document.getElementById('qtyAuto').value||0);
+    const prodId=document.getElementById('produkNamaAuto').getAttribute('data-id')||'';
+    item={nama,barcode:document.getElementById('barcodeField').value,harga,modal:document.getElementById('modalAuto').value||harga,qty,subtotal:harga*qty,type:'auto',productId:prodId};
   }
+  rincianItems.push(item);renderRincian();
+  document.getElementById('produkSearch').value='';document.getElementById('produkNamaAuto').value='';document.getElementById('hargaAuto').value='';document.getElementById('modalAuto').value='';document.getElementById('qtyAuto').value=1;document.getElementById('subtotalAuto').value='';
+  document.getElementById('produkNamaManual').value='';document.getElementById('barcodeManual').value='';document.getElementById('hargaManual').value='';document.getElementById('qtyManual').value=1;document.getElementById('subtotalManual').value='';
 }
-window.openRequest=async jenis=>{
-  if(!currentUid){showInfo("Sesi Belum Siap","Firebase belum menemukan akun reseller. Pastikan login di Index sudah aktif.");return}
-  selectedJenis=jenis;
-  $("requestTitle").textContent=jenis==="registrasi"?"Request Token Registrasi":"Request Token Perpanjangan";
-  $("jenisView").value=jenis==="registrasi"?"Token Registrasi":"Token Perpanjangan";
-  $("jumlahRequest").value="";$("catatan").value="";$("planSelect").value="";
-  $("planRow").style.display=jenis==="perpanjangan"?"block":"none";
-  $("planInfo").classList.remove("show");$("planInfo").innerHTML="";
-  $("hargaView").textContent=jenis==="perpanjangan"?"Pilih masa perpanjangan":"Masukkan jumlah token";
-  $("hargaInfo").textContent=jenis==="perpanjangan"?"Pilih paket 3, 6, atau 12 bulan sebelum request.":"Jumlah token wajib diisi sebelum request.";
-  $("requestBox").classList.add("show");
-  $("requestBox").scrollIntoView({behavior:"smooth",block:"nearest"});
-};
-window.closeRequest=()=>{$("requestBox").classList.remove("show");selectedJenis=""};
-$("jumlahRequest").addEventListener("input",updateHargaView);
-$("planSelect").addEventListener("change",updatePlanUI);
-
-window.kirimRequest=async()=>{
-  if(!currentUid){showInfo("Sesi Belum Siap","Akun Firebase belum terbaca. Silakan kembali ke Index dan pastikan login.");return}
-  if(!selectedJenis)return;
-  const qty=getQuantity(true);
-  if(!qty){showInfo("Jumlah Token Belum Diisi","Masukkan jumlah token minimal 1.");$("jumlahRequest").focus();return}
-  let plan=null;
-  if(selectedJenis==="perpanjangan"){
-    plan=getSelectedPlan();
-    if(!plan){showInfo("Masa Perpanjangan Belum Dipilih","Pilih salah satu paket: 3 bulan / 90 hari Rp 50.000, 6 bulan / 180 hari Rp 80.000, atau 12 bulan / 360 hari Rp 120.000.");$("planSelect").focus();return}
-  }
-  const status=String(profile.status||"aktif").toLowerCase();
-  if(["nonaktif","inactive","disabled","blocked","rejected"].includes(status)){
-    showInfo("Akun Nonaktif","Akun reseller sedang nonaktif. Request token tidak dapat dikirim.");return;
-  }
-  const catatan=$("catatan").value.trim(),btn=document.querySelector(".send");
-  btn.disabled=true;btn.textContent="Mengirim...";
-  try{
-    let harga=0,jumlahTagihan=0;
-    if(selectedJenis==="perpanjangan"){harga=plan.price;jumlahTagihan=plan.price*qty}
-    else{harga=await loadHarga(selectedJenis);jumlahTagihan=harga>0?harga*qty:0}
-    const nama=profile.namaKonter||profile.namaPemilik||profile.namaToko||profile.nama||profile.displayName||profile.name||currentEmail.split("@")[0]||"Reseller";
-    const now=new Date();
-    await addDoc(collection(db,"registrationTokens"),{
-      requestType:selectedJenis,requestStatus:"pending",status:"pending",
-      resellerUid:currentUid,resellerEmail:currentEmail,resellerNama:nama,
-      role:String(profile.role||"reseller").toLowerCase(),
-      ownerUid:profile.ownerUid||profile.ownerId||"",ownerId:profile.ownerId||profile.ownerUid||"",
-      catatan,jumlahRequest:qty,jumlahTokenDiminta:qty,hargaToken:harga||0,
-      jumlahTagihan,totalTagihan:jumlahTagihan,
-      masaPerpanjangan:selectedJenis==="perpanjangan"?plan.value:"",
-      perpanjanganLabel:selectedJenis==="perpanjangan"?plan.label:"",
-      perpanjanganHari:selectedJenis==="perpanjangan"?plan.days:0,
-      hargaPerpanjangan:selectedJenis==="perpanjangan"?plan.price:0,
-      token:"",kodeToken:"",registrationToken:"",tokens:[],adminNote:"",
-      createdAt:now,createdAtText:now.toLocaleString("id-ID"),updatedAt:now,
-      notificationAdmin:true,notificationReseller:false,
-      notificationText:`Request token ${selectedJenis} sebanyak ${qty} token${selectedJenis==="perpanjangan"?" ("+plan.days+" hari)":""} dari ${nama}`
-    });
-    const sentType=selectedJenis,sentDays=plan?.days||0,sentPrice=plan?.price||0;
-    closeRequest();
-    showInfo("Request Terkirim",sentType==="perpanjangan"
-      ?`Request ${qty} token paket ${sentDays} hari (${rupiah(sentPrice)}/token) sudah dikirim ke admin. Perkiraan tagihan ${rupiah(jumlahTagihan)}.`
-      :`Request ${sentType} sebanyak ${qty} token sudah dikirim ke admin.`);
-  }catch(e){
-    console.error("Kirim request:",e);
-    let msg=e?.message||String(e);
-    if(e?.code==="permission-denied")msg="Firestore Rules menolak penulisan ke registrationTokens untuk UID akun ini.";
-    showInfo("Gagal Mengirim Request",msg);
-  }finally{btn.disabled=false;btn.textContent="📨 Kirim Request"}
-};
-
-async function refreshData(){
-  const btn=$("refreshBtn");btn.disabled=true;btn.classList.add("loading");
-  try{
-    const s=getParentSession();if(s)applySession(s);else await loadAuthDirect();
-    if(!currentUid){showInfo("Sesi Belum Siap","Akun Firebase belum terbaca dari Index.");return}
-    await listenRequests();showInfo("Berhasil","Data akun dan request sudah diperbarui.");
-  }catch(e){showInfo("Refresh Gagal",e?.message||String(e))}
-  finally{btn.disabled=false;btn.classList.remove("loading")}
-}
-$("refreshBtn").onclick=refreshData;
-$("darkBtn").onclick=()=>document.body.classList.toggle("dark");
-onAuthStateChanged(auth,async u=>{if(!currentUid&&u){await loadAuthDirect();await listenRequests()}});
-waitForIndexSession();
-</script>
-</body>
-</html>
+function renderRincian(){
+  const tbody=document.getElementById('rincianBody');
+  if(rincianItems.length===0){tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:16px">Belum ada produk</td></tr>`;document.getElement
