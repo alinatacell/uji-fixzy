@@ -135,7 +135,8 @@ import {
 import {
   getFirestore,
   doc,
-  getDoc
+  getDoc,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 
@@ -190,18 +191,47 @@ form.addEventListener("submit",async(e)=>{
     const cred=await signInWithEmailAndPassword(auth,email,password);
     const uid=cred.user.uid;
 
-    // Verifikasi profil mengikuti Rules baru.
-    const snap=await getDoc(doc(db,"users",uid));
+    // =========================================================
+    // SUPERADMIN BOLEH LOGIN WALAU FIRESTORE MASIH KOSONG
+    // =========================================================
+    // Akun superadmin utama ditentukan dari email Firebase Auth.
+    // Jika dokumen users/{uid} belum ada, buat profil dasar
+    // otomatis agar halaman index berikutnya juga menemukan profil.
+    const SUPERADMIN_EMAIL="servicehpmaja@gmail.com";
+    const isSuperAdminLogin=(String(cred.user.email||"").trim().toLowerCase()===SUPERADMIN_EMAIL);
 
-    if(!snap.exists()){
-      await signOut(auth);
-      tampilPopup("Fixzy","Data profil akun tidak ditemukan.");
-      return;
+    let snap=await getDoc(doc(db,"users",uid));
+
+    if(isSuperAdminLogin){
+      if(!snap.exists()){
+        const superAdminData={
+          email: SUPERADMIN_EMAIL,
+          role: "superadmin",
+          status: "aktif",
+          ownerUid: uid,
+          ownerId: uid,
+          ownerEmail: SUPERADMIN_EMAIL,
+          namaPemilik: "Super Admin",
+          namaKonter: "FIXZY",
+          dibuatOtomatis: true,
+          dibuatOleh: SUPERADMIN_EMAIL
+        };
+
+        await setDoc(doc(db,"users",uid),superAdminData);
+        snap=await getDoc(doc(db,"users",uid));
+      }
+    }else{
+      // Akun biasa tetap wajib mempunyai profil users/{uid}.
+      if(!snap.exists()){
+        await signOut(auth);
+        tampilPopup("Fixzy","Data profil akun tidak ditemukan.");
+        return;
+      }
     }
 
     const data=snap.data()||{};
-    const role=data.role||"";
-    const status=data.status||"";
+    const role=isSuperAdminLogin ? "superadmin" : (data.role||"");
+    const status=isSuperAdminLogin ? "aktif" : (data.status||"");
 
     if(!["owner","employee","reseller","superadmin","karyawan","iprem"].includes(role)){
       await signOut(auth);
@@ -231,7 +261,7 @@ form.addEventListener("submit",async(e)=>{
       if(!Number.isNaN(d.getTime())) expDate=d;
     }
 
-    if(expDate && new Date()>expDate){
+    if(!isSuperAdminLogin && expDate && new Date()>expDate){
       await signOut(auth);
 
       if(data.perpanjanganStatus==="pending"){
@@ -252,9 +282,11 @@ form.addEventListener("submit",async(e)=>{
     // Tidak memakai localStorage/sessionStorage.
     tampilPopup(
       "Fixzy",
-      `Halo ${data.namaKonter||data.namaPemilik||email}!\nAkun aktif sampai ${
-        expDate ? expDate.toLocaleDateString("id-ID") : "-"
-      }`
+      isSuperAdminLogin
+        ? "Halo Super Admin FIXZY!\nLogin berhasil."
+        : `Halo ${data.namaKonter||data.namaPemilik||email}!\nAkun aktif sampai ${
+            expDate ? expDate.toLocaleDateString("id-ID") : "-"
+          }`
     );
 
     // Beri waktu popup tampil, lalu kembali ke index.
